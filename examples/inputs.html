@@ -68,34 +68,32 @@ AddActivity.prototype.Execute = function (context, done) {
 
         <h2>Demo</h2>
 
+        <table class="table-condensed" style="width:auto;">
+            <tr>
+                <td><input type="number" id="number1" value="" /></td>
+                <td>+</td>
+                <td><input type="number" id="number2" value="" /></td>
+                <td>=</td>
+                <td><div id="result">?</div></td>
+            </tr>
+            <tr>
+                <td colspan="5"><input id="button" type="button" value="calculate" /></td>
+            </tr>
+        </table>
+
+        <h2>Source</h2>
+
         <div>
 
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation" class="active"><a href="#demo" aria-controls="demo" role="tab" data-toggle="tab">Demo</a></li>
                 <li role="presentation"><a href="#htmlfile" aria-controls="htmlfile" role="tab" data-toggle="tab">inputs.html</a></li>
-                <li role="presentation"><a href="#typescriptfile" aria-controls="typescriptfile" role="tab" data-toggle="tab">inputs.ts</a></li>
+                <li role="presentation" class="active"><a href="#typescriptfile" aria-controls="typescriptfile" role="tab" data-toggle="tab">inputs.ts</a></li>
                 <li role="presentation"><a href="#javascriptfile" aria-controls="javascriptfile" role="tab" data-toggle="tab">inputs.js</a></li>
             </ul>
 
             <!-- Tab panes -->
             <div class="tab-content">
-                <div role="tabpanel" class="tab-pane active" id="demo">
-
-                    <table class="table-condensed" style="width:auto;">
-                        <tr>
-                            <td><input type="number" id="number1" value="" /></td>
-                            <td>+</td>
-                            <td><input type="number" id="number2" value="" /></td>
-                            <td>=</td>
-                            <td><div id="result">?</div></td>
-                        </tr>
-                        <tr>
-                            <td colspan="5"><input id="button" type="button" value="calculate" /></td>
-                        </tr>
-                    </table>
-
-                </div>
                 <div role="tabpanel" class="tab-pane" id="htmlfile">
 <pre>
 &lt;html lang="en"&gt;
@@ -123,7 +121,7 @@ AddActivity.prototype.Execute = function (context, done) {
 &lt;/html&gt;
 </pre>
                 </div>
-                <div role="tabpanel" class="tab-pane" id="typescriptfile">
+                <div role="tabpanel" class="tab-pane active" id="typescriptfile">
 
 <pre>
 /// &lt;reference path="../../Scripts/typings/jquery/jquery.d.ts" /&gt;
@@ -182,6 +180,7 @@ var wfjsExample;
 (function (wfjsExample) {
     var Inputs;
     (function (Inputs) {
+
         var Application = (function () {
             function Application(number1, number2, button, result) {
                 var _this = this;
@@ -191,13 +190,16 @@ var wfjsExample;
                 this.result = result;
                 this.button.click(function () { return _this.Click(); });
             }
+
             Application.prototype.Click = function () {
+
                 var _this = this;
                 var activity = new wfjs.Activities.AddActivity();
                 var inputs = {
                     'number1': parseFloat(this.number1.val()) || 0,
                     'number2': parseFloat(this.number2.val()) || 0
                 };
+
                 wfjs.WorkflowInvoker.CreateActivity(activity).Inputs(inputs).Invoke(function (err, ctx) {
                     if (err != null) {
                         _this.result.text('Finished with error: ' + err.toString());
@@ -207,8 +209,11 @@ var wfjsExample;
                     }
                 });
             };
+
             return Application;
+
         })();
+
         window.onload = function () {
             var app = new Application($('#number1'), $('#number2'), $('#button'), $('#result'));
         };
