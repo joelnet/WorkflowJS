@@ -20,11 +20,12 @@
         next: string;
     }
 
-    export interface IDecision extends MapBase
+    export interface IDecisionActivity extends MapBase
     {
         condition: string;
         ontrue: string;
         onfalse: string;
+        next: string;
     }
 
     export interface IAssignActivity extends MapBase

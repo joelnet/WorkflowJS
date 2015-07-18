@@ -50,54 +50,49 @@
         {
             var innerContext = Workflow._CreateNextActivityContext(context);
 
+            var next = (err, innerContext: ActivityContext) =>
+            {
+                if (err != null)
+                {
+                    return done(err);
+                }
+
+                var nextActivity = Workflow._GetNextActivity(activity, this._activities);
+                console.log('nextActivity', nextActivity);
+
+                var activityExecute = nextActivity != null
+                    ? this._ExecuteLoop.bind(this)
+                    : (innerContext, nextActivity, callback) => { callback(); };
+
+                activityExecute(innerContext, nextActivity, err =>
+                {
+                    ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                    done(err);
+                });
+            }
+
             if ((<ActivityMap>activity).activity != null)
             {
-                this._ExecuteActivity(innerContext, <ActivityMap>activity, err =>
-                {
-                    if (err != null)
-                    {
-                        return done(err);
-                    }
-
-                    var nextActivity = Workflow._GetNextActivity(activity, this._activities);
-
-                    var fin = (err?: Error) =>
-                    {
-                        ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
-                        done(err);
-                    };
-
-                    if (nextActivity != null)
-                    {
-                        this._ExecuteLoop(innerContext, nextActivity, fin);
-                    }
-                    else
-                    {
-                        fin();
-                    }
-                });
+                this._ExecuteActivity(innerContext, <ActivityMap>activity, err => next(err, innerContext));
             }
             else if ((<IAssignActivity>activity).value != null && (<IAssignActivity>activity).output != null)
             {
-                var assignActivity = <IAssignActivity>activity;
-
-                var values: Dictionary<any> = context.Inputs;
-                ObjectHelper.CopyProperties(context.Outputs, values);
-
-                context.Outputs[assignActivity.output] = EvalHelper.Eval(values, assignActivity.value);
-
-                done();
+                this._ExecuteAssign(context, <IAssignActivity>activity, err => next(err, context));
+            }
+            else if ((<IDecisionActivity>activity).condition != null)
+            {
+                this._ExecuteDecision(context, <IDecisionActivity>activity, err => next(err, context));
             }
             else
             {
-                done(new Error('Activity is not valid.'));
+                done(new Error(Resources.Error_Activity_Invalid));
             }
         }
 
         /**
          * _ExecuteActivity Executes the actual Activity.
          */
-        private _ExecuteActivity(context: ActivityContext, activity: ActivityMap, done: (err?: Error) => void)
+        private _ExecuteActivity(context: ActivityContext, activity: ActivityMap, done: (err?: Error) => void): void
         {
             var inputs = Workflow._GetInputs(context, activity.$inputs);
 
@@ -115,6 +110,60 @@
 
                     done(err);
                 });
+        }
+
+        /**
+         * _ExecuteDecision Evaluates the condition (to true or false) and executes next activity.
+         */
+        private _ExecuteDecision(context: ActivityContext, activity: IDecisionActivity, done: (err?: Error) => void): void
+        {
+            var err: Error = null;
+
+            try
+            {
+                var decisionActivity = <IDecisionActivity>activity;
+
+                var values: Dictionary<any> = context.Inputs;
+                ObjectHelper.CopyProperties(context.Outputs, values);
+
+                var condition: boolean = EvalHelper.Eval(values, decisionActivity.condition);
+
+                decisionActivity.next = condition ? decisionActivity.ontrue : decisionActivity.onfalse;
+            }
+            catch (ex)
+            {
+                err = ex;
+            }
+            finally
+            {
+                done(err);
+            }
+        }
+
+        /**
+         * _ExecuteAssign Assigns a value to an output variable.
+         */
+        private _ExecuteAssign(context: ActivityContext, activity: IAssignActivity, done: (err?: Error) => void): void
+        {
+            var err: Error = null;
+
+            try
+            {
+                var assignActivity = <IAssignActivity>activity;
+
+                var values: Dictionary<any> = context.Inputs;
+                ObjectHelper.CopyProperties(context.Outputs, values);
+
+                context.Outputs[assignActivity.output] = EvalHelper.Eval(values, assignActivity.value);
+            }
+            catch (ex)
+            {
+                err = ex;
+            }
+            finally
+            {
+                done(err);
+            }
         }
 
         /**

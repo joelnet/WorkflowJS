@@ -30,33 +30,31 @@ var wfjs;
         Workflow.prototype._ExecuteLoop = function (context, activity, done) {
             var _this = this;
             var innerContext = Workflow._CreateNextActivityContext(context);
-            if (activity.activity != null) {
-                this._ExecuteActivity(innerContext, activity, function (err) {
-                    if (err != null) {
-                        return done(err);
-                    }
-                    var nextActivity = Workflow._GetNextActivity(activity, _this._activities);
-                    var fin = function (err) {
-                        wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
-                        done(err);
-                    };
-                    if (nextActivity != null) {
-                        _this._ExecuteLoop(innerContext, nextActivity, fin);
-                    }
-                    else {
-                        fin();
-                    }
+            var next = function (err, innerContext) {
+                if (err != null) {
+                    return done(err);
+                }
+                var nextActivity = Workflow._GetNextActivity(activity, _this._activities);
+                console.log('nextActivity', nextActivity);
+                var activityExecute = nextActivity != null ? _this._ExecuteLoop.bind(_this) : function (innerContext, nextActivity, callback) {
+                    callback();
+                };
+                activityExecute(innerContext, nextActivity, function (err) {
+                    wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                    done(err);
                 });
+            };
+            if (activity.activity != null) {
+                this._ExecuteActivity(innerContext, activity, function (err) { return next(err, innerContext); });
             }
             else if (activity.value != null && activity.output != null) {
-                var assignActivity = activity;
-                var values = context.Inputs;
-                wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
-                context.Outputs[assignActivity.output] = wfjs.EvalHelper.Eval(values, assignActivity.value);
-                done();
+                this._ExecuteAssign(context, activity, function (err) { return next(err, context); });
+            }
+            else if (activity.condition != null) {
+                this._ExecuteDecision(context, activity, function (err) { return next(err, context); });
             }
             else {
-                done(new Error('Activity is not valid.'));
+                done(new Error(wfjs.Resources.Error_Activity_Invalid));
             }
         };
         /**
@@ -71,6 +69,43 @@ var wfjs;
                 }
                 done(err);
             });
+        };
+        /**
+         * _ExecuteDecision Evaluates the condition (to true or false) and executes next activity.
+         */
+        Workflow.prototype._ExecuteDecision = function (context, activity, done) {
+            var err = null;
+            try {
+                var decisionActivity = activity;
+                var values = context.Inputs;
+                wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
+                var condition = wfjs.EvalHelper.Eval(values, decisionActivity.condition);
+                decisionActivity.next = condition ? decisionActivity.ontrue : decisionActivity.onfalse;
+            }
+            catch (ex) {
+                err = ex;
+            }
+            finally {
+                done(err);
+            }
+        };
+        /**
+         * _ExecuteAssign Assigns a value to an output variable.
+         */
+        Workflow.prototype._ExecuteAssign = function (context, activity, done) {
+            var err = null;
+            try {
+                var assignActivity = activity;
+                var values = context.Inputs;
+                wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
+                context.Outputs[assignActivity.output] = wfjs.EvalHelper.Eval(values, assignActivity.value);
+            }
+            catch (ex) {
+                err = ex;
+            }
+            finally {
+                done(err);
+            }
         };
         /**
          * _GetInputs Returns a collection of remapped inputs

@@ -8,7 +8,7 @@ var wfjsExample;
             }
             Application.prototype.Run = function () {
                 var _this = this;
-                var workflow = {
+                var flowchart = {
                     $outputs: ['result'],
                     activities: {
                         'GetUsersName': {
@@ -17,15 +17,24 @@ var wfjsExample;
                                 message: { value: 'What is your name?' }
                             },
                             $outputs: { 'result': 'name' },
-                            next: 'CreateMessage'
+                            next: 'Decision:IsCancelled'
                         },
-                        'CreateMessage': {
+                        'Decision:IsCancelled': {
+                            condition: 'this.name == null || this.name == ""',
+                            ontrue: 'CreateMessage:NameRefusal',
+                            onfalse: 'CreateMessage:Hello'
+                        },
+                        'CreateMessage:NameRefusal': {
                             output: 'result',
-                            value: '"Hello " + this.name + "!"'
+                            value: '"You did not enter a name!"',
+                        },
+                        'CreateMessage:Hello': {
+                            output: 'result',
+                            value: '"Hello " + this.name + "!"',
                         }
                     }
                 };
-                wfjs.WorkflowInvoker.CreateActivity(workflow).Extensions({
+                wfjs.WorkflowInvoker.CreateActivity(flowchart).Extensions({
                     "window": window
                 }).Invoke(function (err, ctx) {
                     if (err != null) {
