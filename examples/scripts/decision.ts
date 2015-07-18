@@ -11,46 +11,33 @@
         
         public Run()
         {
-            var inputs: wfjs.Dictionary<any> = {
-                'number': 123
-            };
-
-            this.AppendToElement(this.element, 'Actions: [AddActivity]');
-            this.AppendToElement(this.element, 'Inputs: ' + JSON.stringify(inputs));
-
-            var workflow: wfjs.IWorkflowMap = {
-                $inputs: ['number'],
-                $outputs: ['total'],
+            var workflow: wfjs.IFlowchartMap = {
+                $outputs: ['result'],
                 activities: 
                 {
-                    "Add 100":
+                    'GetUsersName':
                     {
-                        activity: new wfjs.Activities.AddActivity(),
+                        activity: new wfjs.Activities.PromptActivity(),
                         $inputs:
                         {
-                            'number1': { name: 'number' },
-                            'number2': { value: 100 }
+                            message: { value: 'What is your name?' }
                         },
-                        $outputs: { 'total': 'total' },
-                        next: "Multiply 2"
+                        $outputs: { 'result': 'name' },
+                        next: 'CreateMessage'
                     },
-                    "Multiply 2":
+                    'CreateMessage':
                     {
-                        activity: new wfjs.Activities.MultiplyActivity(),
-                        $inputs:
-                        {
-                            'number1': { name: 'total' },
-                            'number2': { value: 2 }
-                        },
-                        $outputs: { 'total': 'total' },
-                        next: null
+                        output: 'result',
+                        value: '"Hello " + this.name + "!"'
                     }
                 }
             };
 
             wfjs.WorkflowInvoker
                 .CreateActivity(workflow)
-                .Inputs(inputs)
+                .Extensions({
+                    "window": window
+                })
                 .Invoke((err, ctx) =>
                 {
                     if (err != null)

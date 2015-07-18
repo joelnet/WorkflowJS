@@ -5,10 +5,10 @@
         public $inputs: string[];
         public $outputs: string[];
 
-        private _activities: Dictionary<ActivityMap>;
+        private _activities: Dictionary<MapBase>;
         private _extensions: Dictionary<any>;
 
-        constructor(map: IWorkflowMap)
+        constructor(map: IFlowchartMap)
         {
             if (map == null)
             {
@@ -46,29 +46,52 @@
         /**
          * _ExecuteLoop Execution loop that executes every Activity.
          */
-        private _ExecuteLoop(context: ActivityContext, activity: ActivityMap, done: (err?: Error) => void): void
+        private _ExecuteLoop(context: ActivityContext, activity: MapBase, done: (err?: Error) => void): void
         {
             var innerContext = Workflow._CreateNextActivityContext(context);
 
-            this._ExecuteActivity(innerContext, activity, err =>
+            if ((<ActivityMap>activity).activity != null)
             {
-                var nextActivity = Workflow._GetNextActivity(activity, this._activities);
+                this._ExecuteActivity(innerContext, <ActivityMap>activity, err =>
+                {
+                    if (err != null)
+                    {
+                        return done(err);
+                    }
 
-                var innerDone = (err) =>
-                {
-                    ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
-                    done(err);
-                };
+                    var nextActivity = Workflow._GetNextActivity(activity, this._activities);
 
-                if (nextActivity != null)
-                {
-                    this._ExecuteLoop(innerContext, nextActivity, innerDone);
-                }
-                else
-                {
-                    innerDone(err);
-                }
-            });
+                    var fin = (err?: Error) =>
+                    {
+                        ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                        done(err);
+                    };
+
+                    if (nextActivity != null)
+                    {
+                        this._ExecuteLoop(innerContext, nextActivity, fin);
+                    }
+                    else
+                    {
+                        fin();
+                    }
+                });
+            }
+            else if ((<IAssignActivity>activity).value != null && (<IAssignActivity>activity).output != null)
+            {
+                var assignActivity = <IAssignActivity>activity;
+
+                var values: Dictionary<any> = context.Inputs;
+                ObjectHelper.CopyProperties(context.Outputs, values);
+
+                context.Outputs[assignActivity.output] = EvalHelper.Eval(values, assignActivity.value);
+
+                done();
+            }
+            else
+            {
+                done(new Error('Activity is not valid.'));
+            }
         }
 
         /**
@@ -147,7 +170,7 @@
         /**
          * _GetFirstActivity Gets the Activity to be executed first.
          */
-        private static _GetFirstActivity(activities: Dictionary<ActivityMap>): ActivityMap
+        private static _GetFirstActivity(activities: Dictionary<MapBase>): MapBase
         {
             var key: string = Object.keys(activities)[0];
             return activities[key];
@@ -156,14 +179,19 @@
         /**
          * _GetNextActivity returns the next Activity or null.
          */
-        private static _GetNextActivity(activity: ActivityMap, activities: Dictionary<ActivityMap>): ActivityMap
+        private static _GetNextActivity(activity: MapBase, activities: Dictionary<MapBase>): MapBase
         {
-            if (activity == null || activity.next == null)
+            if (activity == null)
             {
                 return null;
             }
 
-            return activities[activity.next] || null;
+            if ((<ActivityMap>activity).next != null)
+            {
+                return activities[(<ActivityMap>activity).next] || null
+            }
+
+            return null;
         }
 
         /**

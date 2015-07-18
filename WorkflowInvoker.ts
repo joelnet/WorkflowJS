@@ -6,7 +6,7 @@
         private _inputs: Dictionary<string> = null
         private _extensions: Dictionary<string> = null
 
-        constructor(activity: Activity | IWorkflowMap)
+        constructor(activity: Activity | IFlowchartMap)
         {
             if (activity == null)
             {
@@ -19,22 +19,22 @@
             }
             else
             {
-                this._activity = new Workflow(<IWorkflowMap>activity);
+                this._activity = new Workflow(<IFlowchartMap>activity);
             }
         }
 
-        public static CreateActivity(activity: Activity | IWorkflowMap): WorkflowInvoker
+        public static CreateActivity(activity: Activity | IFlowchartMap): WorkflowInvoker
         {
             return new WorkflowInvoker(activity);
         }
 
-        public Inputs(inputs: Dictionary<string>): WorkflowInvoker
+        public Inputs(inputs: Dictionary<any>): WorkflowInvoker
         {
             this._inputs = inputs;
             return this;
         }
 
-        public Extensions(extensions: Dictionary<string>): WorkflowInvoker
+        public Extensions(extensions: Dictionary<any>): WorkflowInvoker
         {
             this._extensions = extensions;
             return this;

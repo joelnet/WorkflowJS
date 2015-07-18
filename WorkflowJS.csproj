@@ -22,6 +22,7 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="examples\decision.html" />
     <Content Include="examples\css\app.css" />
     <Content Include="examples\basicWorkflow.html" />
     <Content Include="examples\scripts\activities\AddActivity.js">
@@ -34,9 +35,14 @@
     <Content Include="examples\scripts\activities\MultiplyActivity.js">
       <DependentUpon>MultiplyActivity.ts</DependentUpon>
     </Content>
-    <Content Include="examples\scripts\basicWorkflow.js">
-      <DependentUpon>basicWorkflow.ts</DependentUpon>
+    <Content Include="examples\scripts\activities\PromptActivity.js" />
+    <Content Include="examples\scripts\basicWorkflow - Copy.js">
+      <DependentUpon>basicWorkflow - Copy.ts</DependentUpon>
     </Content>
+    <Content Include="examples\scripts\basicWorkflow.js">
+      <DependentUpon>decision.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\decision.js" />
     <Content Include="examples\scripts\inputs.js">
       <DependentUpon>inputs.ts</DependentUpon>
     </Content>
@@ -56,6 +62,7 @@
     <Content Include="IWorkflowMap.js">
       <DependentUpon>IWorkflowMap.ts</DependentUpon>
     </Content>
+    <Content Include="lib\ObjectHelper.js" />
     <Content Include="Resource.js">
       <DependentUpon>Resource.ts</DependentUpon>
     </Content>
@@ -65,6 +72,12 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
+    <Content Include="lib\ObjectHelper.js.map" />
+    <Content Include="examples\scripts\basicWorkflow - Copy.js.map">
+      <DependentUpon>basicWorkflow - Copy.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\PromptActivity.js.map" />
+    <Content Include="examples\scripts\decision.js.map" />
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -89,9 +102,12 @@
     <TypeScriptCompile Include="examples\scripts\activities\HelloWorldActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\AddActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\MultiplyActivity.ts" />
-    <TypeScriptCompile Include="examples\scripts\basicWorkflow.ts" />
+    <TypeScriptCompile Include="examples\scripts\activities\PromptActivity.ts" />
+    <TypeScriptCompile Include="examples\scripts\basicWorkflow - Copy.ts" />
+    <TypeScriptCompile Include="examples\scripts\decision.ts" />
     <TypeScriptCompile Include="examples\scripts\inputs.ts" />
     <TypeScriptCompile Include="IWorkflowMap.ts" />
+    <TypeScriptCompile Include="lib\EvalHelper.ts" />
     <TypeScriptCompile Include="lib\ObjectHelper.ts" />
     <TypeScriptCompile Include="Resource.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
@@ -128,7 +144,7 @@
       <DependentUpon>MultiplyActivity.ts</DependentUpon>
     </Content>
     <Content Include="examples\scripts\basicWorkflow.js.map">
-      <DependentUpon>basicWorkflow.ts</DependentUpon>
+      <DependentUpon>decision.ts</DependentUpon>
     </Content>
     <Content Include="IWorkflowMap.js.map">
       <DependentUpon>IWorkflowMap.ts</DependentUpon>
@@ -187,6 +203,7 @@
   <PropertyGroup>
     <PostBuildEvent>cd $(ProjectDir)
 echo lib\ObjectHelper.ts &gt;ts-files
+echo lib\EvalHelper.ts &gt;&gt;ts-files
 dir *.ts /b &gt;&gt;ts-files
 tsc @ts-files --out bin\workflow.js
 copy bin\workflow.js examples\scripts\lib\workflow.js

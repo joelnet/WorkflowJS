@@ -30,19 +30,34 @@ var wfjs;
         Workflow.prototype._ExecuteLoop = function (context, activity, done) {
             var _this = this;
             var innerContext = Workflow._CreateNextActivityContext(context);
-            this._ExecuteActivity(innerContext, activity, function (err) {
-                var nextActivity = Workflow._GetNextActivity(activity, _this._activities);
-                var innerDone = function (err) {
-                    wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
-                    done(err);
-                };
-                if (nextActivity != null) {
-                    _this._ExecuteLoop(innerContext, nextActivity, innerDone);
-                }
-                else {
-                    innerDone(err);
-                }
-            });
+            if (activity.activity != null) {
+                this._ExecuteActivity(innerContext, activity, function (err) {
+                    if (err != null) {
+                        return done(err);
+                    }
+                    var nextActivity = Workflow._GetNextActivity(activity, _this._activities);
+                    var fin = function (err) {
+                        wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                        done(err);
+                    };
+                    if (nextActivity != null) {
+                        _this._ExecuteLoop(innerContext, nextActivity, fin);
+                    }
+                    else {
+                        fin();
+                    }
+                });
+            }
+            else if (activity.value != null && activity.output != null) {
+                var assignActivity = activity;
+                var values = context.Inputs;
+                wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
+                context.Outputs[assignActivity.output] = wfjs.EvalHelper.Eval(values, assignActivity.value);
+                done();
+            }
+            else {
+                done(new Error('Activity is not valid.'));
+            }
         };
         /**
          * _ExecuteActivity Executes the actual Activity.
@@ -100,10 +115,13 @@ var wfjs;
          * _GetNextActivity returns the next Activity or null.
          */
         Workflow._GetNextActivity = function (activity, activities) {
-            if (activity == null || activity.next == null) {
+            if (activity == null) {
                 return null;
             }
-            return activities[activity.next] || null;
+            if (activity.next != null) {
+                return activities[activity.next] || null;
+            }
+            return null;
         };
         /**
          * _CreateNextActivityContext Returns a new context for inner activities.
