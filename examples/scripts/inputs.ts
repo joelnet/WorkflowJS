@@ -1,5 +1,7 @@
 ﻿/// <reference path="../../Scripts/typings/jquery/jquery.d.ts" />
 
+declare var hljs;
+
 module wfjsExample.Inputs
 {
     class Application
@@ -38,8 +40,9 @@ module wfjsExample.Inputs
         }
     }
 
-    window.onload = () =>
+    $(() =>
     {
         var app = new Application($('#number1'), $('#number2'), $('#button'), $('#result'));
-    };
+        hljs.initHighlightingOnLoad();
+    });
 }

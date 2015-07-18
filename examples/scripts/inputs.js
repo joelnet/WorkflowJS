@@ -30,9 +30,10 @@ var wfjsExample;
             };
             return Application;
         })();
-        window.onload = function () {
+        $(function () {
             var app = new Application($('#number1'), $('#number2'), $('#button'), $('#result'));
-        };
+            hljs.initHighlightingOnLoad();
+        });
     })(Inputs = wfjsExample.Inputs || (wfjsExample.Inputs = {}));
 })(wfjsExample || (wfjsExample = {}));
 //# sourceMappingURL=inputs.js.map

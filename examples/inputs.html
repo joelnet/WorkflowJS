@@ -3,9 +3,11 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>WorkflowJS Input Example</title>
+    <title>WorkflowJS Example: Inputs</title>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/vs.min.css">
     <link rel="stylesheet" href="/Content/bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="css/app.css" type="text/css" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
     <script src="/Scripts/jquery-1.9.1.min.js"></script>
     <script src="/Scripts/bootstrap.min.js"></script>
     <script src="scripts/lib/workflow.js"></script>
@@ -15,9 +17,9 @@
 <body>
 
     <div class="container">
-        <h1>WorkflowJS Input Example</h1>
+        <h1>WorkflowJS Example: Inputs</h1>
 
-        This example demonstrates input and output for an Activity
+        This example executes the Activity <code>AddActivity</code> which takes two inputs (<code>number1</code>, <code>number2</code>) adds them together and returns the result (<code>total</code>).
 
         <h2>Activity Code</h2>
 
@@ -32,35 +34,37 @@
             <!-- Tab panes -->
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="typescript">
-<pre>
-export class AddActivity implements wfjs.Activity
+<pre><code class="typescript">export class AddActivity implements wfjs.Activity
 {
     public $inputs = ['number1', 'number2'];
     public $outputs = ['total'];
+
     public Execute(context: wfjs.ActivityContext, done: (err?: Error) => void): void
     {
         var number1: number = context.Inputs['number1'];
         var number2: number = context.Inputs['number2'];
+
         context.Outputs['total'] = number1 + number2;
+
         done();
     }
-}
-</pre>
+}</code></pre>
 
                 </div>
                 <div role="tabpanel" class="tab-pane" id="javascript">
-<pre>
-function AddActivity() {
+<pre><code class="javascript">function AddActivity() {
     this.$inputs = ['number1', 'number2'];
     this.$outputs = ['total'];
 }
+
 AddActivity.prototype.Execute = function (context, done) {
     var number1 = context.Inputs['number1'];
     var number2 = context.Inputs['number2'];
+
     context.Outputs['total'] = number1 + number2;
+
     done();
-};
-</pre>
+};</code></pre>
                 </div>
             </div>
 
@@ -95,8 +99,7 @@ AddActivity.prototype.Execute = function (context, done) {
             <!-- Tab panes -->
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane" id="htmlfile">
-<pre>
-&lt;html lang="en"&gt;
+<pre><code class="html">&lt;html lang="en"&gt;
 &lt;head&gt;
     &lt;title&gt;WorkflowJS Input Example&lt;/title&gt;
     &lt;script src="/Scripts/jquery-1.9.1.min.js"&gt;&lt;/script&gt;
@@ -105,6 +108,7 @@ AddActivity.prototype.Execute = function (context, done) {
     &lt;script src="scripts/inputs.js"&gt;&lt;/script&gt;
 &lt;/head&gt;
 &lt;body&gt;
+
     &lt;table class="table-condensed" style="width:auto;"&gt;
         &lt;tr&gt;
             &lt;td&gt;&lt;input type="number" id="number1" value="" /&gt;&lt;/td&gt;
@@ -117,15 +121,14 @@ AddActivity.prototype.Execute = function (context, done) {
             &lt;td colspan="5"&gt;&lt;input id="button" type="button" value="calculate" /&gt;&lt;/td&gt;
         &lt;/tr&gt;
     &lt;/table&gt;
+
 &lt;/body&gt;
 &lt;/html&gt;
-</pre>
+</code></pre>
                 </div>
                 <div role="tabpanel" class="tab-pane active" id="typescriptfile">
 
-<pre>
-/// &lt;reference path="../../Scripts/typings/jquery/jquery.d.ts" /&gt;
-
+<pre><code class="typescript">/// &lt;reference path="../../Scripts/typings/jquery/jquery.d.ts" /&gt;
 module wfjsExample.Inputs
 {
     class Application
@@ -164,23 +167,20 @@ module wfjsExample.Inputs
         }
     }
 
-    window.onload = () =&gt;
+    $(() =&gt;
     {
         var app = new Application($('#number1'), $('#number2'), $('#button'), $('#result'));
-    };
+    });
 }
-</pre>
+</code></pre>
 
                 </div>
                 <div role="tabpanel" class="tab-pane" id="javascriptfile">
 
-<pre>
-/// &lt;reference path="../../Scripts/typings/jquery/jquery.d.ts" /&gt;
-var wfjsExample;
+<pre><code class="javascript">var wfjsExample;
 (function (wfjsExample) {
     var Inputs;
     (function (Inputs) {
-
         var Application = (function () {
             function Application(number1, number2, button, result) {
                 var _this = this;
@@ -192,7 +192,6 @@ var wfjsExample;
             }
 
             Application.prototype.Click = function () {
-
                 var _this = this;
                 var activity = new wfjs.Activities.AddActivity();
                 var inputs = {
@@ -211,16 +210,15 @@ var wfjsExample;
             };
 
             return Application;
-
         })();
 
-        window.onload = function () {
+        $(function () {
             var app = new Application($('#number1'), $('#number2'), $('#button'), $('#result'));
-        };
+        });
     })(Inputs = wfjsExample.Inputs || (wfjsExample.Inputs = {}));
 })(wfjsExample || (wfjsExample = {}));
 //# sourceMappingURL=inputs.js.map
-</pre>
+</code></pre>
 
                 </div>
             </div>
