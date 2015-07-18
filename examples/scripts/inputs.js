@@ -16,8 +16,8 @@ var wfjsExample;
                 var _this = this;
                 var activity = new wfjs.Activities.AddActivity();
                 var inputs = {
-                    'number1': parseFloat(this.number1.val()) || 0,
-                    'number2': parseFloat(this.number2.val()) || 0
+                    'number1': this.number1.val(),
+                    'number2': this.number2.val()
                 };
                 wfjs.WorkflowInvoker.CreateActivity(activity).Inputs(inputs).Invoke(function (err, ctx) {
                     if (err != null) {

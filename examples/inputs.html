@@ -41,8 +41,8 @@
 
     public Execute(context: wfjs.ActivityContext, done: (err?: Error) => void): void
     {
-        var number1: number = context.Inputs['number1'];
-        var number2: number = context.Inputs['number2'];
+        var number1: number = parseFloat(context.Inputs['number1']) || 0;
+        var number2: number = parseFloat(context.Inputs['number2']) || 0;
 
         context.Outputs['total'] = number1 + number2;
 
@@ -58,8 +58,8 @@
 }
 
 AddActivity.prototype.Execute = function (context, done) {
-    var number1 = context.Inputs['number1'];
-    var number2 = context.Inputs['number2'];
+    var number1 = parseFloat(context.Inputs['number1']) || 0;
+    var number2 = parseFloat(context.Inputs['number2']) || 0;
 
     context.Outputs['total'] = number1 + number2;
 
@@ -146,8 +146,8 @@ module wfjsExample.Inputs
         {
             var activity = new wfjs.Activities.AddActivity();
             var inputs: wfjs.Dictionary&lt;any&gt; = {
-                'number1': parseFloat(this.number1.val()) || 0,
-                'number2': parseFloat(this.number2.val()) || 0
+                'number1': this.number1.val(),
+                'number2': this.number2.val()
             };
 
             wfjs.WorkflowInvoker
@@ -195,8 +195,8 @@ module wfjsExample.Inputs
                 var _this = this;
                 var activity = new wfjs.Activities.AddActivity();
                 var inputs = {
-                    'number1': parseFloat(this.number1.val()) || 0,
-                    'number2': parseFloat(this.number2.val()) || 0
+                    'number1': this.number1.val(),
+                    'number2': this.number2.val()
                 };
 
                 wfjs.WorkflowInvoker.CreateActivity(activity).Inputs(inputs).Invoke(function (err, ctx) {

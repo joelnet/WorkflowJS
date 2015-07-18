@@ -7,8 +7,8 @@
 
         public Execute(context: wfjs.ActivityContext, done: (err?: Error) => void): void
         {
-            var number1: number = context.Inputs['number1'];
-            var number2: number = context.Inputs['number2'];
+            var number1: number = parseFloat(context.Inputs['number1']) || 0;
+            var number2: number = parseFloat(context.Inputs['number2']) || 0;
 
             context.Outputs['total'] = number1 + number2;
 
