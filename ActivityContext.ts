@@ -2,9 +2,9 @@
 {
     export interface ActivityContextOptions
     {
-        Extensions: Dictionary<any>;
-        Inputs: Dictionary<any>;
-        Outputs: Dictionary<any>;
+        Extensions?: Dictionary<any>;
+        Inputs?: Dictionary<any>;
+        Outputs?: Dictionary<any>;
     }
 
     export class ActivityContext

@@ -18,55 +18,137 @@
     <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="app.css" />
-    <Content Include="app.js">
-      <DependentUpon>app.ts</DependentUpon>
+    <Content Include="Content\bootstrap-theme.css" />
+    <Content Include="Content\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="examples\css\app.css" />
+    <Content Include="examples\basicWorkflow.html" />
+    <Content Include="examples\scripts\activities\AddActivity.js">
+      <DependentUpon>AddActivity.ts</DependentUpon>
     </Content>
-    <Content Include="index.html" />
-    <Content Include="src\Activity.js">
+    <Content Include="examples\scripts\activities\HelloWorldActivity.js">
+      <DependentUpon>HelloWorldActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\inputs.html" />
+    <Content Include="examples\scripts\activities\MultiplyActivity.js">
+      <DependentUpon>MultiplyActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\basicWorkflow.js">
+      <DependentUpon>basicWorkflow.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\inputs.js">
+      <DependentUpon>inputs.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\index.html" />
+    <Content Include="Activity.js">
       <DependentUpon>Activity.ts</DependentUpon>
     </Content>
-    <Content Include="src\ActivityContext.js">
+    <Content Include="ActivityContext.js">
       <DependentUpon>ActivityContext.ts</DependentUpon>
     </Content>
-    <Content Include="src\Dictionary.js">
+    <Content Include="Dictionary.js">
       <DependentUpon>Dictionary.ts</DependentUpon>
     </Content>
-    <Content Include="src\WorkflowApplication.js">
-      <DependentUpon>WorkflowApplication.ts</DependentUpon>
+    <Content Include="examples\scripts\lib\workflow.js" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Icon.png" />
+    <Content Include="IWorkflowMap.js">
+      <DependentUpon>IWorkflowMap.ts</DependentUpon>
+    </Content>
+    <Content Include="Resource.js">
+      <DependentUpon>Resource.ts</DependentUpon>
+    </Content>
+    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="Content\bootstrap.css.map" />
+    <None Include="Scripts\jquery-1.9.1.intellisense.js" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\jquery-1.9.1.js" />
+    <Content Include="Scripts\jquery-1.9.1.min.js" />
+    <Content Include="Scripts\npm.js" />
+    <Content Include="SerialActivity.js">
+      <DependentUpon>SerialActivity.ts</DependentUpon>
     </Content>
     <Content Include="web.config" />
+    <Content Include="Workflow.js">
+      <DependentUpon>Workflow.ts</DependentUpon>
+    </Content>
+    <Content Include="WorkflowInvoker.js">
+      <DependentUpon>WorkflowInvoker.ts</DependentUpon>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="app.ts" />
-    <TypeScriptCompile Include="src\Activity.ts" />
-    <TypeScriptCompile Include="src\ActivityContext.ts" />
-    <TypeScriptCompile Include="src\Dictionary.ts" />
-    <TypeScriptCompile Include="src\WorkflowApplication.ts" />
+    <TypeScriptCompile Include="Activity.ts" />
+    <TypeScriptCompile Include="ActivityContext.ts" />
+    <TypeScriptCompile Include="Dictionary.ts" />
+    <TypeScriptCompile Include="examples\scripts\activities\HelloWorldActivity.ts" />
+    <TypeScriptCompile Include="examples\scripts\activities\AddActivity.ts" />
+    <TypeScriptCompile Include="examples\scripts\activities\MultiplyActivity.ts" />
+    <TypeScriptCompile Include="examples\scripts\basicWorkflow.ts" />
+    <TypeScriptCompile Include="examples\scripts\inputs.ts" />
+    <TypeScriptCompile Include="IWorkflowMap.ts" />
+    <TypeScriptCompile Include="lib\ObjectHelper.ts" />
+    <TypeScriptCompile Include="Resource.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="SerialActivity.ts" />
+    <TypeScriptCompile Include="Workflow.ts" />
+    <TypeScriptCompile Include="WorkflowInvoker.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="app.js.map">
-      <DependentUpon>app.ts</DependentUpon>
-    </Content>
-    <Content Include="src\WorkflowApplication.js.map">
-      <DependentUpon>WorkflowApplication.ts</DependentUpon>
-    </Content>
-    <Content Include="src\Activity.js.map">
+    <Content Include="Activity.js.map">
       <DependentUpon>Activity.ts</DependentUpon>
     </Content>
-    <Content Include="src\ActivityContext.js.map">
+    <Content Include="ActivityContext.js.map">
       <DependentUpon>ActivityContext.ts</DependentUpon>
     </Content>
-    <Content Include="src\Dictionary.js.map">
+    <Content Include="Dictionary.js.map">
       <DependentUpon>Dictionary.ts</DependentUpon>
     </Content>
+    <Content Include="SerialActivity.js.map">
+      <DependentUpon>SerialActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Resource.js.map">
+      <DependentUpon>Resource.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\AddActivity.js.map">
+      <DependentUpon>AddActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\HelloWorldActivity.js.map">
+      <DependentUpon>HelloWorldActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\inputs.js.map">
+      <DependentUpon>inputs.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\MultiplyActivity.js.map">
+      <DependentUpon>MultiplyActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\basicWorkflow.js.map">
+      <DependentUpon>basicWorkflow.ts</DependentUpon>
+    </Content>
+    <Content Include="IWorkflowMap.js.map">
+      <DependentUpon>IWorkflowMap.ts</DependentUpon>
+    </Content>
+    <Content Include="packages.config" />
+    <Content Include="Scripts\jquery-1.9.1.min.map" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
+    <Content Include="WorkflowInvoker.js.map">
+      <DependentUpon>WorkflowInvoker.ts</DependentUpon>
+    </Content>
+    <Content Include="Workflow.js.map">
+      <DependentUpon>Workflow.ts</DependentUpon>
+    </Content>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>
@@ -86,7 +168,8 @@
           <IISUrl>http://localhost:53201/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl></CustomServerUrl>
+          <CustomServerUrl>
+          </CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
@@ -101,4 +184,12 @@
     <TypeScriptSourceMap>false</TypeScriptSourceMap>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>cd $(ProjectDir)
+echo lib\ObjectHelper.ts &gt;ts-files
+dir *.ts /b &gt;&gt;ts-files
+tsc @ts-files --out bin\workflow.js
+copy bin\workflow.js examples\scripts\lib\workflow.js
+del ts-files</PostBuildEvent>
+  </PropertyGroup>
 </Project>
