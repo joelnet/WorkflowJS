@@ -35,7 +35,6 @@ var wfjs;
                     return done(err);
                 }
                 var nextActivity = Workflow._GetNextActivity(activity, _this._activities);
-                console.log('nextActivity', nextActivity);
                 var activityExecute = nextActivity != null ? _this._ExecuteLoop.bind(_this) : function (innerContext, nextActivity, callback) {
                     callback();
                 };

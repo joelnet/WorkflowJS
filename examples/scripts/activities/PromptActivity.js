@@ -8,6 +8,7 @@ var wfjs;
                 this.$outputs = ['result'];
             }
             PromptActivity.prototype.Execute = function (context, done) {
+                /* window is passed in as an extension */
                 var window = context.Extensions['window'];
                 if (window == null) {
                     throw new Error('Extension window cannot be null.');

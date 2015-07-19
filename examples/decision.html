@@ -4,14 +4,241 @@
 <head>
     <meta charset="utf-8" />
     <title>TypeScript HTML App</title>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/vs.min.css">
+    <link rel="stylesheet" href="/Content/bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="css/app.css" type="text/css" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+    <script src="/Scripts/jquery-1.9.1.min.js"></script>
+    <script src="/Scripts/bootstrap.min.js"></script>
     <script src="scripts/lib/workflow.js"></script>
     <script src="scripts/activities/PromptActivity.js"></script>
+    <script src="scripts/activities/GetUserNameActivity.js"></script>
     <script src="scripts/decision.js"></script>
 </head>
 <body>
-    <h1>TypeScript HTML App</h1>
 
-    <div id="content"></div>
+    <div class="container">
+
+        <h1>WorkflowJS Example: Decisions</h1>
+
+        <p>This example executes the Activity <code>GetUserNameActivity</code> which prompts the user for their name and returns a message.</p>
+
+        <h2>Activity Code</h2>
+
+        <div>
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#workflow" aria-controls="workflow" role="tab" data-toggle="tab">GetUserNameActivity.js</a></li>
+                <li role="presentation"><a href="#typescript" aria-controls="typescript" role="tab" data-toggle="tab">PromptActivity.ts</a></li>
+                <li role="presentation"><a href="#javascript" aria-controls="javascript" role="tab" data-toggle="tab">PromptActivity.js</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="workflow">
+<pre><code class="typescript">Activities.GreetUserActivity = {
+    $outputs: ['result'],
+    activities: {
+        'GetUsersName': {
+            activity: new wfjs.Activities.PromptActivity(),
+            $inputs: {
+                message: { value: 'What is your name?' }
+            },
+            $outputs: { 'result': 'name' },
+            next: 'Decision:IsCancelled'
+        },
+        'Decision:IsCancelled': {
+            condition: 'this.name == null || this.name == ""',
+            ontrue: 'CreateMessage:NameRefusal',
+            onfalse: 'CreateMessage:Hello'
+        },
+        'CreateMessage:NameRefusal': {
+            output: 'result',
+            value: '"You did not enter a name!"',
+        },
+        'CreateMessage:Hello': {
+            output: 'result',
+            value: '"Hello " + this.name + "!"',
+        }
+    }
+};</code></pre>
+
+                </div>
+                <div role="tabpanel" class="tab-pane" id="typescript">
+<pre><code class="typescript">export class PromptActivity implements wfjs.Activity
+{
+    public $inputs = ['message'];
+    public $outputs = ['result'];
+
+    public Execute(context: wfjs.ActivityContext, done: (err?: Error) =&gt; void): void
+    {
+        /* window is passed in as an extension */
+        var window: Window = context.Extensions['window'];
+
+        if (window == null)
+        {
+            throw new Error('Extension window cannot be null.');
+        }
+
+        var response = window.prompt(context.Inputs['message']);
+
+        context.Outputs['result'] = response;
+
+        done();
+    }
+}</code></pre>
+
+                </div>
+                <div role="tabpanel" class="tab-pane" id="javascript">
+<pre><code class="javascript">var PromptActivity = (function () {
+
+    function PromptActivity() {
+        this.$inputs = ['message'];
+        this.$outputs = ['result'];
+    }
+
+    PromptActivity.prototype.Execute = function (context, done) {
+
+        /* window is passed in as an extension */
+        var window = context.Extensions['window'];
+
+        if (window == null) {
+            throw new Error('Extension window cannot be null.');
+        }
+        
+        var response = window.prompt(context.Inputs['message']);
+        
+        context.Outputs['result'] = response;
+        
+        done();
+    };
+
+    return PromptActivity;
+})();</code></pre>
+                </div>
+            </div>
+
+        </div>
+
+        <h2>Demo</h2>
+
+        <blockquote>
+            <input type="button" id="button" value="Run" />
+            <div>result: <span id="result">n/a</span></div>
+        </blockquote>
+
+        <h2>Source</h2>
+
+        <div>
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation"><a href="#htmlfile" aria-controls="htmlfile" role="tab" data-toggle="tab">decisions.html</a></li>
+                <li role="presentation" class="active"><a href="#typescriptfile" aria-controls="typescriptfile" role="tab" data-toggle="tab">decisions.ts</a></li>
+                <li role="presentation"><a href="#javascriptfile" aria-controls="javascriptfile" role="tab" data-toggle="tab">decisions.js</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane" id="htmlfile">
+<pre><code class="html">&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;title&gt;WorkflowJS Input Example&lt;/title&gt;
+    &lt;script src="/Scripts/jquery-1.9.1.min.js"&gt;&lt;/script&gt;
+    &lt;script src="scripts/lib/workflow.js"&gt;&lt;/script&gt;
+    &lt;script src="scripts/activities/AddActivity.js"&gt;&lt;/script&gt;
+    &lt;script src="scripts/inputs.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+    &lt;input type="button" id="button" value="Run" /&gt;
+    &lt;div&gt;result: &lt;span id="result"&gt;n/a&lt;/span&gt;&lt;/div&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+                </div>
+                <div role="tabpanel" class="tab-pane active" id="typescriptfile">
+
+<pre><code class="typescript">export class Application
+{
+    constructor(private button: JQuery, private result: JQuery)
+    {
+        button.click(() =&gt; this.Click());
+    }
+    
+    public Click()
+    {
+        wfjs.WorkflowInvoker
+            .CreateActivity(Activities.GreetUserActivity)
+            .Extensions({
+                window: window
+            })
+            .Invoke((err, ctx) =&gt;
+            {
+                if (err != null)
+                {
+                    this.result.text('finished with error: ' + err.toString());
+                }
+                else
+                {
+                    this.result.text(ctx.Outputs['result']);
+                }
+            });
+    }
+}
+$(() =&gt;
+{
+    var app = new Application($('#button'), $('#result'));
+});
+
+</code></pre>
+
+                </div>
+                <div role="tabpanel" class="tab-pane" id="javascriptfile">
+
+<pre><code class="javascript">var Application = (function () {
+
+    function Application(button, result) {
+        var _this = this;
+        this.button = button;
+        this.result = result;
+
+        button.click(function () { return _this.Click(); });
+    }
+
+    Application.prototype.Click = function () {
+        var _this = this;
+
+        wfjs.WorkflowInvoker
+            .CreateActivity(wfjs.Activities.GreetUserActivity)
+            .Extensions({
+                window: window
+            })
+            .Invoke(function (err, ctx) {
+                if (err != null) {
+                    _this.result.text('finished with error: ' + err.toString());
+                }
+                else {
+                    _this.result.text(ctx.Outputs['result']);
+                }
+            });
+    };
+
+    return Application;
+})();
+
+$(function () {
+    var app = new Application($('#button'), $('#result'));
+});</code></pre>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
 </body>
 </html>

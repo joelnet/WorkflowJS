@@ -58,7 +58,6 @@
                 }
 
                 var nextActivity = Workflow._GetNextActivity(activity, this._activities);
-                console.log('nextActivity', nextActivity);
 
                 var activityExecute = nextActivity != null
                     ? this._ExecuteLoop.bind(this)

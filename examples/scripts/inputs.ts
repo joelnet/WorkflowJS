@@ -1,6 +1,4 @@
-﻿/// <reference path="../../Scripts/typings/jquery/jquery.d.ts" />
-
-declare var hljs;
+﻿declare var hljs;
 
 module wfjsExample.Inputs
 {

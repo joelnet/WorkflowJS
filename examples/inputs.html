@@ -19,7 +19,7 @@
     <div class="container">
         <h1>WorkflowJS Example: Inputs</h1>
 
-        This example executes the Activity <code>AddActivity</code> which takes two inputs (<code>number1</code> and <code>number2</code>) adds them together and returns the result (<code>total</code>).
+        <p>This example executes the Activity <code>AddActivity</code> which takes two inputs (<code>number1</code> and <code>number2</code>) adds them together and returns the result (<code>total</code>).</p>
 
         <h2>Activity Code</h2>
 
@@ -72,18 +72,20 @@ AddActivity.prototype.Execute = function (context, done) {
 
         <h2>Demo</h2>
 
-        <table class="table-condensed" style="width:auto;">
-            <tr>
-                <td><input type="number" id="number1" value="" /></td>
-                <td>+</td>
-                <td><input type="number" id="number2" value="" /></td>
-                <td>=</td>
-                <td><div id="result">?</div></td>
-            </tr>
-            <tr>
-                <td colspan="5"><input id="button" type="button" value="calculate" /></td>
-            </tr>
-        </table>
+        <blockquote>
+            <table class="table-condensed" style="width:auto;">
+                <tr>
+                    <td><input type="number" id="number1" value="" /></td>
+                    <td>+</td>
+                    <td><input type="number" id="number2" value="" /></td>
+                    <td>=</td>
+                    <td><div id="result">?</div></td>
+                </tr>
+                <tr>
+                    <td colspan="5"><input id="button" type="button" value="calculate" /></td>
+                </tr>
+            </table>
+        </blockquote>
 
         <h2>Source</h2>
 
@@ -128,97 +130,90 @@ AddActivity.prototype.Execute = function (context, done) {
                 </div>
                 <div role="tabpanel" class="tab-pane active" id="typescriptfile">
 
-<pre><code class="typescript">/// &lt;reference path="../../Scripts/typings/jquery/jquery.d.ts" /&gt;
-module wfjsExample.Inputs
+<pre><code class="typescript">class Application
 {
-    class Application
+    constructor(
+        private number1: JQuery,
+        private number2: JQuery,
+        private button: JQuery,
+        private result: JQuery)
     {
-        constructor(
-            private number1: JQuery,
-            private number2: JQuery,
-            private button: JQuery,
-            private result: JQuery)
-        {
-            this.button.click(() =&gt; this.Click());
-        }
-        
-        public Click()
-        {
-            var activity = new wfjs.Activities.AddActivity();
-            var inputs: wfjs.Dictionary&lt;any&gt; = {
-                'number1': this.number1.val(),
-                'number2': this.number2.val()
-            };
-
-            wfjs.WorkflowInvoker
-                .CreateActivity(activity)
-                .Inputs(inputs)
-                .Invoke((err, ctx) =&gt;
-                {
-                    if (err != null)
-                    {
-                        this.result.text('Finished with error: ' + err.toString());
-                    }
-                    else
-                    {
-                        this.result.text(ctx.Outputs['total']);
-                    }
-                });
-        }
+        this.button.click(() =&gt; this.Click());
     }
-
-    $(() =&gt;
+        
+    public Click()
     {
-        var app = new Application($('#number1'), $('#number2'), $('#button'), $('#result'));
-    });
+        var activity = new AddActivity();
+        var inputs: wfjs.Dictionary&lt;any&gt; = {
+            'number1': this.number1.val(),
+            'number2': this.number2.val()
+        };
+
+        wfjs.WorkflowInvoker
+            .CreateActivity(activity)
+            .Inputs(inputs)
+            .Invoke((err, ctx) =&gt;
+            {
+                if (err != null)
+                {
+                    this.result.text('Finished with error: ' + err.toString());
+                }
+                else
+                {
+                    this.result.text(ctx.Outputs['total']);
+                }
+            });
+    }
 }
+
+$(() =&gt;
+{
+    var app = new Application($('#number1'), $('#number2'), $('#button'), $('#result'));
+});
+
 </code></pre>
 
                 </div>
                 <div role="tabpanel" class="tab-pane" id="javascriptfile">
 
-<pre><code class="javascript">var wfjsExample;
-(function (wfjsExample) {
-    var Inputs;
-    (function (Inputs) {
-        var Application = (function () {
-            function Application(number1, number2, button, result) {
-                var _this = this;
-                this.number1 = number1;
-                this.number2 = number2;
-                this.button = button;
-                this.result = result;
-                this.button.click(function () { return _this.Click(); });
-            }
+<pre><code class="javascript">
+var Application = (function () {
+    function Application(number1, number2, button, result) {
+        var _this = this;
+        this.number1 = number1;
+        this.number2 = number2;
+        this.button = button;
+        this.result = result;
+        this.button.click(function () { return _this.Click(); });
+    }
 
-            Application.prototype.Click = function () {
-                var _this = this;
-                var activity = new wfjs.Activities.AddActivity();
-                var inputs = {
-                    'number1': this.number1.val(),
-                    'number2': this.number2.val()
-                };
+    Application.prototype.Click = function () {
+        var _this = this;
+        var activity = new AddActivity();
+        var inputs = {
+            'number1': this.number1.val(),
+            'number2': this.number2.val()
+        };
 
-                wfjs.WorkflowInvoker.CreateActivity(activity).Inputs(inputs).Invoke(function (err, ctx) {
-                    if (err != null) {
-                        _this.result.text('Finished with error: ' + err.toString());
-                    }
-                    else {
-                        _this.result.text(ctx.Outputs['total']);
-                    }
-                });
-            };
+        wfjs.WorkflowInvoker
+            .CreateActivity(activity)
+            .Inputs(inputs)
+            .Invoke(function (err, ctx) {
+                if (err != null) {
+                    _this.result.text('Finished with error: ' + err.toString());
+                }
+                else {
+                    _this.result.text(ctx.Outputs['total']);
+                }
+            });
+    };
 
-            return Application;
-        })();
+    return Application;
+})();
 
-        $(function () {
-            var app = new Application($('#number1'), $('#number2'), $('#button'), $('#result'));
-        });
-    })(Inputs = wfjsExample.Inputs || (wfjsExample.Inputs = {}));
-})(wfjsExample || (wfjsExample = {}));
-//# sourceMappingURL=inputs.js.map
-</code></pre>
+$(function () {
+    var app = new Application($('#number1'), $('#number2'), $('#button'), $('#result'));
+});</code></pre>
 
                 </div>
             </div>

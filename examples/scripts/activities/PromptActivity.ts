@@ -7,6 +7,7 @@
 
         public Execute(context: wfjs.ActivityContext, done: (err?: Error) => void): void
         {
+            /* window is passed in as an extension */
             var window: Window = context.Extensions['window'];
 
             if (window == null)

@@ -1,4 +1,3 @@
-/// <reference path="../../Scripts/typings/jquery/jquery.d.ts" />
 var wfjsExample;
 (function (wfjsExample) {
     var Inputs;

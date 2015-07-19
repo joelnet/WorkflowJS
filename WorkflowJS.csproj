@@ -19,14 +19,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
-    <Content Include="Content\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap-theme.min.css">
+      <DependentUpon>bootstrap-theme.css</DependentUpon>
+    </Content>
     <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\bootstrap.min.css">
+      <DependentUpon>bootstrap.css</DependentUpon>
+    </Content>
     <Content Include="examples\decision.html" />
     <Content Include="examples\css\app.css" />
-    <Content Include="examples\basicWorkflow.html" />
     <Content Include="examples\scripts\activities\AddActivity.js">
       <DependentUpon>AddActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\GetUserNameActivity.js">
+      <DependentUpon>GetUserNameActivity.ts</DependentUpon>
     </Content>
     <Content Include="examples\scripts\activities\HelloWorldActivity.js">
       <DependentUpon>HelloWorldActivity.ts</DependentUpon>
@@ -35,14 +41,12 @@
     <Content Include="examples\scripts\activities\MultiplyActivity.js">
       <DependentUpon>MultiplyActivity.ts</DependentUpon>
     </Content>
-    <Content Include="examples\scripts\activities\PromptActivity.js" />
-    <Content Include="examples\scripts\basicWorkflow - Copy.js">
-      <DependentUpon>basicWorkflow - Copy.ts</DependentUpon>
+    <Content Include="examples\scripts\activities\PromptActivity.js">
+      <DependentUpon>PromptActivity.ts</DependentUpon>
     </Content>
-    <Content Include="examples\scripts\basicWorkflow.js">
+    <Content Include="examples\scripts\decision.js">
       <DependentUpon>decision.ts</DependentUpon>
     </Content>
-    <Content Include="examples\scripts\decision.js" />
     <Content Include="examples\scripts\inputs.js">
       <DependentUpon>inputs.ts</DependentUpon>
     </Content>
@@ -62,7 +66,12 @@
     <Content Include="IWorkflowMap.js">
       <DependentUpon>IWorkflowMap.ts</DependentUpon>
     </Content>
-    <Content Include="lib\ObjectHelper.js" />
+    <Content Include="lib\EvalHelper.js">
+      <DependentUpon>EvalHelper.ts</DependentUpon>
+    </Content>
+    <Content Include="lib\ObjectHelper.js">
+      <DependentUpon>ObjectHelper.ts</DependentUpon>
+    </Content>
     <Content Include="Resource.js">
       <DependentUpon>Resource.ts</DependentUpon>
     </Content>
@@ -70,19 +79,36 @@
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Content\bootstrap-theme.css.map" />
-    <Content Include="Content\bootstrap.css.map" />
-    <Content Include="lib\ObjectHelper.js.map" />
-    <Content Include="examples\scripts\basicWorkflow - Copy.js.map">
-      <DependentUpon>basicWorkflow - Copy.ts</DependentUpon>
+    <Content Include="Content\bootstrap-theme.css.map">
+      <DependentUpon>bootstrap-theme.css</DependentUpon>
     </Content>
-    <Content Include="examples\scripts\activities\PromptActivity.js.map" />
-    <Content Include="examples\scripts\decision.js.map" />
+    <Content Include="Content\bootstrap.css.map">
+      <DependentUpon>bootstrap.css</DependentUpon>
+    </Content>
+    <Content Include="lib\ObjectHelper.js.map">
+      <DependentUpon>ObjectHelper.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\PromptActivity.js.map">
+      <DependentUpon>PromptActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\decision.js.map">
+      <DependentUpon>decision.ts</DependentUpon>
+    </Content>
+    <Content Include="lib\EvalHelper.js.map">
+      <DependentUpon>EvalHelper.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\GetUserNameActivity.js.map">
+      <DependentUpon>GetUserNameActivity.ts</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
-    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\bootstrap.min.js">
+      <DependentUpon>bootstrap.js</DependentUpon>
+    </Content>
     <Content Include="Scripts\jquery-1.9.1.js" />
-    <Content Include="Scripts\jquery-1.9.1.min.js" />
+    <Content Include="Scripts\jquery-1.9.1.min.js">
+      <DependentUpon>jquery-1.9.1.js</DependentUpon>
+    </Content>
     <Content Include="Scripts\npm.js" />
     <Content Include="SerialActivity.js">
       <DependentUpon>SerialActivity.ts</DependentUpon>
@@ -99,11 +125,11 @@
     <TypeScriptCompile Include="Activity.ts" />
     <TypeScriptCompile Include="ActivityContext.ts" />
     <TypeScriptCompile Include="Dictionary.ts" />
+    <TypeScriptCompile Include="examples\scripts\activities\GetUserNameActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\HelloWorldActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\AddActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\MultiplyActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\PromptActivity.ts" />
-    <TypeScriptCompile Include="examples\scripts\basicWorkflow - Copy.ts" />
     <TypeScriptCompile Include="examples\scripts\decision.ts" />
     <TypeScriptCompile Include="examples\scripts\inputs.ts" />
     <TypeScriptCompile Include="IWorkflowMap.ts" />
@@ -143,9 +169,6 @@
     <Content Include="examples\scripts\activities\MultiplyActivity.js.map">
       <DependentUpon>MultiplyActivity.ts</DependentUpon>
     </Content>
-    <Content Include="examples\scripts\basicWorkflow.js.map">
-      <DependentUpon>decision.ts</DependentUpon>
-    </Content>
     <Content Include="IWorkflowMap.js.map">
       <DependentUpon>IWorkflowMap.ts</DependentUpon>
     </Content>
@@ -184,8 +207,7 @@
           <IISUrl>http://localhost:53201/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <CustomServerUrl></CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
