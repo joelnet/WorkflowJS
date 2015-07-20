@@ -5,14 +5,14 @@
         $inputs?: string[];
         $outputs?: string[];
         $extensions?: Dictionary<any>;
-        activities: wfjs.Dictionary<MapBase>;
+        activities: wfjs.Dictionary<IMapBase>;
     }
 
-    export interface MapBase
+    export interface IMapBase
     {
     }
 
-    export interface ActivityMap extends MapBase
+    export interface ActivityMap extends IMapBase
     {
         activity: wfjs.Activity;
         $inputs?: Dictionary<ActivityInputMap>;
@@ -20,7 +20,7 @@
         next: string;
     }
 
-    export interface IDecisionActivity extends MapBase
+    export interface IDecisionActivity extends IMapBase
     {
         condition: string;
         ontrue: string;
@@ -28,11 +28,26 @@
         next: string;
     }
 
-    export interface IAssignActivity extends MapBase
+    export interface IAssignActivity extends IMapBase
     {
         value: string;
         output: string;
         next: string;
+    }
+
+    export interface ISwitchActivity extends IMapBase
+    {
+        switch: string;
+        case: Dictionary<IMapBase>;
+        null: IMapBase;
+        default: IMapBase;
+        next: string;
+    }
+
+    export interface IExecuteActivity extends IMapBase
+    {
+        execute: (context: ActivityContext, done: (err?: Error) => void) => void;
+        next?: string;
     }
 
     export interface ActivityInputMap

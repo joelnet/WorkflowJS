@@ -5,7 +5,7 @@
         public $inputs: string[];
         public $outputs: string[];
 
-        private _activities: Dictionary<MapBase>;
+        private _activities: Dictionary<IMapBase>;
         private _extensions: Dictionary<any>;
 
         constructor(map: IFlowchartMap)
@@ -46,7 +46,7 @@
         /**
          * _ExecuteLoop Execution loop that executes every Activity.
          */
-        private _ExecuteLoop(context: ActivityContext, activity: MapBase, done: (err?: Error) => void): void
+        private _ExecuteLoop(context: ActivityContext, activity: IMapBase, done: (err?: Error) => void): void
         {
             var innerContext = Workflow._CreateNextActivityContext(context);
 
@@ -81,6 +81,14 @@
             else if ((<IDecisionActivity>activity).condition != null)
             {
                 this._ExecuteDecision(context, <IDecisionActivity>activity, err => next(err, context));
+            }
+            else if ((<ISwitchActivity>activity).switch != null)
+            {
+                this._ExecuteSwitch(context, <ISwitchActivity>activity, err => next(err, context));
+            }
+            else if ((<IExecuteActivity>activity).execute != null)
+            {
+                this._ExecuteCodeActivity(context, <IExecuteActivity>activity, err => next(err, context));
             }
             else
             {
@@ -120,14 +128,46 @@
 
             try
             {
-                var decisionActivity = <IDecisionActivity>activity;
-
                 var values: Dictionary<any> = context.Inputs;
                 ObjectHelper.CopyProperties(context.Outputs, values);
 
-                var condition: boolean = EvalHelper.Eval(values, decisionActivity.condition);
+                var condition: boolean = EvalHelper.Eval(values, activity.condition);
 
-                decisionActivity.next = condition ? decisionActivity.ontrue : decisionActivity.onfalse;
+                activity.next = condition ? activity.ontrue : activity.onfalse;
+            }
+            catch (ex)
+            {
+                err = ex;
+            }
+            finally
+            {
+                done(err);
+            }
+        }
+
+        /**
+         * _ExecuteDecision Evaluates the condition (to true or false) and executes next activity.
+         */
+        private _ExecuteSwitch(context: ActivityContext, activity: ISwitchActivity, done: (err?: Error) => void): void
+        {
+            var err: Error = null;
+
+            try
+            {
+                var values: Dictionary<any> = context.Inputs;
+                ObjectHelper.CopyProperties(context.Outputs, values);
+
+                var _switch = EvalHelper.Eval(values, activity.switch);
+                var _activity = activity.case[_switch] || activity.case['default'];
+
+                if (_activity != null)
+                {
+                    this._ExecuteLoop(context, _activity, done);
+                }
+                else
+                {
+                    done();
+                }
             }
             catch (ex)
             {
@@ -154,6 +194,37 @@
                 ObjectHelper.CopyProperties(context.Outputs, values);
 
                 context.Outputs[assignActivity.output] = EvalHelper.Eval(values, assignActivity.value);
+            }
+            catch (ex)
+            {
+                err = ex;
+            }
+            finally
+            {
+                done(err);
+            }
+        }
+
+        /**
+         * _ExecuteCodeActivity Executes an IExecuteActivity block.
+         */
+        private _ExecuteCodeActivity(context: ActivityContext, activity: IExecuteActivity, done: (err?: Error) => void): void
+        {
+            var err: Error = null;
+
+            try
+            {
+                var innerContext = Workflow._CreateNextActivityContext(context);
+
+                activity.execute(innerContext, err =>
+                {
+                    if (innerContext != null)
+                    {
+                        ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                    }
+
+                    done(err);
+                });
             }
             catch (ex)
             {
@@ -196,16 +267,6 @@
 
             var value: Dictionary<any> = {};
 
-            // get values that are NOT in the mapping.
-            for (var k in context.Outputs)
-            {
-                if (typeof outputMap[k] == 'undefined')
-                {
-                    value[k] = context.Outputs[k];
-                }
-            }
-
-            // get values that have a mapping.
             for (var k in outputMap)
             {
                 var v = outputMap[k];
@@ -218,7 +279,7 @@
         /**
          * _GetFirstActivity Gets the Activity to be executed first.
          */
-        private static _GetFirstActivity(activities: Dictionary<MapBase>): MapBase
+        private static _GetFirstActivity(activities: Dictionary<IMapBase>): IMapBase
         {
             var key: string = Object.keys(activities)[0];
             return activities[key];
@@ -227,7 +288,7 @@
         /**
          * _GetNextActivity returns the next Activity or null.
          */
-        private static _GetNextActivity(activity: MapBase, activities: Dictionary<MapBase>): MapBase
+        private static _GetNextActivity(activity: IMapBase, activities: Dictionary<IMapBase>): IMapBase
         {
             if (activity == null)
             {

@@ -28,8 +28,19 @@
     </Content>
     <Content Include="examples\decision.html" />
     <Content Include="examples\css\app.css" />
+    <Content Include="examples\errors.html" />
+    <Content Include="examples\scripts\activities\GetTypeActivity.js">
+      <DependentUpon>GetTypeActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\switch.js">
+      <DependentUpon>switch.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\switch.html" />
     <Content Include="examples\scripts\activities\AddActivity.js">
       <DependentUpon>AddActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\DivideAsyncActivity.js">
+      <DependentUpon>DivideAsyncActivity.ts</DependentUpon>
     </Content>
     <Content Include="examples\scripts\activities\GetUserNameActivity.js">
       <DependentUpon>GetUserNameActivity.ts</DependentUpon>
@@ -46,6 +57,9 @@
     </Content>
     <Content Include="examples\scripts\decision.js">
       <DependentUpon>decision.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\errors.js">
+      <DependentUpon>errors.ts</DependentUpon>
     </Content>
     <Content Include="examples\scripts\inputs.js">
       <DependentUpon>inputs.ts</DependentUpon>
@@ -100,6 +114,18 @@
     <Content Include="examples\scripts\activities\GetUserNameActivity.js.map">
       <DependentUpon>GetUserNameActivity.ts</DependentUpon>
     </Content>
+    <Content Include="examples\scripts\errors.js.map">
+      <DependentUpon>errors.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\DivideAsyncActivity.js.map">
+      <DependentUpon>DivideAsyncActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\switch.js.map">
+      <DependentUpon>switch.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\GetTypeActivity.js.map">
+      <DependentUpon>GetTypeActivity.ts</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js">
@@ -125,13 +151,17 @@
     <TypeScriptCompile Include="Activity.ts" />
     <TypeScriptCompile Include="ActivityContext.ts" />
     <TypeScriptCompile Include="Dictionary.ts" />
+    <TypeScriptCompile Include="examples\scripts\activities\DivideAsyncActivity.ts" />
+    <TypeScriptCompile Include="examples\scripts\activities\GetTypeActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\GetUserNameActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\HelloWorldActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\AddActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\MultiplyActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\PromptActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\decision.ts" />
+    <TypeScriptCompile Include="examples\scripts\errors.ts" />
     <TypeScriptCompile Include="examples\scripts\inputs.ts" />
+    <TypeScriptCompile Include="examples\scripts\switch.ts" />
     <TypeScriptCompile Include="IWorkflowMap.ts" />
     <TypeScriptCompile Include="lib\EvalHelper.ts" />
     <TypeScriptCompile Include="lib\ObjectHelper.ts" />

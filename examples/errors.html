@@ -1,0 +1,264 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>WorkflowJS Example: Inputs</title>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/vs.min.css">
+    <link rel="stylesheet" href="/Content/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="css/app.css" type="text/css" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+    <script src="/Scripts/jquery-1.9.1.min.js"></script>
+    <script src="/Scripts/bootstrap.min.js"></script>
+    <script src="scripts/lib/workflow.js"></script>
+    <script src="scripts/activities/DivideAsyncActivity.js"></script>
+    <script src="scripts/errors.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>WorkflowJS Example: Asynchronous Errors</h1>
+
+        <p>This example executes the Activity <code>DivideAsyncActivity</code> which takes two inputs (<code>number1</code> and <code>number2</code>) and divides them Asynchronously and returns the result (<code>total</code>).</p>
+
+        <h2>Activity Code</h2>
+
+        <div>
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#typescript" aria-controls="typescript" role="tab" data-toggle="tab">DivideAsyncActivity.ts</a></li>
+                <li role="presentation"><a href="#javascript" aria-controls="javascript" role="tab" data-toggle="tab">DivideAsyncActivity.js</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="typescript">
+<pre><code class="typescript">export class DivideAsyncActivity implements wfjs.Activity
+{
+    public $inputs = ['number1', 'number2'];
+    public $outputs = ['total'];
+
+    public Execute(context: wfjs.ActivityContext, done: (err?: Error) =&gt; void): void
+    {
+        var number1: number = parseFloat(context.Inputs['number1']) || 0;
+        var number2: number = parseFloat(context.Inputs['number2']) || 0;
+
+        this._DivideAsync(number1, number2, (err, total) =&gt;
+        {
+            context.Outputs['total'] = total;
+
+            done(err);
+        });
+    }
+
+    private _DivideAsync(number1: number, number2: number,
+        callback: (err: Error, total?: number) =&gt; void): void
+    {
+        setTimeout(() =&gt;
+        {
+            if (number2 == 0)
+            {
+                return callback(new Error('Cannot divide by 0.'));
+            }
+
+            callback(null, number1 / number2);
+        }, 0);
+    }
+}
+</code></pre>
+
+                </div>
+                <div role="tabpanel" class="tab-pane" id="javascript">
+<pre><code class="javascript">function DivideAsyncActivity() {
+    this.$inputs = ['number1', 'number2'];
+    this.$outputs = ['total'];
+}
+
+DivideAsyncActivity.prototype.Execute = function (context, done) {
+    var number1 = parseFloat(context.Inputs['number1']) || 0;
+    var number2 = parseFloat(context.Inputs['number2']) || 0;
+
+    this._DivideAsync(number1, number2, function (err, total) {
+        context.Outputs['total'] = total;
+        done(err);
+    });
+};
+
+DivideAsyncActivity.prototype._DivideAsync = function (number1, number2, callback) {
+    setTimeout(function () {
+        if (number2 == 0) {
+            return callback(new Error('Cannot divide by 0.'));
+        }
+
+        callback(null, number1 / number2);
+    }, 0);
+};
+</code></pre>
+                </div>
+            </div>
+
+        </div>
+
+        <h2>Demo</h2>
+
+        <blockquote>
+            <table class="table-condensed" style="width:auto;">
+                <tr>
+                    <td><input type="number" id="number1" value="" /></td>
+                    <td>/</td>
+                    <td><input type="number" id="number2" value="" /></td>
+                    <td>=</td>
+                    <td><div id="result">?</div></td>
+                </tr>
+                <tr>
+                    <td colspan="5">
+                        <input id="button" type="button" value="calculate" />
+                        <div>* divide by 0 to create an error.</div>
+                    </td>
+                </tr>
+            </table>
+        </blockquote>
+
+        <h2>Source</h2>
+
+        <div>
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation"><a href="#htmlfile" aria-controls="htmlfile" role="tab" data-toggle="tab">inputs.html</a></li>
+                <li role="presentation" class="active"><a href="#typescriptfile" aria-controls="typescriptfile" role="tab" data-toggle="tab">errors.ts</a></li>
+                <li role="presentation"><a href="#javascriptfile" aria-controls="javascriptfile" role="tab" data-toggle="tab">errors.js</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane" id="htmlfile">
+<pre><code class="html">&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;title&gt;WorkflowJS Input Example&lt;/title&gt;
+    &lt;script src="/Scripts/jquery-1.9.1.min.js"&gt;&lt;/script&gt;
+    &lt;script src="scripts/lib/workflow.js"&gt;&lt;/script&gt;
+    &lt;script src="scripts/activities/AddActivity.js"&gt;&lt;/script&gt;
+    &lt;script src="scripts/inputs.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+    &lt;table class="table-condensed" style="width:auto;"&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;input type="number" id="number1" value="" /&gt;&lt;/td&gt;
+            &lt;td&gt;/&lt;/td&gt;
+            &lt;td&gt;&lt;input type="number" id="number2" value="" /&gt;&lt;/td&gt;
+            &lt;td&gt;=&lt;/td&gt;
+            &lt;td&gt;&lt;div id="result"&gt;?&lt;/div&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td colspan="5"&gt;
+                &lt;input id="button" type="button" value="calculate" /&gt;
+                &lt;div&gt;* divide by 0 to create an error.&lt;/div&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+                </div>
+                <div role="tabpanel" class="tab-pane active" id="typescriptfile">
+
+<pre><code class="typescript">class Application
+{
+    constructor(
+        private number1: JQuery,
+        private number2: JQuery,
+        private button: JQuery,
+        private result: JQuery)
+    {
+        this.button.click(() =&gt; this.Click());
+    }
+    
+    public Click()
+    {
+        var activity = new wfjs.Activities.DivideAsyncActivity();
+
+        var inputs: wfjs.Dictionary&gt;any&gt; = {
+            'number1': this.number1.val(),
+            'number2': this.number2.val()
+        };
+
+        wfjs.WorkflowInvoker
+            .CreateActivity(activity)
+            .Inputs(inputs)
+            .Invoke((err, ctx) =&gt;
+            {
+                if (err != null)
+                {
+                    this.result.text(err.toString());
+                }
+                else
+                {
+                    this.result.text(ctx.Outputs['total']);
+                }
+            });
+    }
+}
+
+$(() =&gt;
+{
+    var app = new Application($('#number1'), $('#number2'), $('#button'), $('#result'));
+});</code></pre>
+
+                </div>
+                <div role="tabpanel" class="tab-pane" id="javascriptfile">
+
+<pre><code class="javascript">var Application = (function () {
+
+    function Application(number1, number2, button, result) {
+        var _this = this;
+        this.number1 = number1;
+        this.number2 = number2;
+        this.button = button;
+        this.result = result;
+
+        this.button.click(function () { return _this.Click(); });
+    }
+
+    Application.prototype.Click = function () {
+        var _this = this;
+        var activity = new wfjs.Activities.DivideAsyncActivity();
+
+        var inputs = {
+            'number1': this.number1.val(),
+            'number2': this.number2.val()
+        };
+
+        wfjs.WorkflowInvoker
+            .CreateActivity(activity)
+            .Inputs(inputs)
+            .Invoke(function (err, ctx) {
+                if (err != null) {
+                    _this.result.text(err.toString());
+                }
+                else {
+                    _this.result.text(ctx.Outputs['total']);
+                }
+        });
+    };
+
+    return Application;
+})();
+
+$(function () {
+    var app = new Application($('#number1'), $('#number2'), $('#button'), $('#result'));
+});
+</code></pre>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

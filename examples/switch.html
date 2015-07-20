@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>TypeScript HTML App</title>
+    <title>WorkflowJS Example: Inputs</title>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/vs.min.css">
     <link rel="stylesheet" href="/Content/bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="css/app.css" type="text/css" />
@@ -12,16 +12,15 @@
     <script src="/Scripts/bootstrap.min.js"></script>
     <script src="scripts/lib/workflow.js"></script>
     <script src="scripts/activities/PromptActivity.js"></script>
-    <script src="scripts/activities/GetUserNameActivity.js"></script>
-    <script src="scripts/decision.js"></script>
+    <script src="scripts/activities/GetTypeActivity.js"></script>
+    <script src="scripts/switch.js"></script>
 </head>
 <body>
 
     <div class="container">
+        <h1>WorkflowJS Example: Switch</h1>
 
-        <h1>WorkflowJS Example: Decisions</h1>
-
-        <p>This example executes the Activity <code>GetUserNameActivity</code> which prompts the user for their name and returns a message.</p>
+        <p>This example executes the Activity <code>GetTypeActivity</code> which takes an input and and determines the type (<code>number</code>, <code>string</code>, <code>null</code>).</p>
 
         <h2>Activity Code</h2>
 
@@ -29,7 +28,7 @@
 
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation" class="active"><a href="#workflow" aria-controls="workflow" role="tab" data-toggle="tab">GetUserNameActivity.js</a></li>
+                <li role="presentation" class="active"><a href="#workflow" aria-controls="workflow" role="tab" data-toggle="tab">GetTypeActivity.js</a></li>
                 <li role="presentation"><a href="#typescript" aria-controls="typescript" role="tab" data-toggle="tab">PromptActivity.ts</a></li>
                 <li role="presentation"><a href="#javascript" aria-controls="javascript" role="tab" data-toggle="tab">PromptActivity.js</a></li>
             </ul>
@@ -37,32 +36,59 @@
             <!-- Tab panes -->
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="workflow">
-<pre><code class="typescript">Activities.GreetUserActivity = {
+<pre><code class="typescript">GetTypeActivity = {
     $outputs: ['result'],
     activities: {
-        'GetUsersName': {
-            activity: new wfjs.Activities.PromptActivity(),
+        'GetUserInput': {
+            activity: new PromptActivity(),
             $inputs: {
-                message: { value: 'What is your name?' }
+                message: { value: 'Enter either a number or a string.' }
             },
-            $outputs: { 'result': 'name' },
-            next: 'Decision:IsCancelled'
+            $outputs: { 'result': 'input' },
+            next: 'SetInputType'
         },
-        'Decision:IsCancelled': {
-            condition: 'this.name == null || this.name == ""',
-            ontrue: 'CreateMessage:NameRefusal',
-            onfalse: 'CreateMessage:Hello'
+        'SetInputType': {
+            execute: function (context, done) {
+                var input = context.Inputs['input'];
+                if (!isNaN(input) && input != null && input.trim() != '') {
+                    input = parseFloat(input);
+                }
+                /* this is a fix for typeof null returning object. */
+                var inputType = input == null || input == '' ? 'null' : (typeof input);
+                context.Outputs['inputType'] = inputType;
+                done();
+            },
+            next: 'Switch:DisplayInputType'
         },
-        'CreateMessage:NameRefusal': {
-            output: 'result',
-            value: '"You did not enter a name!"',
+        'Switch:DisplayInputType': {
+            execute: function (context, done) {
+                var inputType = context.Inputs['inputType'];
+                switch (inputType) {
+                    case 'null':
+                    case 'undefined':
+                        this.next = 'CreateMessage:NoValue';
+                        break;
+                    case 'string':
+                        this.next = 'CreateMessage:String';
+                        break;
+                    case 'number':
+                        this.next = 'CreateMessage:Number';
+                        break;
+                    default:
+                        this.next = 'CreateMessage:Unknown';
+                        break;
+                }
+                done();
+            },
+            next: null
         },
-        'CreateMessage:Hello': {
-            output: 'result',
-            value: '"Hello " + this.name + "!"',
-        }
-    }
-};</code></pre>
+        'CreateMessage:NoValue': { output: 'result', value: '"You did not enter a value!"' },
+        'CreateMessage:String':  { output: 'result', value: '"You entered a string!"' },
+        'CreateMessage:Number':  { output: 'result', value: '"You entered a number!"' },
+        'CreateMessage:Unknown': { output: 'result', value: '"You entered something unknown!"' }
+    },
+};
+</code></pre>
 
                 </div>
                 <div role="tabpanel" class="tab-pane" id="typescript">
@@ -134,9 +160,9 @@
 
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation"><a href="#htmlfile" aria-controls="htmlfile" role="tab" data-toggle="tab">decisions.html</a></li>
-                <li role="presentation" class="active"><a href="#typescriptfile" aria-controls="typescriptfile" role="tab" data-toggle="tab">decisions.ts</a></li>
-                <li role="presentation"><a href="#javascriptfile" aria-controls="javascriptfile" role="tab" data-toggle="tab">decisions.js</a></li>
+                <li role="presentation"><a href="#htmlfile" aria-controls="htmlfile" role="tab" data-toggle="tab">inputs.html</a></li>
+                <li role="presentation" class="active"><a href="#typescriptfile" aria-controls="typescriptfile" role="tab" data-toggle="tab">inputs.ts</a></li>
+                <li role="presentation"><a href="#javascriptfile" aria-controls="javascriptfile" role="tab" data-toggle="tab">inputs.js</a></li>
             </ul>
 
             <!-- Tab panes -->
@@ -147,9 +173,8 @@
     &lt;title&gt;WorkflowJS Input Example&lt;/title&gt;
     &lt;script src="/Scripts/jquery-1.9.1.min.js"&gt;&lt;/script&gt;
     &lt;script src="scripts/lib/workflow.js"&gt;&lt;/script&gt;
-    &lt;script src="scripts/activities/GetUserNameActivity.js"&gt;&lt;/script&gt;
-    &lt;script src="scripts/activities/PromptActivity.js"&gt;&lt;/script&gt;
-    &lt;script src="scripts/decision.js"&gt;&lt;/script&gt;
+    &lt;script src="scripts/activities/AddActivity.js"&gt;&lt;/script&gt;
+    &lt;script src="scripts/inputs.js"&gt;&lt;/script&gt;
 &lt;/head&gt;
 &lt;body&gt;
 
@@ -162,17 +187,17 @@
                 </div>
                 <div role="tabpanel" class="tab-pane active" id="typescriptfile">
 
-<pre><code class="typescript">export class Application
+<pre><code class="typescript">class Application
 {
     constructor(private button: JQuery, private result: JQuery)
     {
-        button.click(() =&gt; this.Click());
+        this.button.click(() =&gt; this.Click());
     }
     
     public Click()
     {
         wfjs.WorkflowInvoker
-            .CreateActivity(Activities.GreetUserActivity)
+            .CreateActivity(GetTypeActivity)
             .Extensions({
                 window: window
             })
@@ -180,7 +205,7 @@
             {
                 if (err != null)
                 {
-                    this.result.text('finished with error: ' + err.toString());
+                    this.result.text('Finished with error: ' + err.toString());
                 }
                 else
                 {
@@ -189,11 +214,11 @@
             });
     }
 }
+
 $(() =&gt;
 {
     var app = new Application($('#button'), $('#result'));
 });
-
 </code></pre>
 
                 </div>
@@ -206,20 +231,20 @@ $(() =&gt;
         this.button = button;
         this.result = result;
 
-        button.click(function () { return _this.Click(); });
+        this.button.click(function () { return _this.Click(); });
     }
-
+    
     Application.prototype.Click = function () {
         var _this = this;
 
         wfjs.WorkflowInvoker
-            .CreateActivity(wfjs.Activities.GreetUserActivity)
+            .CreateActivity(GetTypeActivity)
             .Extensions({
                 window: window
             })
             .Invoke(function (err, ctx) {
                 if (err != null) {
-                    _this.result.text('finished with error: ' + err.toString());
+                    _this.result.text('Finished with error: ' + err.toString());
                 }
                 else {
                     _this.result.text(ctx.Outputs['result']);
@@ -232,7 +257,8 @@ $(() =&gt;
 
 $(function () {
     var app = new Application($('#button'), $('#result'));
-});</code></pre>
+});
+</code></pre>
 
                 </div>
             </div>

@@ -174,6 +174,12 @@ var wfjs;
             else if (activity.condition != null) {
                 this._ExecuteDecision(context, activity, function (err) { return next(err, context); });
             }
+            else if (activity.switch != null) {
+                this._ExecuteSwitch(context, activity, function (err) { return next(err, context); });
+            }
+            else if (activity.execute != null) {
+                this._ExecuteCodeActivity(context, activity, function (err) { return next(err, context); });
+            }
             else {
                 done(new Error(wfjs.Resources.Error_Activity_Invalid));
             }
@@ -197,11 +203,34 @@ var wfjs;
         Workflow.prototype._ExecuteDecision = function (context, activity, done) {
             var err = null;
             try {
-                var decisionActivity = activity;
                 var values = context.Inputs;
                 wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
-                var condition = wfjs.EvalHelper.Eval(values, decisionActivity.condition);
-                decisionActivity.next = condition ? decisionActivity.ontrue : decisionActivity.onfalse;
+                var condition = wfjs.EvalHelper.Eval(values, activity.condition);
+                activity.next = condition ? activity.ontrue : activity.onfalse;
+            }
+            catch (ex) {
+                err = ex;
+            }
+            finally {
+                done(err);
+            }
+        };
+        /**
+         * _ExecuteDecision Evaluates the condition (to true or false) and executes next activity.
+         */
+        Workflow.prototype._ExecuteSwitch = function (context, activity, done) {
+            var err = null;
+            try {
+                var values = context.Inputs;
+                wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
+                var _switch = wfjs.EvalHelper.Eval(values, activity.switch);
+                var _activity = activity.case[_switch] || activity.case['default'];
+                if (_activity != null) {
+                    this._ExecuteLoop(context, _activity, done);
+                }
+                else {
+                    done();
+                }
             }
             catch (ex) {
                 err = ex;
@@ -220,6 +249,27 @@ var wfjs;
                 var values = context.Inputs;
                 wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
                 context.Outputs[assignActivity.output] = wfjs.EvalHelper.Eval(values, assignActivity.value);
+            }
+            catch (ex) {
+                err = ex;
+            }
+            finally {
+                done(err);
+            }
+        };
+        /**
+         * _ExecuteCodeActivity Executes an IExecuteActivity block.
+         */
+        Workflow.prototype._ExecuteCodeActivity = function (context, activity, done) {
+            var err = null;
+            try {
+                var innerContext = Workflow._CreateNextActivityContext(context);
+                activity.execute(innerContext, function (err) {
+                    if (innerContext != null) {
+                        wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                    }
+                    done(err);
+                });
             }
             catch (ex) {
                 err = ex;
@@ -249,11 +299,6 @@ var wfjs;
         Workflow._GetOutputs = function (context, outputMap) {
             outputMap = outputMap || {};
             var value = {};
-            for (var k in context.Outputs) {
-                if (typeof outputMap[k] == 'undefined') {
-                    value[k] = context.Outputs[k];
-                }
-            }
             for (var k in outputMap) {
                 var v = outputMap[k];
                 value[v] = context.Outputs[k];
