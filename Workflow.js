@@ -52,9 +52,6 @@ var wfjs;
             else if (activity.condition != null) {
                 this._ExecuteDecision(context, activity, function (err) { return next(err, context); });
             }
-            else if (activity.switch != null) {
-                this._ExecuteSwitch(context, activity, function (err) { return next(err, context); });
-            }
             else if (activity.execute != null) {
                 this._ExecuteCodeActivity(context, activity, function (err) { return next(err, context); });
             }
@@ -85,30 +82,6 @@ var wfjs;
                 wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
                 var condition = wfjs.EvalHelper.Eval(values, activity.condition);
                 activity.next = condition ? activity.ontrue : activity.onfalse;
-            }
-            catch (ex) {
-                err = ex;
-            }
-            finally {
-                done(err);
-            }
-        };
-        /**
-         * _ExecuteDecision Evaluates the condition (to true or false) and executes next activity.
-         */
-        Workflow.prototype._ExecuteSwitch = function (context, activity, done) {
-            var err = null;
-            try {
-                var values = context.Inputs;
-                wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
-                var _switch = wfjs.EvalHelper.Eval(values, activity.switch);
-                var _activity = activity.case[_switch] || activity.case['default'];
-                if (_activity != null) {
-                    this._ExecuteLoop(context, _activity, done);
-                }
-                else {
-                    done();
-                }
             }
             catch (ex) {
                 err = ex;

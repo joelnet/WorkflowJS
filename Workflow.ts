@@ -82,10 +82,6 @@
             {
                 this._ExecuteDecision(context, <IDecisionActivity>activity, err => next(err, context));
             }
-            else if ((<ISwitchActivity>activity).switch != null)
-            {
-                this._ExecuteSwitch(context, <ISwitchActivity>activity, err => next(err, context));
-            }
             else if ((<IExecuteActivity>activity).execute != null)
             {
                 this._ExecuteCodeActivity(context, <IExecuteActivity>activity, err => next(err, context));
@@ -134,40 +130,6 @@
                 var condition: boolean = EvalHelper.Eval(values, activity.condition);
 
                 activity.next = condition ? activity.ontrue : activity.onfalse;
-            }
-            catch (ex)
-            {
-                err = ex;
-            }
-            finally
-            {
-                done(err);
-            }
-        }
-
-        /**
-         * _ExecuteDecision Evaluates the condition (to true or false) and executes next activity.
-         */
-        private _ExecuteSwitch(context: ActivityContext, activity: ISwitchActivity, done: (err?: Error) => void): void
-        {
-            var err: Error = null;
-
-            try
-            {
-                var values: Dictionary<any> = context.Inputs;
-                ObjectHelper.CopyProperties(context.Outputs, values);
-
-                var _switch = EvalHelper.Eval(values, activity.switch);
-                var _activity = activity.case[_switch] || activity.case['default'];
-
-                if (_activity != null)
-                {
-                    this._ExecuteLoop(context, _activity, done);
-                }
-                else
-                {
-                    done();
-                }
             }
             catch (ex)
             {

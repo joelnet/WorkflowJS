@@ -35,15 +35,6 @@
         next: string;
     }
 
-    export interface ISwitchActivity extends IMapBase
-    {
-        switch: string;
-        case: Dictionary<IMapBase>;
-        null: IMapBase;
-        default: IMapBase;
-        next: string;
-    }
-
     export interface IExecuteActivity extends IMapBase
     {
         execute: (context: ActivityContext, done: (err?: Error) => void) => void;
