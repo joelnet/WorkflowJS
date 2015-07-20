@@ -15,7 +15,7 @@
     export interface ActivityMap extends IMapBase
     {
         activity: wfjs.Activity;
-        $inputs?: Dictionary<ActivityInputMap>;
+        $inputs?: Dictionary<string>;
         $outputs?: Dictionary<string>;
         next: string;
     }
@@ -48,11 +48,5 @@
     {
         execute: (context: ActivityContext, done: (err?: Error) => void) => void;
         next?: string;
-    }
-
-    export interface ActivityInputMap
-    {
-        name?: any;
-        value?: any;
     }
 } 

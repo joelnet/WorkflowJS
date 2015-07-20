@@ -9,7 +9,7 @@
                 activity: new wfjs.Activities.PromptActivity(),
                 $inputs:
                 {
-                    message: { value: 'What is your name?' }
+                    message: '"What is your name?"'
                 },
                 $outputs: { 'result': 'name' },
                 next: 'Decision:IsCancelled'

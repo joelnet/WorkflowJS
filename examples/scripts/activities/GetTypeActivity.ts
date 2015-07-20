@@ -9,7 +9,7 @@
                 activity: new wfjs.Activities.PromptActivity(),
                 $inputs:
                 {
-                    message: { value: 'Enter either a number or a string.' }
+                    message: '"Enter either a number or a string."'
                 },
                 $outputs: { 'result': 'input' },
                 next: 'SetInputType'

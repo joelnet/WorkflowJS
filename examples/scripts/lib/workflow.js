@@ -279,28 +279,25 @@ var wfjs;
             }
         };
         /**
-         * _GetInputs Returns a collection of remapped inputs
+         * _GetInputs Returns a collection of input values.
          */
-        Workflow._GetInputs = function (context, inputMap) {
+        Workflow._GetInputs = function (context, inputs) {
             var value = {};
-            for (var key in inputMap) {
-                if (typeof inputMap[key].value != 'undefined') {
-                    value[key] = inputMap[key].value;
-                }
-                else if (typeof inputMap[key].name != 'undefined') {
-                    value[key] = context.Inputs[inputMap[key].name];
-                }
+            var combinedValues = context.Inputs;
+            wfjs.ObjectHelper.CopyProperties(context.Outputs, combinedValues);
+            for (var key in inputs) {
+                value[key] = wfjs.EvalHelper.Eval(combinedValues, inputs[key]);
             }
             return value;
         };
         /**
          * _GetOutputs Returns a collection out remapped outputs
          */
-        Workflow._GetOutputs = function (context, outputMap) {
-            outputMap = outputMap || {};
+        Workflow._GetOutputs = function (context, outputs) {
+            outputs = outputs || {};
             var value = {};
-            for (var k in outputMap) {
-                var v = outputMap[k];
+            for (var k in outputs) {
+                var v = outputs[k];
                 value[v] = context.Outputs[k];
             }
             return value;

@@ -237,22 +237,18 @@
         }
 
         /**
-         * _GetInputs Returns a collection of remapped inputs
+         * _GetInputs Returns a collection of input values.
          */
-        private static _GetInputs(context: ActivityContext, inputMap: Dictionary<ActivityInputMap>): Dictionary<any>
+        private static _GetInputs(context: ActivityContext, inputs: Dictionary<string>): Dictionary<any>
         {
             var value: Dictionary<any> = {};
 
-            for (var key in inputMap)
+            var combinedValues: Dictionary<any> = context.Inputs;
+            ObjectHelper.CopyProperties(context.Outputs, combinedValues);
+
+            for (var key in inputs)
             {
-                if (typeof inputMap[key].value != 'undefined')
-                {
-                    value[key] = inputMap[key].value;
-                }
-                else if (typeof inputMap[key].name != 'undefined')
-                {
-                    value[key] = context.Inputs[inputMap[key].name];
-                }
+                value[key] = EvalHelper.Eval(combinedValues, inputs[key]);
             }
 
             return value;
@@ -261,15 +257,15 @@
         /**
          * _GetOutputs Returns a collection out remapped outputs
          */
-        private static _GetOutputs(context: ActivityContext, outputMap: Dictionary<string>): Dictionary<any>
+        private static _GetOutputs(context: ActivityContext, outputs: Dictionary<string>): Dictionary<any>
         {
-            outputMap = outputMap || {};
+            outputs = outputs || {};
 
             var value: Dictionary<any> = {};
 
-            for (var k in outputMap)
+            for (var k in outputs)
             {
-                var v = outputMap[k];
+                var v = outputs[k];
                 value[v] = context.Outputs[k];
             }
 
