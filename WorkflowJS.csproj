@@ -29,8 +29,24 @@
     <Content Include="examples\decision.html" />
     <Content Include="examples\css\app.css" />
     <Content Include="examples\errors.html" />
+    <Content Include="examples\extensions.html" />
+    <Content Include="examples\scripts\activities\GetCustomerActivity.js">
+      <DependentUpon>GetCustomerActivity.ts</DependentUpon>
+    </Content>
     <Content Include="examples\scripts\activities\GetTypeActivity.js">
       <DependentUpon>GetTypeActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\extensions.js">
+      <DependentUpon>extensions.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\extensions\CustomerService.js">
+      <DependentUpon>CustomerService.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\models\Customer.js">
+      <DependentUpon>Customer.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\models\Order.js">
+      <DependentUpon>Order.ts</DependentUpon>
     </Content>
     <Content Include="examples\scripts\switch.js">
       <DependentUpon>switch.ts</DependentUpon>
@@ -126,6 +142,21 @@
     <Content Include="examples\scripts\activities\GetTypeActivity.js.map">
       <DependentUpon>GetTypeActivity.ts</DependentUpon>
     </Content>
+    <Content Include="examples\scripts\extensions\CustomerService.js.map">
+      <DependentUpon>CustomerService.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\models\Customer.js.map">
+      <DependentUpon>Customer.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\models\Order.js.map">
+      <DependentUpon>Order.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\extensions.js.map">
+      <DependentUpon>extensions.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\GetCustomerActivity.js.map">
+      <DependentUpon>GetCustomerActivity.ts</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js">
@@ -152,6 +183,7 @@
     <TypeScriptCompile Include="ActivityContext.ts" />
     <TypeScriptCompile Include="Dictionary.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\DivideAsyncActivity.ts" />
+    <TypeScriptCompile Include="examples\scripts\activities\GetCustomerActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\GetTypeActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\GetUserNameActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\HelloWorldActivity.ts" />
@@ -160,7 +192,11 @@
     <TypeScriptCompile Include="examples\scripts\activities\PromptActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\decision.ts" />
     <TypeScriptCompile Include="examples\scripts\errors.ts" />
+    <TypeScriptCompile Include="examples\scripts\extensions.ts" />
+    <TypeScriptCompile Include="examples\scripts\extensions\CustomerService.ts" />
     <TypeScriptCompile Include="examples\scripts\inputs.ts" />
+    <TypeScriptCompile Include="examples\scripts\models\Customer.ts" />
+    <TypeScriptCompile Include="examples\scripts\models\Order.ts" />
     <TypeScriptCompile Include="examples\scripts\switch.ts" />
     <TypeScriptCompile Include="IWorkflowMap.ts" />
     <TypeScriptCompile Include="lib\EvalHelper.ts" />

@@ -1,0 +1,261 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>WorkflowJS Example: Extensions</title>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/vs.min.css">
+    <link rel="stylesheet" href="/Content/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="css/app.css" type="text/css" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+    <script src="/Scripts/jquery-1.9.1.min.js"></script>
+    <script src="/Scripts/bootstrap.min.js"></script>
+    <script src="scripts/lib/workflow.js"></script>
+    <script src="scripts/extensions/CustomerService.js"></script>
+    <script src="scripts/activities/GetCustomerActivity.js"></script>
+    <script src="scripts/extensions.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>WorkflowJS Example: Extensions</h1>
+
+        <p>
+            Extensions are a great way to inject external dependencies into your <code>Activity</code>.
+        </p>
+
+        <p>
+            This example executes the Activity <code>GetCustomerActivity</code> and returns a <code>Customer</code> model. The <code>GetCustomerActivity</code> calls the <code>GetCustomer</code>
+            method on the <code>ICustomerService</code> which is passed in as an <code>Extension</code>.
+        </p>
+
+        <h2>Activity Code</h2>
+
+        <div>
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#typescript" aria-controls="typescript" role="tab" data-toggle="tab">TypeScript</a></li>
+                <li role="presentation"><a href="#javascript" aria-controls="javascript" role="tab" data-toggle="tab">JavaScript</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="typescript">
+<pre><code class="typescript">class GetCustomerActivity implements wfjs.Activity
+{
+    public $inputs = ['customerId'];
+    public $outputs = ['customer'];
+
+    public Execute(context: wfjs.ActivityContext, done: (err?: Error) =&gt; void): void
+    {
+        var customerId: number = parseInt(context.Inputs['customerId']);
+        var customerService: Services.ICustomerService = context.Extensions['CustomerService'];
+
+        if (customerId &gt; 0 == false)
+        {
+            return done(new Error('customerId: Parameter is invalid.'));
+        }
+
+        if (customerService == null)
+        {
+            return done(new Error('CustomerService: Extension cannot be null.'));
+        }
+
+        customerService.GetCustomer(customerId, (err, customer) =&gt;
+        {
+            if (err == null)
+            {
+                context.Outputs['customer'] = customer;
+            }
+
+            done(err);
+        });
+    }
+}</code></pre>
+
+                </div>
+                <div role="tabpanel" class="tab-pane" id="javascript">
+<pre><code class="javascript">function GetCustomerActivity() {
+    this.$inputs = ['customerId'];
+    this.$outputs = ['customer'];
+}
+
+GetCustomerActivity.prototype.Execute = function (context, done) {
+    var customerId = parseInt(context.Inputs['customerId']);
+    var customerService = context.Extensions['CustomerService'];
+    
+    if (customerId &gt; 0 == false) {
+        return done(new Error('customerId: Parameter is invalid.'));
+    }
+    
+    if (customerService == null) {
+        return done(new Error('CustomerService: Extension cannot be null.'));
+    }
+    
+    customerService.GetCustomer(customerId, function (err, customer) {
+        if (err == null) {
+            context.Outputs['customer'] = customer;
+        }
+        
+        done(err);
+    });
+};
+</code></pre>
+                </div>
+            </div>
+
+        </div>
+
+        <h2>Demo</h2>
+
+        <p>
+            Enter a valid number between 1 - 80 to get a <code>Customer</code>.
+            Enter a number greater than 80 and you will get an <code>Error: 99: customer does not exist.</code> error message.
+            Enter an invalid number to get the error <code>Error: customerId: Parameter is invalid.</code>
+        </p>
+
+        <blockquote>
+            <table class="table-condensed" style="width:auto;">
+                <tr>
+                    <td>Customer ID:</td>
+                    <td><input type="number" id="number" value="" /></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input id="button" type="button" value="get customer" /></td>
+                </tr>
+                <tr>
+                    <td>Customer:</td>
+                    <td><pre class="xml"><code id="result">n/a</code></pre></td>
+                </tr>
+            </table>
+        </blockquote>
+
+        <h2>Source</h2>
+
+        <div>
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation"><a href="#htmlfile" aria-controls="htmlfile" role="tab" data-toggle="tab">extensions.html</a></li>
+                <li role="presentation" class="active"><a href="#typescriptfile" aria-controls="typescriptfile" role="tab" data-toggle="tab">extensions.ts</a></li>
+                <li role="presentation"><a href="#javascriptfile" aria-controls="javascriptfile" role="tab" data-toggle="tab">extensions.js</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane" id="htmlfile">
+<pre><code class="html">&lt;table class="table-condensed" style="width:auto;"&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Customer ID:&lt;/td&gt;
+        &lt;td&gt;&lt;input type="number" id="number" value="" /&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input id="button" type="button" value="get customer" /&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Customer:&lt;/td&gt;
+        &lt;td&gt;&lt;pre class="xml"&gt;&lt;code id="result"&gt;n/a&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+</code></pre>
+                </div>
+                <div role="tabpanel" class="tab-pane active" id="typescriptfile">
+
+<pre><code class="typescript">class Application
+{
+    constructor(
+        private number: JQuery,
+        private button: JQuery,
+        private result: JQuery)
+    {
+        this.button.click(() =&gt; this.Click());
+    }
+    
+    public Click()
+    {
+        var activity = new wfjs.Activities.GetCustomerActivity();
+        var extensions: wfjs.Dictionary&lt;any&gt; = {
+            'CustomerService': new wfjs.Services.MockCustomerService()
+        };
+        var inputs: wfjs.Dictionary&lt;any&gt; = {
+            'customerId': this.number.val(),
+        };
+
+        wfjs.WorkflowInvoker
+            .CreateActivity(activity)
+            .Extensions(extensions)
+            .Inputs(inputs)
+            .Invoke((err, ctx) =&gt;
+            {
+                if (err != null)
+                {
+                    this.result.text(err.toString());
+                }
+                else
+                {
+                    this.result.text(JSON.stringify(ctx.Outputs['customer'], null, '    '));
+                }
+            });
+    }
+}
+
+$(() =&gt;
+{
+    var app = new Application($('#number'), $('#button'), $('#result'));
+});
+
+</code></pre>
+
+                </div>
+                <div role="tabpanel" class="tab-pane" id="javascriptfile">
+
+<pre><code class="javascript">function Application(number, button, result) {
+    var _this = this;
+    this.number = number;
+    this.button = button;
+    this.result = result;
+
+    this.button.click(function () { return _this.Click(); });
+}
+
+Application.prototype.Click = function () {
+    var _this = this;
+
+    var activity = new wfjs.Activities.GetCustomerActivity();
+    var extensions = {
+        'CustomerService': new wfjs.Services.MockCustomerService()
+    };
+    var inputs = {
+        'customerId': this.number.val(),
+    };
+
+    wfjs.WorkflowInvoker
+        .CreateActivity(activity)
+        .Extensions(extensions)
+        .Inputs(inputs)
+        .Invoke(function (err, ctx) {
+            if (err != null) {
+                _this.result.text(err.toString());
+            }
+            else {
+                _this.result.text(JSON.stringify(ctx.Outputs['customer'], null, '    '));
+            }
+        });
+};
+
+$(function () {
+    var app = new Application($('#number'), $('#button'), $('#result'));
+});</code></pre>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
