@@ -1,4 +1,6 @@
-﻿module wfjsExample.Controllers
+﻿/// <reference path="../typings/workflowjs/workflow.d.ts" />
+
+module wfjsExample.Controllers
 {
     'use strict';
 

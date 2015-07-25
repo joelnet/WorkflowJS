@@ -2,7 +2,7 @@
 {
     export interface IInternalWorkflow
     {
-        _state: IPauseState;
+        _stateData: IPauseState;
     }
 
     export class Workflow implements IActivity

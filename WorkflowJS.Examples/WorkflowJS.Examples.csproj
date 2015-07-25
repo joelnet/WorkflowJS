@@ -114,15 +114,13 @@
     <Content Include="scripts\inputs.js">
       <DependentUpon>inputs.ts</DependentUpon>
     </Content>
+    <Content Include="packages.config" />
     <Content Include="scripts\lib\workflow.js" />
     <Content Include="scripts\models\Customer.js">
       <DependentUpon>Customer.ts</DependentUpon>
     </Content>
     <Content Include="scripts\models\Order.js">
       <DependentUpon>Order.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\pause.js">
-      <DependentUpon>pause.ts</DependentUpon>
     </Content>
     <Content Include="scripts\switch.js">
       <DependentUpon>switch.ts</DependentUpon>
@@ -188,9 +186,6 @@
     <Content Include="scripts\models\Order.js.map">
       <DependentUpon>Order.ts</DependentUpon>
     </Content>
-    <Content Include="scripts\pause.js.map">
-      <DependentUpon>pause.ts</DependentUpon>
-    </Content>
     <Content Include="scripts\switch.js.map">
       <DependentUpon>switch.ts</DependentUpon>
     </Content>
@@ -220,8 +215,16 @@
     <TypeScriptCompile Include="scripts\inputs.ts" />
     <TypeScriptCompile Include="scripts\models\Customer.ts" />
     <TypeScriptCompile Include="scripts\models\Order.ts" />
-    <TypeScriptCompile Include="scripts\pause.ts" />
     <TypeScriptCompile Include="scripts\switch.ts" />
+    <TypeScriptCompile Include="scripts\typings\angularjs\angular-animate.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\angularjs\angular-cookies.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\angularjs\angular-mocks.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\angularjs\angular-resource.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\angularjs\angular-route.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\angularjs\angular-sanitize.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\angularjs\angular.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\workflowjs\workflow.d.ts" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>

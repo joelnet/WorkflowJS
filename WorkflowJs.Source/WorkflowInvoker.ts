@@ -5,7 +5,7 @@
         private _activity: IActivity;
         private _inputs: Dictionary<string> = null
         private _extensions: Dictionary<string> = null
-        private _state: IPauseState = null;
+        private _stateData: IPauseState = null;
 
         constructor(activity: IActivity | IFlowchartMap)
         {
@@ -37,8 +37,8 @@
 
         public State(state: IPauseState): WorkflowInvoker
         {
-            this._state = state;
-            (<IInternalWorkflow><any>this._activity)._state = state;
+            this._stateData = state;
+            (<IInternalWorkflow><any>this._activity)._stateData = state;
             return this;
         }
 
@@ -52,7 +52,7 @@
         {
             callback = callback || function(){};
 
-            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._state, this._extensions, callback);
+            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, callback);
         }
 
         private static _InvokeActivity(activity: IActivity, inputs: Dictionary<string>, state: IPauseState, extensions: Dictionary<string>, callback: (err: Error, context?: ActivityContext) => void): void

@@ -4,7 +4,7 @@ var wfjs;
         function WorkflowInvoker(activity) {
             this._inputs = null;
             this._extensions = null;
-            this._state = null;
+            this._stateData = null;
             if (activity == null) {
                 throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'activity'));
             }
@@ -23,8 +23,8 @@ var wfjs;
             return this;
         };
         WorkflowInvoker.prototype.State = function (state) {
-            this._state = state;
-            this._activity._state = state;
+            this._stateData = state;
+            this._activity._stateData = state;
             return this;
         };
         WorkflowInvoker.prototype.Extensions = function (extensions) {
@@ -34,7 +34,7 @@ var wfjs;
         WorkflowInvoker.prototype.Invoke = function (callback) {
             callback = callback || function () {
             };
-            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._state, this._extensions, callback);
+            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, callback);
         };
         WorkflowInvoker._InvokeActivity = function (activity, inputs, state, extensions, callback) {
             WorkflowInvoker._CreateContext(activity, inputs, state, extensions, function (err, context) {

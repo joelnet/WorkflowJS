@@ -21,14 +21,6 @@
     <Content Include="AssignActivity.js">
       <DependentUpon>AssignActivity.ts</DependentUpon>
     </Content>
-    <Content Include="Content\bootstrap-theme.css" />
-    <Content Include="Content\bootstrap-theme.min.css">
-      <DependentUpon>bootstrap-theme.css</DependentUpon>
-    </Content>
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css">
-      <DependentUpon>bootstrap.css</DependentUpon>
-    </Content>
     <Content Include="Activity.js">
       <DependentUpon>Activity.ts</DependentUpon>
     </Content>
@@ -41,8 +33,6 @@
     <Content Include="Execute.js">
       <DependentUpon>Execute.ts</DependentUpon>
     </Content>
-    <Content Include="fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="Icon.png" />
     <Content Include="IWorkflowMap.js">
       <DependentUpon>IWorkflowMap.ts</DependentUpon>
     </Content>
@@ -57,16 +47,6 @@
     </Content>
     <Content Include="Resource.js">
       <DependentUpon>Resource.ts</DependentUpon>
-    </Content>
-    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
-    <Content Include="fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Content\bootstrap-theme.css.map">
-      <DependentUpon>bootstrap-theme.css</DependentUpon>
-    </Content>
-    <Content Include="Content\bootstrap.css.map">
-      <DependentUpon>bootstrap.css</DependentUpon>
     </Content>
     <Content Include="lib\ObjectHelper.js.map">
       <DependentUpon>ObjectHelper.ts</DependentUpon>
@@ -86,16 +66,6 @@
     <Content Include="WorkflowState.js">
       <DependentUpon>WorkflowState.ts</DependentUpon>
     </Content>
-    <None Include="Scripts\jquery-1.9.1.intellisense.js" />
-    <Content Include="Scripts\bootstrap.js" />
-    <Content Include="Scripts\bootstrap.min.js">
-      <DependentUpon>bootstrap.js</DependentUpon>
-    </Content>
-    <Content Include="Scripts\jquery-1.9.1.js" />
-    <Content Include="Scripts\jquery-1.9.1.min.js">
-      <DependentUpon>jquery-1.9.1.js</DependentUpon>
-    </Content>
-    <Content Include="Scripts\npm.js" />
     <Content Include="lib\Specification.js">
       <DependentUpon>Specification.ts</DependentUpon>
     </Content>
@@ -155,9 +125,6 @@
       <DependentUpon>IWorkflowMap.ts</DependentUpon>
     </Content>
     <Content Include="packages.config" />
-    <Content Include="Scripts\jquery-1.9.1.min.map">
-      <DependentUpon>jquery-1.9.1.js</DependentUpon>
-    </Content>
     <Content Include="lib\Specification.js.map">
       <DependentUpon>Specification.ts</DependentUpon>
     </Content>
@@ -197,7 +164,8 @@
           <IISUrl>http://localhost:53201/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl></CustomServerUrl>
+          <CustomServerUrl>
+          </CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
@@ -215,9 +183,11 @@
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <PropertyGroup>
     <PostBuildEvent>cd $(ProjectDir)
-dir *.ts /s /b &gt;&gt;ts-files
-tsc @ts-files --out bin\workflow.js
+dir lib\*.ts /s /b &gt;ts-files
+dir *.ts /b &gt;&gt;ts-files
+tsc @ts-files --out bin\workflow.js --declaration
 copy bin\workflow.js ..\WorkflowJS.Examples\scripts\lib\workflow.js
+copy bin\workflow.d.ts ..\WorkflowJS.Examples\scripts\typings\workflowjs\workflow.d.ts
 del ts-files</PostBuildEvent>
   </PropertyGroup>
 </Project>

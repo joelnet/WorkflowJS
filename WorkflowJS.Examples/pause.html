@@ -5,17 +5,16 @@
     <meta charset="utf-8" />
     <title>WorkflowJS Example: Inputs</title>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/vs.min.css">
-    <link rel="stylesheet" href="/Content/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="css/app.css" type="text/css" />
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.3/angular.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
-    <script src="/Scripts/jquery-1.9.1.min.js"></script>
-    <script src="/Scripts/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="scripts/lib/workflow.js"></script>
     <script src="scripts/activities/CreateMathActivity.js"></script>
     <script src="scripts/activities/MathProblemWorkflow.js"></script>
     <script src="scripts/controllers/MathProblemController.js"></script>
-    <script src="scripts/pause.js"></script>
 </head>
 <body>
 
@@ -41,14 +40,11 @@
 {
     public $inputs = ['number1', 'number2'];
     public $outputs = ['total'];
-
     public Execute(context: wfjs.ActivityContext, done: (err?: Error) => void): void
     {
         var number1: number = parseFloat(context.Inputs['number1']) || 0;
         var number2: number = parseFloat(context.Inputs['number2']) || 0;
-
         context.Outputs['total'] = number1 + number2;
-
         done();
     }
 }</code></pre>
@@ -59,13 +55,10 @@
     this.$inputs = ['number1', 'number2'];
     this.$outputs = ['total'];
 }
-
 AddActivity.prototype.Execute = function (context, done) {
     var number1 = parseFloat(context.Inputs['number1']) || 0;
     var number2 = parseFloat(context.Inputs['number2']) || 0;
-
     context.Outputs['total'] = number1 + number2;
-
     done();
 };</code></pre>
                 </div>
@@ -136,7 +129,6 @@ AddActivity.prototype.Execute = function (context, done) {
     &lt;script src="scripts/inputs.js"&gt;&lt;/script&gt;
 &lt;/head&gt;
 &lt;body&gt;
-
     &lt;table class="table-condensed" style="width:auto;"&gt;
         &lt;tr&gt;
             &lt;td&gt;&lt;input type="number" id="number1" value="" /&gt;&lt;/td&gt;
@@ -149,7 +141,6 @@ AddActivity.prototype.Execute = function (context, done) {
             &lt;td colspan="5"&gt;&lt;input id="button" type="button" value="calculate" /&gt;&lt;/td&gt;
         &lt;/tr&gt;
     &lt;/table&gt;
-
 &lt;/body&gt;
 &lt;/html&gt;
 </code></pre>
@@ -174,7 +165,6 @@ AddActivity.prototype.Execute = function (context, done) {
             'number1': this.number1.val(),
             'number2': this.number2.val()
         };
-
         wfjs.WorkflowInvoker
             .CreateActivity(activity)
             .Inputs(inputs)
@@ -191,12 +181,10 @@ AddActivity.prototype.Execute = function (context, done) {
             });
     }
 }
-
 $(() =&gt;
 {
     var app = new Application($('#number1'), $('#number2'), $('#button'), $('#result'));
 });
-
 </code></pre>
 
                 </div>
@@ -212,7 +200,6 @@ var Application = (function () {
         this.result = result;
         this.button.click(function () { return _this.Click(); });
     }
-
     Application.prototype.Click = function () {
         var _this = this;
         var activity = new AddActivity();
@@ -220,7 +207,6 @@ var Application = (function () {
             'number1': this.number1.val(),
             'number2': this.number2.val()
         };
-
         wfjs.WorkflowInvoker
             .CreateActivity(activity)
             .Inputs(inputs)
@@ -233,10 +219,8 @@ var Application = (function () {
                 }
             });
     };
-
     return Application;
 })();
-
 $(function () {
     var app = new Application($('#number1'), $('#number2'), $('#button'), $('#result'));
 });</code></pre>
@@ -247,6 +231,13 @@ $(function () {
         </div>
 
     </div>
+
+    <script type="text/javascript">
+        (function () {
+            angular.module('mathproblem', [])
+                .controller('MathProblemController', wfjsExample.Controllers.MathProblemController);
+        })();
+    </script>
 
 </body>
 </html>

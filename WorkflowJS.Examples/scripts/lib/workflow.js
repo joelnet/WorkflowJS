@@ -1,5 +1,83 @@
 var wfjs;
 (function (wfjs) {
+    var EvalHelper = (function () {
+        function EvalHelper() {
+        }
+        EvalHelper.Eval = function (thisArg, code) {
+            var contextEval = function () {
+                return eval(code);
+            };
+            return contextEval.call(thisArg);
+        };
+        return EvalHelper;
+    })();
+    wfjs.EvalHelper = EvalHelper;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    var ObjectHelper = (function () {
+        function ObjectHelper() {
+        }
+        ObjectHelper.GetKeys = function (obj) {
+            var keys = [];
+            for (var key in (obj || {})) {
+                keys.push(key);
+            }
+            return keys;
+        };
+        ObjectHelper.CopyProperties = function (source, destination) {
+            if (source == null || destination == null) {
+                return;
+            }
+            for (var key in source) {
+                destination[key] = source[key];
+            }
+        };
+        ObjectHelper.ShallowClone = function (obj) {
+            if (obj == null) {
+                return null;
+            }
+            var isArray = Object.prototype.toString.call(obj) == '[object Array]';
+            if (isArray) {
+                return this.ShallowCloneArray(obj);
+            }
+            else {
+                return this.ShallowCloneObject(obj);
+            }
+        };
+        ObjectHelper.ShallowCloneArray = function (obj) {
+            var clone = [];
+            for (var i = 0; i < obj.length; i++) {
+                clone.push(obj[i]);
+            }
+            return clone;
+        };
+        ObjectHelper.ShallowCloneObject = function (obj) {
+            var clone = {};
+            for (var key in obj) {
+                clone[key] = obj[key];
+            }
+            return clone;
+        };
+        return ObjectHelper;
+    })();
+    wfjs.ObjectHelper = ObjectHelper;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    var Specification = (function () {
+        function Specification(criteria) {
+            this._criteria = criteria;
+        }
+        Specification.prototype.IsSatisfiedBy = function (value) {
+            return this._criteria(value);
+        };
+        return Specification;
+    })();
+    wfjs.Specification = Specification;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
     wfjs.Activity = function (options) {
         return options;
     };
@@ -311,7 +389,7 @@ var wfjs;
         function WorkflowInvoker(activity) {
             this._inputs = null;
             this._extensions = null;
-            this._state = null;
+            this._stateData = null;
             if (activity == null) {
                 throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'activity'));
             }
@@ -330,8 +408,8 @@ var wfjs;
             return this;
         };
         WorkflowInvoker.prototype.State = function (state) {
-            this._state = state;
-            this._activity._state = state;
+            this._stateData = state;
+            this._activity._stateData = state;
             return this;
         };
         WorkflowInvoker.prototype.Extensions = function (extensions) {
@@ -341,7 +419,7 @@ var wfjs;
         WorkflowInvoker.prototype.Invoke = function (callback) {
             callback = callback || function () {
             };
-            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._state, this._extensions, callback);
+            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, callback);
         };
         WorkflowInvoker._InvokeActivity = function (activity, inputs, state, extensions, callback) {
             WorkflowInvoker._CreateContext(activity, inputs, state, extensions, function (err, context) {
@@ -421,82 +499,4 @@ var wfjs;
         WorkflowState[WorkflowState["Fault"] = 4] = "Fault";
     })(wfjs.WorkflowState || (wfjs.WorkflowState = {}));
     var WorkflowState = wfjs.WorkflowState;
-})(wfjs || (wfjs = {}));
-var wfjs;
-(function (wfjs) {
-    var EvalHelper = (function () {
-        function EvalHelper() {
-        }
-        EvalHelper.Eval = function (thisArg, code) {
-            var contextEval = function () {
-                return eval(code);
-            };
-            return contextEval.call(thisArg);
-        };
-        return EvalHelper;
-    })();
-    wfjs.EvalHelper = EvalHelper;
-})(wfjs || (wfjs = {}));
-var wfjs;
-(function (wfjs) {
-    var ObjectHelper = (function () {
-        function ObjectHelper() {
-        }
-        ObjectHelper.GetKeys = function (obj) {
-            var keys = [];
-            for (var key in (obj || {})) {
-                keys.push(key);
-            }
-            return keys;
-        };
-        ObjectHelper.CopyProperties = function (source, destination) {
-            if (source == null || destination == null) {
-                return;
-            }
-            for (var key in source) {
-                destination[key] = source[key];
-            }
-        };
-        ObjectHelper.ShallowClone = function (obj) {
-            if (obj == null) {
-                return null;
-            }
-            var isArray = Object.prototype.toString.call(obj) == '[object Array]';
-            if (isArray) {
-                return this.ShallowCloneArray(obj);
-            }
-            else {
-                return this.ShallowCloneObject(obj);
-            }
-        };
-        ObjectHelper.ShallowCloneArray = function (obj) {
-            var clone = [];
-            for (var i = 0; i < obj.length; i++) {
-                clone.push(obj[i]);
-            }
-            return clone;
-        };
-        ObjectHelper.ShallowCloneObject = function (obj) {
-            var clone = {};
-            for (var key in obj) {
-                clone[key] = obj[key];
-            }
-            return clone;
-        };
-        return ObjectHelper;
-    })();
-    wfjs.ObjectHelper = ObjectHelper;
-})(wfjs || (wfjs = {}));
-var wfjs;
-(function (wfjs) {
-    var Specification = (function () {
-        function Specification(criteria) {
-            this._criteria = criteria;
-        }
-        Specification.prototype.IsSatisfiedBy = function (value) {
-            return this._criteria(value);
-        };
-        return Specification;
-    })();
-    wfjs.Specification = Specification;
 })(wfjs || (wfjs = {}));

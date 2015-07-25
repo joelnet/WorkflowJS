@@ -1,3 +1,4 @@
+/// <reference path="../typings/workflowjs/workflow.d.ts" />
 var wfjsExample;
 (function (wfjsExample) {
     var Controllers;
