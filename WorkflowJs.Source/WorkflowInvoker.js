@@ -46,7 +46,7 @@ var wfjs;
                         if (err != null) {
                             return callback(err, null);
                         }
-                        if (wfjs.Specifications._IsPaused.IsSatisfiedBy(context)) {
+                        if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
                             return callback(null, context);
                         }
                         WorkflowInvoker._GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {

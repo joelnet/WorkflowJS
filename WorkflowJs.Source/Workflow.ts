@@ -9,10 +9,11 @@
     {
         public $inputs: string[];
         public $outputs: string[];
+        public State: WorkflowState = WorkflowState.None;
 
         private _activities: Dictionary<IMapBase>;
         private _extensions: Dictionary<any>;
-        private _state: IPauseState;
+        private _stateData: IPauseState;
 
         constructor(map: IFlowchartMap, state?: IPauseState)
         {
@@ -30,7 +31,7 @@
             this.$outputs = map.$outputs || [];
             this._activities = map.activities || {};
             this._extensions = map.$extensions || {};
-            this._state = state || null;
+            this._stateData = state || null;
         }
 
         /**
@@ -38,6 +39,8 @@
          */
         public Execute(context: ActivityContext, done: (err?: Error) => void): void
         {
+            this.State = WorkflowState.Running;
+
             var activityCount = Object.keys(this._activities).length;
 
             if (activityCount == 0)
@@ -45,9 +48,25 @@
                 return done();
             }
 
-            var activity = Workflow._GetFirstActivity(this._activities, this._state);
+            var activity = Workflow._GetFirstActivity(this._activities, this._stateData);
 
-            this._ExecuteLoop(context, activity, done);
+            this._ExecuteLoop(context, activity, err =>
+            {
+                if (_Specifications.IsPaused.IsSatisfiedBy(context))
+                {
+                    this.State = WorkflowState.Paused;
+                }
+                else if (err != null)
+                {
+                    this.State = WorkflowState.Fault;
+                }
+                else
+                {
+                    this.State = WorkflowState.Complete;
+                }
+                
+                done(err);
+            });
         }
 
         /**
@@ -64,7 +83,7 @@
                     return done(err);
                 }
                 
-                var nextActivity = !Specifications._IsPaused.IsSatisfiedBy(innerContext)
+                var nextActivity = !_Specifications.IsPaused.IsSatisfiedBy(innerContext)
                     ? Workflow._GetNextActivity(activity, this._activities)
                     : null;
                 var activityExecute = nextActivity != null
@@ -75,9 +94,9 @@
                 {
                     ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
                     
-                    if (Specifications._IsPaused.IsSatisfiedBy(innerContext))
+                    if (_Specifications.IsPaused.IsSatisfiedBy(innerContext))
                     {
-                        context.State = innerContext.State;
+                        context.StateData = innerContext.StateData;
                     }
 
                     done(err);
@@ -122,7 +141,7 @@
 
             try
             {
-                context.State = activity.Pause(context);
+                context.StateData = activity.Pause(context);
             }
             catch (ex)
             {

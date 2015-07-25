@@ -73,7 +73,7 @@
                             return callback(err, null);
                         }
 
-                        if (Specifications._IsPaused.IsSatisfiedBy(context))
+                        if (_Specifications.IsPaused.IsSatisfiedBy(context))
                         {
                             return callback(null, context);
                         }

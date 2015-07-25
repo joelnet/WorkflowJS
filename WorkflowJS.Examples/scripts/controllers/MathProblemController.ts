@@ -80,9 +80,9 @@
                         }
                     }
 
-                    if (ctx != null && ctx.State != null)
+                    if (ctx != null && ctx.StateData != null)
                     {
-                        this.$scope.model.workflowState = ctx.State;
+                        this.$scope.model.workflowState = ctx.StateData;
                     }
                 });
         }

@@ -39,8 +39,8 @@ var wfjsExample;
                             _this.$scope.model.correct = ctx.Outputs['correct'];
                         }
                     }
-                    if (ctx != null && ctx.State != null) {
-                        _this.$scope.model.workflowState = ctx.State;
+                    if (ctx != null && ctx.StateData != null) {
+                        _this.$scope.model.workflowState = ctx.StateData;
                     }
                 });
             };

@@ -1,0 +1,260 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DDF9933C-8839-44B5-A8BF-B59357B7C2AD}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WorkflowJS.Examples</RootNamespace>
+    <AssemblyName>WorkflowJS.Examples</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <TypeScriptToolsVersion>1.4</TypeScriptToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="css\app.css" />
+    <Content Include="decision.html" />
+    <Content Include="errors.html" />
+    <Content Include="extensions.html" />
+    <Content Include="index.html" />
+    <Content Include="inputs.html" />
+    <Content Include="pause.html" />
+    <Content Include="scripts\activities\AddActivity.js">
+      <DependentUpon>AddActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\CreateMathActivity.js">
+      <DependentUpon>CreateMathActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\DivideAsyncActivity.js">
+      <DependentUpon>DivideAsyncActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\GetCustomerActivity.js">
+      <DependentUpon>GetCustomerActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\GetTypeActivity.js">
+      <DependentUpon>GetTypeActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\GetUserNameActivity.js">
+      <DependentUpon>GetUserNameActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\HelloWorldActivity.js">
+      <DependentUpon>HelloWorldActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\MathProblemWorkflow.js">
+      <DependentUpon>MathProblemWorkflow.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\MultiplyActivity.js">
+      <DependentUpon>MultiplyActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\PromptActivity.js">
+      <DependentUpon>PromptActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\controllers\MathProblemController.js">
+      <DependentUpon>MathProblemController.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\decision.js">
+      <DependentUpon>decision.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\errors.js">
+      <DependentUpon>errors.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\extensions.js">
+      <DependentUpon>extensions.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\extensions\CustomerService.js">
+      <DependentUpon>CustomerService.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\inputs.js">
+      <DependentUpon>inputs.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\lib\workflow.js" />
+    <Content Include="scripts\models\Customer.js">
+      <DependentUpon>Customer.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\models\Order.js">
+      <DependentUpon>Order.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\pause.js">
+      <DependentUpon>pause.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\switch.js">
+      <DependentUpon>switch.ts</DependentUpon>
+    </Content>
+    <Content Include="switch.html" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="scripts\activities\AddActivity.js.map">
+      <DependentUpon>AddActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\CreateMathActivity.js.map">
+      <DependentUpon>CreateMathActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\DivideAsyncActivity.js.map">
+      <DependentUpon>DivideAsyncActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\GetCustomerActivity.js.map">
+      <DependentUpon>GetCustomerActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\GetTypeActivity.js.map">
+      <DependentUpon>GetTypeActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\GetUserNameActivity.js.map">
+      <DependentUpon>GetUserNameActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\HelloWorldActivity.js.map">
+      <DependentUpon>HelloWorldActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\MathProblemWorkflow.js.map">
+      <DependentUpon>MathProblemWorkflow.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\MultiplyActivity.js.map">
+      <DependentUpon>MultiplyActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\activities\PromptActivity.js.map">
+      <DependentUpon>PromptActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\controllers\MathProblemController.js.map">
+      <DependentUpon>MathProblemController.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\decision.js.map">
+      <DependentUpon>decision.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\errors.js.map">
+      <DependentUpon>errors.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\extensions.js.map">
+      <DependentUpon>extensions.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\extensions\CustomerService.js.map">
+      <DependentUpon>CustomerService.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\inputs.js.map">
+      <DependentUpon>inputs.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\models\Customer.js.map">
+      <DependentUpon>Customer.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\models\Order.js.map">
+      <DependentUpon>Order.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\pause.js.map">
+      <DependentUpon>pause.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\switch.js.map">
+      <DependentUpon>switch.ts</DependentUpon>
+    </Content>
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="scripts\activities\AddActivity.ts" />
+    <TypeScriptCompile Include="scripts\activities\CreateMathActivity.ts" />
+    <TypeScriptCompile Include="scripts\activities\DivideAsyncActivity.ts" />
+    <TypeScriptCompile Include="scripts\activities\GetCustomerActivity.ts" />
+    <TypeScriptCompile Include="scripts\activities\GetTypeActivity.ts" />
+    <TypeScriptCompile Include="scripts\activities\GetUserNameActivity.ts" />
+    <TypeScriptCompile Include="scripts\activities\HelloWorldActivity.ts" />
+    <TypeScriptCompile Include="scripts\activities\MathProblemWorkflow.ts" />
+    <TypeScriptCompile Include="scripts\activities\MultiplyActivity.ts" />
+    <TypeScriptCompile Include="scripts\activities\PromptActivity.ts" />
+    <TypeScriptCompile Include="scripts\controllers\MathProblemController.ts" />
+    <TypeScriptCompile Include="scripts\decision.ts" />
+    <TypeScriptCompile Include="scripts\errors.ts" />
+    <TypeScriptCompile Include="scripts\extensions.ts" />
+    <TypeScriptCompile Include="scripts\extensions\CustomerService.ts" />
+    <TypeScriptCompile Include="scripts\inputs.ts" />
+    <TypeScriptCompile Include="scripts\models\Customer.ts" />
+    <TypeScriptCompile Include="scripts\models\Order.ts" />
+    <TypeScriptCompile Include="scripts\pause.ts" />
+    <TypeScriptCompile Include="scripts\switch.ts" />
+  </ItemGroup>
+  <ItemGroup />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>58360</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:58360/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

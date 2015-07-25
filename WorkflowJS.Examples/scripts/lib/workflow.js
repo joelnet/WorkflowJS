@@ -1,83 +1,5 @@
 var wfjs;
 (function (wfjs) {
-    var ObjectHelper = (function () {
-        function ObjectHelper() {
-        }
-        ObjectHelper.GetKeys = function (obj) {
-            var keys = [];
-            for (var key in (obj || {})) {
-                keys.push(key);
-            }
-            return keys;
-        };
-        ObjectHelper.CopyProperties = function (source, destination) {
-            if (source == null || destination == null) {
-                return;
-            }
-            for (var key in source) {
-                destination[key] = source[key];
-            }
-        };
-        ObjectHelper.ShallowClone = function (obj) {
-            if (obj == null) {
-                return null;
-            }
-            var isArray = Object.prototype.toString.call(obj) == '[object Array]';
-            if (isArray) {
-                return this.ShallowCloneArray(obj);
-            }
-            else {
-                return this.ShallowCloneObject(obj);
-            }
-        };
-        ObjectHelper.ShallowCloneArray = function (obj) {
-            var clone = [];
-            for (var i = 0; i < obj.length; i++) {
-                clone.push(obj[i]);
-            }
-            return clone;
-        };
-        ObjectHelper.ShallowCloneObject = function (obj) {
-            var clone = {};
-            for (var key in obj) {
-                clone[key] = obj[key];
-            }
-            return clone;
-        };
-        return ObjectHelper;
-    })();
-    wfjs.ObjectHelper = ObjectHelper;
-})(wfjs || (wfjs = {}));
-var wfjs;
-(function (wfjs) {
-    var EvalHelper = (function () {
-        function EvalHelper() {
-        }
-        EvalHelper.Eval = function (thisArg, code) {
-            var contextEval = function () {
-                return eval(code);
-            };
-            return contextEval.call(thisArg);
-        };
-        return EvalHelper;
-    })();
-    wfjs.EvalHelper = EvalHelper;
-})(wfjs || (wfjs = {}));
-var wfjs;
-(function (wfjs) {
-    var Specification = (function () {
-        function Specification(criteria) {
-            this._criteria = criteria;
-        }
-        Specification.prototype.IsSatisfiedBy = function (value) {
-            return this._criteria(value);
-        };
-        return Specification;
-    })();
-    wfjs.Specification = Specification;
-})(wfjs || (wfjs = {}));
-var wfjs;
-(function (wfjs) {
     wfjs.Activity = function (options) {
         return options;
     };
@@ -144,18 +66,19 @@ var wfjs;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
-    var Specifications = (function () {
-        function Specifications() {
+    var _Specifications = (function () {
+        function _Specifications() {
         }
-        Specifications._IsPaused = new wfjs.Specification(function (o) { return o.State != null; });
-        return Specifications;
+        _Specifications.IsPaused = new wfjs.Specification(function (o) { return o.StateData != null; });
+        return _Specifications;
     })();
-    wfjs.Specifications = Specifications;
+    wfjs._Specifications = _Specifications;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
     var Workflow = (function () {
         function Workflow(map, state) {
+            this.State = 0 /* None */;
             if (map == null) {
                 throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'map'));
             }
@@ -166,22 +89,31 @@ var wfjs;
             this.$outputs = map.$outputs || [];
             this._activities = map.activities || {};
             this._extensions = map.$extensions || {};
-            this._state = state || null;
+            this._stateData = state || null;
         }
         /**
          * Execution point that will be entered via WorkflowInvoker.
          */
         Workflow.prototype.Execute = function (context, done) {
-            if (this._state != null) {
-                console.log('this._state', this._state);
-                console.log('context', context);
-            }
+            var _this = this;
+            this.State = 1 /* Running */;
             var activityCount = Object.keys(this._activities).length;
             if (activityCount == 0) {
                 return done();
             }
-            var activity = Workflow._GetFirstActivity(this._activities, this._state);
-            this._ExecuteLoop(context, activity, done);
+            var activity = Workflow._GetFirstActivity(this._activities, this._stateData);
+            this._ExecuteLoop(context, activity, function (err) {
+                if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
+                    _this.State = 3 /* Paused */;
+                }
+                else if (err != null) {
+                    _this.State = 4 /* Fault */;
+                }
+                else {
+                    _this.State = 2 /* Complete */;
+                }
+                done(err);
+            });
         };
         /**
          * _ExecuteLoop Execution loop that executes every Activity.
@@ -193,14 +125,14 @@ var wfjs;
                 if (err != null) {
                     return done(err);
                 }
-                var nextActivity = !wfjs.Specifications._IsPaused.IsSatisfiedBy(innerContext) ? Workflow._GetNextActivity(activity, _this._activities) : null;
+                var nextActivity = !wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext) ? Workflow._GetNextActivity(activity, _this._activities) : null;
                 var activityExecute = nextActivity != null ? _this._ExecuteLoop.bind(_this) : function (innerContext, nextActivity, callback) {
                     callback();
                 };
                 activityExecute(innerContext, nextActivity, function (err) {
                     wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
-                    if (wfjs.Specifications._IsPaused.IsSatisfiedBy(innerContext)) {
-                        context.State = innerContext.State;
+                    if (wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext)) {
+                        context.StateData = innerContext.StateData;
                     }
                     done(err);
                 });
@@ -232,7 +164,7 @@ var wfjs;
         Workflow.prototype._ExecutePause = function (context, activity, done) {
             var err = null;
             try {
-                context.State = activity.Pause(context);
+                context.StateData = activity.Pause(context);
             }
             catch (ex) {
                 err = ex;
@@ -421,7 +353,7 @@ var wfjs;
                         if (err != null) {
                             return callback(err, null);
                         }
-                        if (wfjs.Specifications._IsPaused.IsSatisfiedBy(context)) {
+                        if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
                             return callback(null, context);
                         }
                         WorkflowInvoker._GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
@@ -478,4 +410,93 @@ var wfjs;
         return WorkflowInvoker;
     })();
     wfjs.WorkflowInvoker = WorkflowInvoker;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    (function (WorkflowState) {
+        WorkflowState[WorkflowState["None"] = 0] = "None";
+        WorkflowState[WorkflowState["Running"] = 1] = "Running";
+        WorkflowState[WorkflowState["Complete"] = 2] = "Complete";
+        WorkflowState[WorkflowState["Paused"] = 3] = "Paused";
+        WorkflowState[WorkflowState["Fault"] = 4] = "Fault";
+    })(wfjs.WorkflowState || (wfjs.WorkflowState = {}));
+    var WorkflowState = wfjs.WorkflowState;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    var EvalHelper = (function () {
+        function EvalHelper() {
+        }
+        EvalHelper.Eval = function (thisArg, code) {
+            var contextEval = function () {
+                return eval(code);
+            };
+            return contextEval.call(thisArg);
+        };
+        return EvalHelper;
+    })();
+    wfjs.EvalHelper = EvalHelper;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    var ObjectHelper = (function () {
+        function ObjectHelper() {
+        }
+        ObjectHelper.GetKeys = function (obj) {
+            var keys = [];
+            for (var key in (obj || {})) {
+                keys.push(key);
+            }
+            return keys;
+        };
+        ObjectHelper.CopyProperties = function (source, destination) {
+            if (source == null || destination == null) {
+                return;
+            }
+            for (var key in source) {
+                destination[key] = source[key];
+            }
+        };
+        ObjectHelper.ShallowClone = function (obj) {
+            if (obj == null) {
+                return null;
+            }
+            var isArray = Object.prototype.toString.call(obj) == '[object Array]';
+            if (isArray) {
+                return this.ShallowCloneArray(obj);
+            }
+            else {
+                return this.ShallowCloneObject(obj);
+            }
+        };
+        ObjectHelper.ShallowCloneArray = function (obj) {
+            var clone = [];
+            for (var i = 0; i < obj.length; i++) {
+                clone.push(obj[i]);
+            }
+            return clone;
+        };
+        ObjectHelper.ShallowCloneObject = function (obj) {
+            var clone = {};
+            for (var key in obj) {
+                clone[key] = obj[key];
+            }
+            return clone;
+        };
+        return ObjectHelper;
+    })();
+    wfjs.ObjectHelper = ObjectHelper;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    var Specification = (function () {
+        function Specification(criteria) {
+            this._criteria = criteria;
+        }
+        Specification.prototype.IsSatisfiedBy = function (value) {
+            return this._criteria(value);
+        };
+        return Specification;
+    })();
+    wfjs.Specification = Specification;
 })(wfjs || (wfjs = {}));

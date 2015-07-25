@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkflowJS", "WorkflowJS.csproj", "{BDFF6765-E588-4AF6-B7A8-D16D0C938C46}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkflowJS.Source", "WorkflowJs.Source\WorkflowJS.Source.csproj", "{BDFF6765-E588-4AF6-B7A8-D16D0C938C46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkflowJS.Examples", "WorkflowJS.Examples\WorkflowJS.Examples.csproj", "{DDF9933C-8839-44B5-A8BF-B59357B7C2AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{BDFF6765-E588-4AF6-B7A8-D16D0C938C46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDFF6765-E588-4AF6-B7A8-D16D0C938C46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDFF6765-E588-4AF6-B7A8-D16D0C938C46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDF9933C-8839-44B5-A8BF-B59357B7C2AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDF9933C-8839-44B5-A8BF-B59357B7C2AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDF9933C-8839-44B5-A8BF-B59357B7C2AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDF9933C-8839-44B5-A8BF-B59357B7C2AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

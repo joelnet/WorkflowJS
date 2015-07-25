@@ -12,7 +12,8 @@
         public Extensions: Dictionary<any>;
         public Inputs: Dictionary<any>;
         public Outputs: Dictionary<any>;
-        public State: any;
+        public StateData: any;
+        public State: WorkflowState;
 
         constructor(options: ActivityContextOptions)
         {
