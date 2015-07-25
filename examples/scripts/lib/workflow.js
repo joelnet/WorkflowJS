@@ -3,6 +3,13 @@ var wfjs;
     var ObjectHelper = (function () {
         function ObjectHelper() {
         }
+        ObjectHelper.GetKeys = function (obj) {
+            var keys = [];
+            for (var key in (obj || {})) {
+                keys.push(key);
+            }
+            return keys;
+        };
         ObjectHelper.CopyProperties = function (source, destination) {
             if (source == null || destination == null) {
                 return;
@@ -58,6 +65,25 @@ var wfjs;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
+    var Specification = (function () {
+        function Specification(criteria) {
+            this._criteria = criteria;
+        }
+        Specification.prototype.IsSatisfiedBy = function (value) {
+            return this._criteria(value);
+        };
+        return Specification;
+    })();
+    wfjs.Specification = Specification;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    wfjs.Activity = function (options) {
+        return options;
+    };
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
     var ActivityContext = (function () {
         function ActivityContext(options) {
             this.Extensions = options.Extensions || {};
@@ -70,6 +96,46 @@ var wfjs;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
+    wfjs.Assign = function (options) {
+        return options;
+    };
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    wfjs.Execute = function (options) {
+        return options;
+    };
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    wfjs.Pause = function (options) {
+        return new WorkflowPause(options);
+    };
+    var WorkflowPause = (function () {
+        function WorkflowPause(options) {
+            this._type = 'pause';
+            if (options != null) {
+                this.next = options.next;
+            }
+        }
+        WorkflowPause.prototype.Pause = function (context) {
+            return {
+                i: context.Inputs,
+                o: context.Outputs,
+                n: this.next
+            };
+        };
+        WorkflowPause.prototype.Resume = function (context, state) {
+            context.Inputs = state.i;
+            context.Outputs = state.o;
+            this.next = state.n;
+        };
+        return WorkflowPause;
+    })();
+    wfjs.WorkflowPause = WorkflowPause;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
     wfjs.Resources = {
         Error_Argument_Null: '{0}: argument cannot be null.',
         Error_Activity_Argument_Null: 'Activity expects {0} value: {1}.',
@@ -78,52 +144,18 @@ var wfjs;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
-    var SerialActivity = (function () {
-        function SerialActivity(activities) {
-            this.$inputs = null;
-            this.$outputs = null;
-            this._activities = activities || [];
+    var Specifications = (function () {
+        function Specifications() {
         }
-        SerialActivity.prototype.Execute = function (context, done) {
-            var internalContext = new wfjs.ActivityContext({
-                Extensions: context.Extensions,
-                Inputs: context.Inputs,
-                Outputs: context.Outputs
-            });
-            this.InternalExecute(0, internalContext, function (err) {
-                if (context.Outputs != internalContext.Outputs) {
-                    context.Outputs = internalContext.Outputs;
-                }
-                done(err);
-            });
-        };
-        SerialActivity.prototype.InternalExecute = function (index, context, done) {
-            var _this = this;
-            var activity = this._activities[index];
-            if (activity == null) {
-                return done(null);
-            }
-            activity.Execute(context, function (err) {
-                if (err != null) {
-                    return done(err);
-                }
-                _this.CopyOutputsToInputs(context);
-                _this.InternalExecute(++index, context, done);
-            });
-        };
-        SerialActivity.prototype.CopyOutputsToInputs = function (context) {
-            for (var key in (context.Outputs || {})) {
-                context.Inputs[key] = context.Outputs[key];
-            }
-        };
-        return SerialActivity;
+        Specifications._IsPaused = new wfjs.Specification(function (o) { return o.State != null; });
+        return Specifications;
     })();
-    wfjs.SerialActivity = SerialActivity;
+    wfjs.Specifications = Specifications;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
     var Workflow = (function () {
-        function Workflow(map) {
+        function Workflow(map, state) {
             if (map == null) {
                 throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'map'));
             }
@@ -134,16 +166,21 @@ var wfjs;
             this.$outputs = map.$outputs || [];
             this._activities = map.activities || {};
             this._extensions = map.$extensions || {};
+            this._state = state || null;
         }
         /**
          * Execution point that will be entered via WorkflowInvoker.
          */
         Workflow.prototype.Execute = function (context, done) {
+            if (this._state != null) {
+                console.log('this._state', this._state);
+                console.log('context', context);
+            }
             var activityCount = Object.keys(this._activities).length;
             if (activityCount == 0) {
                 return done();
             }
-            var activity = Workflow._GetFirstActivity(this._activities);
+            var activity = Workflow._GetFirstActivity(this._activities, this._state);
             this._ExecuteLoop(context, activity, done);
         };
         /**
@@ -156,19 +193,24 @@ var wfjs;
                 if (err != null) {
                     return done(err);
                 }
-                var nextActivity = Workflow._GetNextActivity(activity, _this._activities);
+                var nextActivity = !wfjs.Specifications._IsPaused.IsSatisfiedBy(innerContext) ? Workflow._GetNextActivity(activity, _this._activities) : null;
                 var activityExecute = nextActivity != null ? _this._ExecuteLoop.bind(_this) : function (innerContext, nextActivity, callback) {
                     callback();
                 };
                 activityExecute(innerContext, nextActivity, function (err) {
                     wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                    if (wfjs.Specifications._IsPaused.IsSatisfiedBy(innerContext)) {
+                        context.State = innerContext.State;
+                    }
                     done(err);
                 });
             };
+            // TODO: use InternalMapBase globally.
+            var iActivity = activity;
             if (activity.activity != null) {
                 this._ExecuteActivity(innerContext, activity, function (err) { return next(err, innerContext); });
             }
-            else if (activity.value != null && activity.output != null) {
+            else if (activity.values != null) {
                 this._ExecuteAssign(context, activity, function (err) { return next(err, context); });
             }
             else if (activity.condition != null) {
@@ -177,9 +219,25 @@ var wfjs;
             else if (activity.execute != null) {
                 this._ExecuteCodeActivity(context, activity, function (err) { return next(err, context); });
             }
+            else if (iActivity._type == 'pause') {
+                this._ExecutePause(context, activity, function (err) { return next(err, context); });
+            }
             else {
                 done(new Error(wfjs.Resources.Error_Activity_Invalid));
             }
+        };
+        /**
+         * _ExecutePause Pause / Resume the workflow.
+         */
+        Workflow.prototype._ExecutePause = function (context, activity, done) {
+            var err = null;
+            try {
+                context.State = activity.Pause(context);
+            }
+            catch (ex) {
+                err = ex;
+            }
+            done(err);
         };
         /**
          * _ExecuteActivity Executes the actual Activity.
@@ -218,10 +276,11 @@ var wfjs;
         Workflow.prototype._ExecuteAssign = function (context, activity, done) {
             var err = null;
             try {
-                var assignActivity = activity;
                 var values = context.Inputs;
                 wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
-                context.Outputs[assignActivity.output] = wfjs.EvalHelper.Eval(values, assignActivity.value);
+                for (var key in activity.values) {
+                    context.Outputs[key] = wfjs.EvalHelper.Eval(values, activity.values[key]);
+                }
             }
             catch (ex) {
                 err = ex;
@@ -278,9 +337,10 @@ var wfjs;
         /**
          * _GetFirstActivity Gets the Activity to be executed first.
          */
-        Workflow._GetFirstActivity = function (activities) {
-            var key = Object.keys(activities)[0];
-            return activities[key];
+        Workflow._GetFirstActivity = function (activities, state) {
+            var hasStateNext = state != null && state.n != null;
+            var activityName = hasStateNext ? state.n : Object.keys(activities)[0];
+            return activities[activityName];
         };
         /**
          * _GetNextActivity returns the next Activity or null.
@@ -319,6 +379,7 @@ var wfjs;
         function WorkflowInvoker(activity) {
             this._inputs = null;
             this._extensions = null;
+            this._state = null;
             if (activity == null) {
                 throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'activity'));
             }
@@ -336,6 +397,11 @@ var wfjs;
             this._inputs = inputs;
             return this;
         };
+        WorkflowInvoker.prototype.State = function (state) {
+            this._state = state;
+            this._activity._state = state;
+            return this;
+        };
         WorkflowInvoker.prototype.Extensions = function (extensions) {
             this._extensions = extensions;
             return this;
@@ -343,10 +409,10 @@ var wfjs;
         WorkflowInvoker.prototype.Invoke = function (callback) {
             callback = callback || function () {
             };
-            WorkflowInvoker.InvokeActivity(this._activity, this._inputs, this._extensions, callback);
+            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._state, this._extensions, callback);
         };
-        WorkflowInvoker.InvokeActivity = function (activity, inputs, extensions, callback) {
-            WorkflowInvoker.CreateContext(activity, inputs, extensions, function (err, context) {
+        WorkflowInvoker._InvokeActivity = function (activity, inputs, state, extensions, callback) {
+            WorkflowInvoker._CreateContext(activity, inputs, state, extensions, function (err, context) {
                 if (err != null) {
                     return callback(err, context);
                 }
@@ -355,7 +421,10 @@ var wfjs;
                         if (err != null) {
                             return callback(err, null);
                         }
-                        WorkflowInvoker.GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
+                        if (wfjs.Specifications._IsPaused.IsSatisfiedBy(context)) {
+                            return callback(null, context);
+                        }
+                        WorkflowInvoker._GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
                             context.Outputs = values;
                             callback(err, context);
                         });
@@ -366,26 +435,42 @@ var wfjs;
                 }
             });
         };
-        WorkflowInvoker.CreateContext = function (activity, inputs, extensions, callback) {
-            this.GetValueDictionary(activity.$inputs, inputs, 'input', function (err, values) {
+        WorkflowInvoker._CreateContext = function (activity, inputs, state, extensions, callback) {
+            if (state != null) {
+                return callback(null, this._CreateStateContext(activity, inputs, state, extensions));
+            }
+            this._GetValueDictionary(activity.$inputs, inputs, 'input', function (err, values) {
                 var context = err != null ? null : new wfjs.ActivityContext({
                     Extensions: extensions,
                     Inputs: values,
-                    Outputs: {}
+                    Outputs: (state || {}).o || {}
                 });
                 return callback(err, context);
             });
         };
-        WorkflowInvoker.GetValueDictionary = function (keys, values, valueType, callback) {
+        WorkflowInvoker._CreateStateContext = function (activity, inputs, state, extensions) {
+            var combinedInputs = {};
+            wfjs.ObjectHelper.CopyProperties(state.i || {}, combinedInputs);
+            wfjs.ObjectHelper.CopyProperties(inputs, combinedInputs);
+            var outputs = {};
+            wfjs.ObjectHelper.CopyProperties(state.o || {}, outputs);
+            var context = new wfjs.ActivityContext({
+                Extensions: extensions,
+                Inputs: combinedInputs,
+                Outputs: outputs
+            });
+            return context;
+        };
+        WorkflowInvoker._GetValueDictionary = function (keys, values, valueType, callback) {
             var result = {};
             for (var i = 0; i < (keys || []).length; i++) {
                 var key = keys[i];
-                if (values == null || values[key] === undefined) {
-                    var message = wfjs.Resources.Error_Activity_Argument_Null.replace(/\{0}/g, valueType).replace(/\{1}/g, key);
-                    return callback(new Error(message));
+                if (values != null && values[key] !== undefined) {
+                    result[key] = values[key];
                 }
                 else {
-                    result[key] = values[key];
+                    var message = wfjs.Resources.Error_Activity_Argument_Null.replace(/\{0}/g, valueType).replace(/\{1}/g, key);
+                    return callback(new Error(message));
                 }
             }
             callback(null, result);

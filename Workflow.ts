@@ -1,14 +1,20 @@
 ﻿module wfjs
 {
-    export class Workflow implements Activity
+    export interface IInternalWorkflow
+    {
+        _state: IPauseState;
+    }
+
+    export class Workflow implements IActivity
     {
         public $inputs: string[];
         public $outputs: string[];
 
         private _activities: Dictionary<IMapBase>;
         private _extensions: Dictionary<any>;
+        private _state: IPauseState;
 
-        constructor(map: IFlowchartMap)
+        constructor(map: IFlowchartMap, state?: IPauseState)
         {
             if (map == null)
             {
@@ -24,6 +30,7 @@
             this.$outputs = map.$outputs || [];
             this._activities = map.activities || {};
             this._extensions = map.$extensions || {};
+            this._state = state || null;
         }
 
         /**
@@ -38,7 +45,7 @@
                 return done();
             }
 
-            var activity = Workflow._GetFirstActivity(this._activities);
+            var activity = Workflow._GetFirstActivity(this._activities, this._state);
 
             this._ExecuteLoop(context, activity, done);
         }
@@ -56,9 +63,10 @@
                 {
                     return done(err);
                 }
-
-                var nextActivity = Workflow._GetNextActivity(activity, this._activities);
-
+                
+                var nextActivity = !Specifications._IsPaused.IsSatisfiedBy(innerContext)
+                    ? Workflow._GetNextActivity(activity, this._activities)
+                    : null;
                 var activityExecute = nextActivity != null
                     ? this._ExecuteLoop.bind(this)
                     : (innerContext, nextActivity, callback) => { callback(); };
@@ -66,15 +74,24 @@
                 activityExecute(innerContext, nextActivity, err =>
                 {
                     ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                    
+                    if (Specifications._IsPaused.IsSatisfiedBy(innerContext))
+                    {
+                        context.State = innerContext.State;
+                    }
+
                     done(err);
                 });
             }
+
+            // TODO: use InternalMapBase globally.
+            var iActivity = <InternalMapBase>activity;
 
             if ((<ActivityMap>activity).activity != null)
             {
                 this._ExecuteActivity(innerContext, <ActivityMap>activity, err => next(err, innerContext));
             }
-            else if ((<IAssignActivity>activity).value != null && (<IAssignActivity>activity).output != null)
+            else if ((<IAssignActivity>activity).values != null)
             {
                 this._ExecuteAssign(context, <IAssignActivity>activity, err => next(err, context));
             }
@@ -86,10 +103,33 @@
             {
                 this._ExecuteCodeActivity(context, <IExecuteActivity>activity, err => next(err, context));
             }
+            else if (iActivity._type == 'pause')
+            {
+                this._ExecutePause(context, <WorkflowPause>activity, err => next(err, context));
+            }
             else
             {
                 done(new Error(Resources.Error_Activity_Invalid));
             }
+        }
+
+        /**
+         * _ExecutePause Pause / Resume the workflow.
+         */
+        private _ExecutePause(context: ActivityContext, activity: WorkflowPause, done: (err: Error) => void): void
+        {
+            var err: Error = null;
+
+            try
+            {
+                context.State = activity.Pause(context);
+            }
+            catch (ex)
+            {
+                err = ex;
+            }
+
+            done(err);
         }
 
         /**
@@ -150,12 +190,13 @@
 
             try
             {
-                var assignActivity = <IAssignActivity>activity;
-
                 var values: Dictionary<any> = context.Inputs;
                 ObjectHelper.CopyProperties(context.Outputs, values);
 
-                context.Outputs[assignActivity.output] = EvalHelper.Eval(values, assignActivity.value);
+                for (var key in activity.values)
+                {
+                    context.Outputs[key] = EvalHelper.Eval(values, activity.values[key]);
+                }
             }
             catch (ex)
             {
@@ -237,10 +278,12 @@
         /**
          * _GetFirstActivity Gets the Activity to be executed first.
          */
-        private static _GetFirstActivity(activities: Dictionary<IMapBase>): IMapBase
+        private static _GetFirstActivity(activities: Dictionary<IMapBase>, state: IPauseState): IMapBase
         {
-            var key: string = Object.keys(activities)[0];
-            return activities[key];
+            var hasStateNext = state != null && state.n != null;
+            var activityName: string = hasStateNext ? state.n : Object.keys(activities)[0];
+
+            return activities[activityName];
         }
 
         /**

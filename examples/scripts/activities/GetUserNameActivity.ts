@@ -1,19 +1,19 @@
-﻿module wfjs.Activities
+﻿module wfjsExample.Activities
 {
     export var GreetUserActivity: wfjs.IFlowchartMap = {
         $outputs: ['result'],
         activities: 
         {
-            'GetUsersName':
-            {
-                activity: new wfjs.Activities.PromptActivity(),
+            'GetUsersName': wfjs.Activity
+            ({
+                activity: new wfjsExample.Activities.PromptActivity(),
                 $inputs:
                 {
                     message: '"What is your name?"'
                 },
                 $outputs: { 'result': 'name' },
                 next: 'Decision:IsCancelled'
-            },
+            }),
             'Decision:IsCancelled':
             {
                 condition: 'this.name == null || this.name == ""',

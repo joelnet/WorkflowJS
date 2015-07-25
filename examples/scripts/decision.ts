@@ -12,7 +12,7 @@ module wfjsExample.BasicWorkflow
         public Click()
         {
             wfjs.WorkflowInvoker
-                .CreateActivity(wfjs.Activities.GreetUserActivity)
+                .CreateActivity(wfjsExample.Activities.GreetUserActivity)
                 .Extensions({
                     window: window
                 })

@@ -12,7 +12,7 @@ module wfjsExample.Inputs
         public Click()
         {
             wfjs.WorkflowInvoker
-                .CreateActivity(wfjs.Activities.GetTypeActivity)
+                .CreateActivity(wfjsExample.Activities.GetTypeActivity)
                 .Extensions({
                     window: window
                 })

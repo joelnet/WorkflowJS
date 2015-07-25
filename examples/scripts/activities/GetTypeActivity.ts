@@ -1,22 +1,22 @@
-﻿module wfjs.Activities
+﻿module wfjsExample.Activities
 {
     export var GetTypeActivity: wfjs.IFlowchartMap = {
         $outputs: ['result'],
         activities: 
         {
-            'GetUserInput':
-            {
-                activity: new wfjs.Activities.PromptActivity(),
+            'GetUserInput': wfjs.Activity
+            ({
+                activity: new wfjsExample.Activities.PromptActivity(),
                 $inputs:
                 {
                     message: '"Enter either a number or a string."'
                 },
                 $outputs: { 'result': 'input' },
                 next: 'SetInputType'
-            },
+            }),
             'SetInputType':
             {
-                execute: function(context: ActivityContext, done: (err?: Error) => void)
+                execute: function(context: wfjs.ActivityContext, done: (err?: Error) => void)
                 {
                     var input = context.Inputs['input'];
 
@@ -36,7 +36,7 @@
             },
             'Switch:DisplayInputType':
             {
-                execute: function(context: ActivityContext, done: (err?: Error) => void)
+                execute: function(context: wfjs.ActivityContext, done: (err?: Error) => void)
                 {
                     var inputType = context.Inputs['inputType'];
 

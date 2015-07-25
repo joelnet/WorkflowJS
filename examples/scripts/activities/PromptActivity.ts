@@ -1,6 +1,6 @@
-﻿module wfjs.Activities
+﻿module wfjsExample.Activities
 {
-    export class PromptActivity implements wfjs.Activity
+    export class PromptActivity implements wfjs.IActivity
     {
         public $inputs = ['message'];
         public $outputs = ['result'];

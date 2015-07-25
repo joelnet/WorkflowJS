@@ -1,18 +1,18 @@
-var wfjs;
-(function (wfjs) {
+var wfjsExample;
+(function (wfjsExample) {
     var Activities;
     (function (Activities) {
         Activities.GetTypeActivity = {
             $outputs: ['result'],
             activities: {
-                'GetUserInput': {
-                    activity: new wfjs.Activities.PromptActivity(),
+                'GetUserInput': wfjs.Activity({
+                    activity: new wfjsExample.Activities.PromptActivity(),
                     $inputs: {
                         message: '"Enter either a number or a string."'
                     },
                     $outputs: { 'result': 'input' },
                     next: 'SetInputType'
-                },
+                }),
                 'SetInputType': {
                     execute: function (context, done) {
                         var input = context.Inputs['input'];
@@ -54,6 +54,6 @@ var wfjs;
                 'CreateMessage:Unknown': { output: 'result', value: '"You entered something unknown!"' }
             },
         };
-    })(Activities = wfjs.Activities || (wfjs.Activities = {}));
-})(wfjs || (wfjs = {}));
+    })(Activities = wfjsExample.Activities || (wfjsExample.Activities = {}));
+})(wfjsExample || (wfjsExample = {}));
 //# sourceMappingURL=GetTypeActivity.js.map

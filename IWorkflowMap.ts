@@ -12,9 +12,14 @@
     {
     }
 
+    export interface InternalMapBase extends IMapBase
+    {
+        _type: string;
+    }
+
     export interface ActivityMap extends IMapBase
     {
-        activity: wfjs.Activity;
+        activity: wfjs.IActivity;
         $inputs?: Dictionary<string>;
         $outputs?: Dictionary<string>;
         next: string;
@@ -26,18 +31,5 @@
         ontrue: string;
         onfalse: string;
         next: string;
-    }
-
-    export interface IAssignActivity extends IMapBase
-    {
-        value: string;
-        output: string;
-        next: string;
-    }
-
-    export interface IExecuteActivity extends IMapBase
-    {
-        execute: (context: ActivityContext, done: (err?: Error) => void) => void;
-        next?: string;
     }
 } 

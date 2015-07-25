@@ -1,6 +1,6 @@
-﻿module wfjs.Activities
+﻿module wfjsExample.Activities
 {
-    export class HelloWorldActivity implements wfjs.Activity
+    export class HelloWorldActivity implements wfjs.IActivity
     {
         public $outputs = ['response'];
 

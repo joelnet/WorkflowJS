@@ -13,7 +13,7 @@ var wfjsExample;
             }
             Application.prototype.Click = function () {
                 var _this = this;
-                var activity = new wfjs.Activities.AddActivity();
+                var activity = new wfjsExample.Activities.AddActivity();
                 var inputs = {
                     'number1': this.number1.val(),
                     'number2': this.number2.val()

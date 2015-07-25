@@ -1,4 +1,4 @@
-﻿module wfjs.Services
+﻿module wfjsExample.Services
 {
     var loremIpsum = ("lorem ipsum dolor sit amet consectetur adipiscing elit phasellus eleifend "
         + "eros sit amet elit ultricies luctus nunc sit amet neque eu augue pellentesque tristique "

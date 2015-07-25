@@ -1,5 +1,5 @@
-var wfjs;
-(function (wfjs) {
+var wfjsExample;
+(function (wfjsExample) {
     var Services;
     (function (Services) {
         var loremIpsum = ("lorem ipsum dolor sit amet consectetur adipiscing elit phasellus eleifend " + "eros sit amet elit ultricies luctus nunc sit amet neque eu augue pellentesque tristique " + "fusce malesuada mi vel tellus egestas id posuere metus tristique praesent eget dapibus " + "sem nam convallis dolor sit amet velit condimentum at mollis nunc finibus nulla " + "malesuada tincidunt interdum nam ut metus id nibh sodales mattis id a augue pellentesque " + "fermentum mi eu ipsum pretium tincidunt ut orci nisi viverra eget mi ut tempor imperdiet " + "eros proin bibendum ligula ac venenatis finibus").split(' ');
@@ -49,6 +49,6 @@ var wfjs;
             return MockCustomerService;
         })();
         Services.MockCustomerService = MockCustomerService;
-    })(Services = wfjs.Services || (wfjs.Services = {}));
-})(wfjs || (wfjs = {}));
+    })(Services = wfjsExample.Services || (wfjsExample.Services = {}));
+})(wfjsExample || (wfjsExample = {}));
 //# sourceMappingURL=CustomerService.js.map

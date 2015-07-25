@@ -11,7 +11,7 @@ var wfjsExample;
             }
             Application.prototype.Click = function () {
                 var _this = this;
-                wfjs.WorkflowInvoker.CreateActivity(wfjs.Activities.GetTypeActivity).Extensions({
+                wfjs.WorkflowInvoker.CreateActivity(wfjsExample.Activities.GetTypeActivity).Extensions({
                     window: window
                 }).Invoke(function (err, ctx) {
                     if (err != null) {

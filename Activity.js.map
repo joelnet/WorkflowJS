@@ -1,1 +1,1 @@
-{"version":3,"file":"Activity.js","sourceRoot":"","sources":["Activity.ts"],"names":[],"mappings":"AAQC"}
+{"version":3,"file":"Activity.js","sourceRoot":"","sources":["Activity.ts"],"names":["wfjs"],"mappings":"AAAA,IAAO,IAAI,CAqBV;AArBD,WAAO,IAAI,EACX,CAAC;IAgBcA,aAAQA,GAAGA,UAACA,OAA0BA;QAE7CA,MAAMA,CAACA,OAAOA,CAACA;IACnBA,CAACA,CAAAA;AACLA,CAACA,EArBM,IAAI,KAAJ,IAAI,QAqBV"}

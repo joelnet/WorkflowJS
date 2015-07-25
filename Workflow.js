@@ -1,7 +1,7 @@
 var wfjs;
 (function (wfjs) {
     var Workflow = (function () {
-        function Workflow(map) {
+        function Workflow(map, state) {
             if (map == null) {
                 throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'map'));
             }
@@ -12,6 +12,7 @@ var wfjs;
             this.$outputs = map.$outputs || [];
             this._activities = map.activities || {};
             this._extensions = map.$extensions || {};
+            this._state = state || null;
         }
         /**
          * Execution point that will be entered via WorkflowInvoker.
@@ -21,7 +22,7 @@ var wfjs;
             if (activityCount == 0) {
                 return done();
             }
-            var activity = Workflow._GetFirstActivity(this._activities);
+            var activity = Workflow._GetFirstActivity(this._activities, this._state);
             this._ExecuteLoop(context, activity, done);
         };
         /**
@@ -34,19 +35,24 @@ var wfjs;
                 if (err != null) {
                     return done(err);
                 }
-                var nextActivity = Workflow._GetNextActivity(activity, _this._activities);
+                var nextActivity = !wfjs.Specifications._IsPaused.IsSatisfiedBy(innerContext) ? Workflow._GetNextActivity(activity, _this._activities) : null;
                 var activityExecute = nextActivity != null ? _this._ExecuteLoop.bind(_this) : function (innerContext, nextActivity, callback) {
                     callback();
                 };
                 activityExecute(innerContext, nextActivity, function (err) {
                     wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                    if (wfjs.Specifications._IsPaused.IsSatisfiedBy(innerContext)) {
+                        context.State = innerContext.State;
+                    }
                     done(err);
                 });
             };
+            // TODO: use InternalMapBase globally.
+            var iActivity = activity;
             if (activity.activity != null) {
                 this._ExecuteActivity(innerContext, activity, function (err) { return next(err, innerContext); });
             }
-            else if (activity.value != null && activity.output != null) {
+            else if (activity.values != null) {
                 this._ExecuteAssign(context, activity, function (err) { return next(err, context); });
             }
             else if (activity.condition != null) {
@@ -55,9 +61,25 @@ var wfjs;
             else if (activity.execute != null) {
                 this._ExecuteCodeActivity(context, activity, function (err) { return next(err, context); });
             }
+            else if (iActivity._type == 'pause') {
+                this._ExecutePause(context, activity, function (err) { return next(err, context); });
+            }
             else {
                 done(new Error(wfjs.Resources.Error_Activity_Invalid));
             }
+        };
+        /**
+         * _ExecutePause Pause / Resume the workflow.
+         */
+        Workflow.prototype._ExecutePause = function (context, activity, done) {
+            var err = null;
+            try {
+                context.State = activity.Pause(context);
+            }
+            catch (ex) {
+                err = ex;
+            }
+            done(err);
         };
         /**
          * _ExecuteActivity Executes the actual Activity.
@@ -96,10 +118,11 @@ var wfjs;
         Workflow.prototype._ExecuteAssign = function (context, activity, done) {
             var err = null;
             try {
-                var assignActivity = activity;
                 var values = context.Inputs;
                 wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
-                context.Outputs[assignActivity.output] = wfjs.EvalHelper.Eval(values, assignActivity.value);
+                for (var key in activity.values) {
+                    context.Outputs[key] = wfjs.EvalHelper.Eval(values, activity.values[key]);
+                }
             }
             catch (ex) {
                 err = ex;
@@ -156,9 +179,10 @@ var wfjs;
         /**
          * _GetFirstActivity Gets the Activity to be executed first.
          */
-        Workflow._GetFirstActivity = function (activities) {
-            var key = Object.keys(activities)[0];
-            return activities[key];
+        Workflow._GetFirstActivity = function (activities, state) {
+            var hasStateNext = state != null && state.n != null;
+            var activityName = hasStateNext ? state.n : Object.keys(activities)[0];
+            return activities[activityName];
         };
         /**
          * _GetNextActivity returns the next Activity or null.

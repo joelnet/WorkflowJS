@@ -14,9 +14,9 @@ module wfjsExample.Extensions
         
         public Click()
         {
-            var activity = new wfjs.Activities.GetCustomerActivity();
+            var activity = new wfjsExample.Activities.GetCustomerActivity();
             var extensions: wfjs.Dictionary<any> = {
-                'CustomerService': new wfjs.Services.MockCustomerService()
+                'CustomerService': new wfjsExample.Services.MockCustomerService()
             };
             var inputs: wfjs.Dictionary<any> = {
                 'customerId': this.number.val(),

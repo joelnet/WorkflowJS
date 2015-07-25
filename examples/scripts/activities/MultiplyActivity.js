@@ -1,5 +1,5 @@
-var wfjs;
-(function (wfjs) {
+var wfjsExample;
+(function (wfjsExample) {
     var Activities;
     (function (Activities) {
         var MultiplyActivity = (function () {
@@ -16,6 +16,6 @@ var wfjs;
             return MultiplyActivity;
         })();
         Activities.MultiplyActivity = MultiplyActivity;
-    })(Activities = wfjs.Activities || (wfjs.Activities = {}));
-})(wfjs || (wfjs = {}));
+    })(Activities = wfjsExample.Activities || (wfjsExample.Activities = {}));
+})(wfjsExample || (wfjsExample = {}));
 //# sourceMappingURL=MultiplyActivity.js.map

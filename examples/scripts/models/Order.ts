@@ -1,4 +1,4 @@
-﻿module wfjs.Models
+﻿module wfjsExample.Models
 {
     export interface Order
     {

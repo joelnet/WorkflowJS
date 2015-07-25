@@ -18,6 +18,9 @@
     <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="AssignActivity.js">
+      <DependentUpon>AssignActivity.ts</DependentUpon>
+    </Content>
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css">
       <DependentUpon>bootstrap-theme.css</DependentUpon>
@@ -30,12 +33,23 @@
     <Content Include="examples\css\app.css" />
     <Content Include="examples\errors.html" />
     <Content Include="examples\extensions.html" />
+    <Content Include="examples\pause.html" />
+    <Content Include="examples\scripts\activities\CreateAccountWorkflow.js">
+      <DependentUpon>MathProblemWorkflow.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\CreateMathActivity.js">
+      <DependentUpon>CreateMathActivity.ts</DependentUpon>
+    </Content>
     <Content Include="examples\scripts\activities\GetCustomerActivity.js">
       <DependentUpon>GetCustomerActivity.ts</DependentUpon>
     </Content>
     <Content Include="examples\scripts\activities\GetTypeActivity.js">
       <DependentUpon>GetTypeActivity.ts</DependentUpon>
     </Content>
+    <Content Include="examples\scripts\activities\MathProblemWorkflow.js">
+      <DependentUpon>MathProblemWorkflow.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\controllers\MathProblemController.js" />
     <Content Include="examples\scripts\extensions.js">
       <DependentUpon>extensions.ts</DependentUpon>
     </Content>
@@ -47,6 +61,9 @@
     </Content>
     <Content Include="examples\scripts\models\Order.js">
       <DependentUpon>Order.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\pause.js">
+      <DependentUpon>pause.ts</DependentUpon>
     </Content>
     <Content Include="examples\scripts\switch.js">
       <DependentUpon>switch.ts</DependentUpon>
@@ -91,6 +108,7 @@
       <DependentUpon>Dictionary.ts</DependentUpon>
     </Content>
     <Content Include="examples\scripts\lib\workflow.js" />
+    <Content Include="Execute.js" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Icon.png" />
     <Content Include="IWorkflowMap.js">
@@ -101,6 +119,9 @@
     </Content>
     <Content Include="lib\ObjectHelper.js">
       <DependentUpon>ObjectHelper.ts</DependentUpon>
+    </Content>
+    <Content Include="Pause.js">
+      <DependentUpon>Pause.ts</DependentUpon>
     </Content>
     <Content Include="Resource.js">
       <DependentUpon>Resource.ts</DependentUpon>
@@ -157,6 +178,26 @@
     <Content Include="examples\scripts\activities\GetCustomerActivity.js.map">
       <DependentUpon>GetCustomerActivity.ts</DependentUpon>
     </Content>
+    <Content Include="examples\scripts\activities\CreateAccountWorkflow.js.map">
+      <DependentUpon>MathProblemWorkflow.ts</DependentUpon>
+    </Content>
+    <Content Include="Pause.js.map">
+      <DependentUpon>Pause.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\pause.js.map">
+      <DependentUpon>pause.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\CreateMathActivity.js.map">
+      <DependentUpon>CreateMathActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="AssignActivity.js.map">
+      <DependentUpon>AssignActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="examples\scripts\activities\MathProblemWorkflow.js.map">
+      <DependentUpon>MathProblemWorkflow.ts</DependentUpon>
+    </Content>
+    <Content Include="Execute.js.map" />
+    <Content Include="examples\scripts\controllers\MathProblemController.js.map" />
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js">
@@ -167,8 +208,11 @@
       <DependentUpon>jquery-1.9.1.js</DependentUpon>
     </Content>
     <Content Include="Scripts\npm.js" />
-    <Content Include="SerialActivity.js">
-      <DependentUpon>SerialActivity.ts</DependentUpon>
+    <Content Include="lib\Specification.js">
+      <DependentUpon>Specification.ts</DependentUpon>
+    </Content>
+    <Content Include="Specifications.js">
+      <DependentUpon>Specifications.ts</DependentUpon>
     </Content>
     <Content Include="web.config" />
     <Content Include="Workflow.js">
@@ -181,7 +225,10 @@
   <ItemGroup>
     <TypeScriptCompile Include="Activity.ts" />
     <TypeScriptCompile Include="ActivityContext.ts" />
+    <TypeScriptCompile Include="AssignActivity.ts" />
     <TypeScriptCompile Include="Dictionary.ts" />
+    <TypeScriptCompile Include="examples\scripts\activities\MathProblemWorkflow.ts" />
+    <TypeScriptCompile Include="examples\scripts\activities\CreateMathActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\DivideAsyncActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\GetCustomerActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\GetTypeActivity.ts" />
@@ -190,6 +237,7 @@
     <TypeScriptCompile Include="examples\scripts\activities\AddActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\MultiplyActivity.ts" />
     <TypeScriptCompile Include="examples\scripts\activities\PromptActivity.ts" />
+    <TypeScriptCompile Include="examples\scripts\controllers\MathProblemController.ts" />
     <TypeScriptCompile Include="examples\scripts\decision.ts" />
     <TypeScriptCompile Include="examples\scripts\errors.ts" />
     <TypeScriptCompile Include="examples\scripts\extensions.ts" />
@@ -197,13 +245,24 @@
     <TypeScriptCompile Include="examples\scripts\inputs.ts" />
     <TypeScriptCompile Include="examples\scripts\models\Customer.ts" />
     <TypeScriptCompile Include="examples\scripts\models\Order.ts" />
+    <TypeScriptCompile Include="examples\scripts\pause.ts" />
     <TypeScriptCompile Include="examples\scripts\switch.ts" />
+    <TypeScriptCompile Include="Execute.ts" />
     <TypeScriptCompile Include="IWorkflowMap.ts" />
     <TypeScriptCompile Include="lib\EvalHelper.ts" />
     <TypeScriptCompile Include="lib\ObjectHelper.ts" />
+    <TypeScriptCompile Include="Pause.ts" />
     <TypeScriptCompile Include="Resource.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-mocks.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-resource.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-route.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-sanitize.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
-    <TypeScriptCompile Include="SerialActivity.ts" />
+    <TypeScriptCompile Include="lib\Specification.ts" />
+    <TypeScriptCompile Include="Specifications.ts" />
     <TypeScriptCompile Include="Workflow.ts" />
     <TypeScriptCompile Include="WorkflowInvoker.ts" />
   </ItemGroup>
@@ -216,9 +275,6 @@
     </Content>
     <Content Include="Dictionary.js.map">
       <DependentUpon>Dictionary.ts</DependentUpon>
-    </Content>
-    <Content Include="SerialActivity.js.map">
-      <DependentUpon>SerialActivity.ts</DependentUpon>
     </Content>
     <Content Include="Resource.js.map">
       <DependentUpon>Resource.ts</DependentUpon>
@@ -240,6 +296,12 @@
     </Content>
     <Content Include="packages.config" />
     <Content Include="Scripts\jquery-1.9.1.min.map" />
+    <Content Include="lib\Specification.js.map">
+      <DependentUpon>Specification.ts</DependentUpon>
+    </Content>
+    <Content Include="Specifications.js.map">
+      <DependentUpon>Specifications.ts</DependentUpon>
+    </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -273,7 +335,8 @@
           <IISUrl>http://localhost:53201/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl></CustomServerUrl>
+          <CustomServerUrl>
+          </CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
@@ -282,6 +345,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
@@ -292,6 +356,7 @@
     <PostBuildEvent>cd $(ProjectDir)
 echo lib\ObjectHelper.ts &gt;ts-files
 echo lib\EvalHelper.ts &gt;&gt;ts-files
+echo lib\Specification.ts &gt;&gt;ts-files
 dir *.ts /b &gt;&gt;ts-files
 tsc @ts-files --out bin\workflow.js
 copy bin\workflow.js examples\scripts\lib\workflow.js

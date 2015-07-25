@@ -1,6 +1,6 @@
-﻿module wfjs.Activities
+﻿module wfjsExample.Activities
 {
-    export class AddActivity implements wfjs.Activity
+    export class AddActivity implements wfjs.IActivity
     {
         public $inputs = ['number1', 'number2'];
         public $outputs = ['total'];

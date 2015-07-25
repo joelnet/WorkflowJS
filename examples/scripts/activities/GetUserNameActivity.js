@@ -1,18 +1,18 @@
-var wfjs;
-(function (wfjs) {
+var wfjsExample;
+(function (wfjsExample) {
     var Activities;
     (function (Activities) {
         Activities.GreetUserActivity = {
             $outputs: ['result'],
             activities: {
-                'GetUsersName': {
-                    activity: new wfjs.Activities.PromptActivity(),
+                'GetUsersName': wfjs.Activity({
+                    activity: new wfjsExample.Activities.PromptActivity(),
                     $inputs: {
                         message: '"What is your name?"'
                     },
                     $outputs: { 'result': 'name' },
                     next: 'Decision:IsCancelled'
-                },
+                }),
                 'Decision:IsCancelled': {
                     condition: 'this.name == null || this.name == ""',
                     ontrue: 'CreateMessage:NameRefusal',
@@ -28,6 +28,6 @@ var wfjs;
                 }
             }
         };
-    })(Activities = wfjs.Activities || (wfjs.Activities = {}));
-})(wfjs || (wfjs = {}));
+    })(Activities = wfjsExample.Activities || (wfjsExample.Activities = {}));
+})(wfjsExample || (wfjsExample = {}));
 //# sourceMappingURL=GetUserNameActivity.js.map

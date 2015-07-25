@@ -2,11 +2,12 @@
 {
     export class WorkflowInvoker
     {
-        private _activity: Activity;
+        private _activity: IActivity;
         private _inputs: Dictionary<string> = null
         private _extensions: Dictionary<string> = null
+        private _state: IPauseState = null;
 
-        constructor(activity: Activity | IFlowchartMap)
+        constructor(activity: IActivity | IFlowchartMap)
         {
             if (activity == null)
             {
@@ -15,7 +16,7 @@
 
             if (typeof (<any>activity).Execute == 'function')
             {
-                this._activity = <Activity>activity;
+                this._activity = <IActivity>activity;
             }
             else
             {
@@ -23,7 +24,7 @@
             }
         }
 
-        public static CreateActivity(activity: Activity | IFlowchartMap): WorkflowInvoker
+        public static CreateActivity(activity: IActivity | IFlowchartMap): WorkflowInvoker
         {
             return new WorkflowInvoker(activity);
         }
@@ -31,6 +32,13 @@
         public Inputs(inputs: Dictionary<any>): WorkflowInvoker
         {
             this._inputs = inputs;
+            return this;
+        }
+
+        public State(state: IPauseState): WorkflowInvoker
+        {
+            this._state = state;
+            (<IInternalWorkflow><any>this._activity)._state = state;
             return this;
         }
 
@@ -44,12 +52,12 @@
         {
             callback = callback || function(){};
 
-            WorkflowInvoker.InvokeActivity(this._activity, this._inputs, this._extensions, callback);
+            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._state, this._extensions, callback);
         }
 
-        private static InvokeActivity(activity: Activity, inputs: Dictionary<string>, extensions: Dictionary<string>, callback: (err: Error, context?: ActivityContext) => void): void
+        private static _InvokeActivity(activity: IActivity, inputs: Dictionary<string>, state: IPauseState, extensions: Dictionary<string>, callback: (err: Error, context?: ActivityContext) => void): void
         {
-            WorkflowInvoker.CreateContext(activity, inputs, extensions, (err, context) =>
+            WorkflowInvoker._CreateContext(activity, inputs, state, extensions, (err, context) =>
             {
                 if (err != null)
                 {
@@ -65,7 +73,12 @@
                             return callback(err, null);
                         }
 
-                        WorkflowInvoker.GetValueDictionary(activity.$outputs, context.Outputs, 'output', (err, values) =>
+                        if (Specifications._IsPaused.IsSatisfiedBy(context))
+                        {
+                            return callback(null, context);
+                        }
+
+                        WorkflowInvoker._GetValueDictionary(activity.$outputs, context.Outputs, 'output', (err, values) =>
                         {
                             context.Outputs = values;
                             callback(err, context);
@@ -79,22 +92,45 @@
             });
         }
 
-        private static CreateContext(activity: Activity, inputs: Dictionary<any>, extensions: Dictionary<any>, callback: (err: Error, context: ActivityContext) => void): void
+        private static _CreateContext(activity: IActivity, inputs: Dictionary<any>, state: IPauseState, extensions: Dictionary<any>, callback: (err: Error, context: ActivityContext) => void): void
         {
-            this.GetValueDictionary(activity.$inputs, inputs, 'input', (err, values) =>
+            if (state != null)
+            {
+                return callback(null, this._CreateStateContext(activity, inputs, state, extensions));
+            }
+
+            this._GetValueDictionary(activity.$inputs, inputs, 'input', (err, values) =>
             {
                 var context = err != null ? null
                     : new ActivityContext(<ActivityContextOptions>{
                         Extensions: extensions,
                         Inputs: values,
-                        Outputs: {}
+                        Outputs: (<IPauseState>(state || {})).o || {}
                       });
 
                 return callback(err, context);
             });
         }
 
-        private static GetValueDictionary(keys: string[], values: Dictionary<any>, valueType: string, callback: (err: Error, values?: Dictionary<any>) => void): void
+        private static _CreateStateContext(activity: IActivity, inputs: Dictionary<any>, state: IPauseState, extensions: Dictionary<any>): ActivityContext
+        {
+            var combinedInputs: Dictionary<any> = {};
+            ObjectHelper.CopyProperties(state.i || {}, combinedInputs);
+            ObjectHelper.CopyProperties(inputs, combinedInputs);
+
+            var outputs: Dictionary<any> = {};
+            ObjectHelper.CopyProperties(state.o || {}, outputs);
+
+            var context = new ActivityContext({
+                Extensions: extensions,
+                Inputs: combinedInputs,
+                Outputs: outputs
+            });
+
+            return context;
+        }
+
+        private static _GetValueDictionary(keys: string[], values: Dictionary<any>, valueType: string, callback: (err: Error, values?: Dictionary<any>) => void): void
         {
             var result: Dictionary<any> = {};
 
@@ -102,16 +138,17 @@
             {
                 var key = keys[i];
 
-                if (values == null || values[key] === undefined)
+                if (values != null && values[key] !== undefined)
+                {
+                    result[key] = values[key];
+                }
+                else
                 {
                     var message = Resources.Error_Activity_Argument_Null
                         .replace(/\{0}/g, valueType)
                         .replace(/\{1}/g, key);
+
                     return callback(new Error(message));
-                }
-                else
-                {
-                    result[key] = values[key];
                 }
             }
 

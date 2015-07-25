@@ -2,6 +2,18 @@
 {
     export class ObjectHelper
     {
+        public static GetKeys(obj): string[]
+        {
+            var keys: string[] = [];
+
+            for (var key in (obj || {}))
+            {
+                keys.push(key);
+            }
+
+            return keys;
+        }
+
         public static CopyProperties(source, destination): void
         {
             if (source == null || destination == null)

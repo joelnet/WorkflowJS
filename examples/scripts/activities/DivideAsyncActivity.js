@@ -1,5 +1,5 @@
-var wfjs;
-(function (wfjs) {
+var wfjsExample;
+(function (wfjsExample) {
     var Activities;
     (function (Activities) {
         var DivideAsyncActivity = (function () {
@@ -26,6 +26,6 @@ var wfjs;
             return DivideAsyncActivity;
         })();
         Activities.DivideAsyncActivity = DivideAsyncActivity;
-    })(Activities = wfjs.Activities || (wfjs.Activities = {}));
-})(wfjs || (wfjs = {}));
+    })(Activities = wfjsExample.Activities || (wfjsExample.Activities = {}));
+})(wfjsExample || (wfjsExample = {}));
 //# sourceMappingURL=DivideAsyncActivity.js.map

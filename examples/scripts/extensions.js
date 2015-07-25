@@ -12,9 +12,9 @@ var wfjsExample;
             }
             Application.prototype.Click = function () {
                 var _this = this;
-                var activity = new wfjs.Activities.GetCustomerActivity();
+                var activity = new wfjsExample.Activities.GetCustomerActivity();
                 var extensions = {
-                    'CustomerService': new wfjs.Services.MockCustomerService()
+                    'CustomerService': new wfjsExample.Services.MockCustomerService()
                 };
                 var inputs = {
                     'customerId': this.number.val(),

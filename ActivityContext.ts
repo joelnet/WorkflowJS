@@ -12,6 +12,7 @@
         public Extensions: Dictionary<any>;
         public Inputs: Dictionary<any>;
         public Outputs: Dictionary<any>;
+        public State: any;
 
         constructor(options: ActivityContextOptions)
         {

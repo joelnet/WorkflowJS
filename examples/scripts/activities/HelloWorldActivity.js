@@ -1,5 +1,5 @@
-var wfjs;
-(function (wfjs) {
+var wfjsExample;
+(function (wfjsExample) {
     var Activities;
     (function (Activities) {
         var HelloWorldActivity = (function () {
@@ -13,6 +13,6 @@ var wfjs;
             return HelloWorldActivity;
         })();
         Activities.HelloWorldActivity = HelloWorldActivity;
-    })(Activities = wfjs.Activities || (wfjs.Activities = {}));
-})(wfjs || (wfjs = {}));
+    })(Activities = wfjsExample.Activities || (wfjsExample.Activities = {}));
+})(wfjsExample || (wfjsExample = {}));
 //# sourceMappingURL=HelloWorldActivity.js.map

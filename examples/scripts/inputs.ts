@@ -15,7 +15,7 @@ module wfjsExample.Inputs
         
         public Click()
         {
-            var activity = new wfjs.Activities.AddActivity();
+            var activity = new wfjsExample.Activities.AddActivity();
             var inputs: wfjs.Dictionary<any> = {
                 'number1': this.number1.val(),
                 'number2': this.number2.val()

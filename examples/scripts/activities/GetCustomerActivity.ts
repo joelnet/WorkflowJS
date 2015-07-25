@@ -1,6 +1,6 @@
-﻿module wfjs.Activities
+﻿module wfjsExample.Activities
 {
-    export class GetCustomerActivity implements wfjs.Activity
+    export class GetCustomerActivity implements wfjs.IActivity
     {
         public $inputs = ['customerId'];
         public $outputs = ['customer'];
