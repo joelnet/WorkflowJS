@@ -1,12 +1,5 @@
 ﻿module wfjs
 {
-    export interface IPauseState
-    {
-        i: wfjs.Dictionary<any>;
-        o: wfjs.Dictionary<any>;
-        n: string;
-    }
-
     export interface IPauseOptions
     {
         next: string;
@@ -14,10 +7,10 @@
 
     export var Pause = (options: IPauseOptions) =>
     {
-        return new WorkflowPause(options);
+        return new PauseActivity(options);
     };
 
-    export class WorkflowPause implements IMapBase
+    export class PauseActivity implements IActivityBase
     {
         private _type = 'pause';
 
@@ -31,7 +24,7 @@
             }
         }
 
-        public Pause(context: wfjs.ActivityContext): IPauseState
+        public Pause(context: ActivityContext): IPauseState
         {
             return {
                 i: context.Inputs,
@@ -40,7 +33,7 @@
             }
         }
 
-        public Resume(context: wfjs.ActivityContext, state: IPauseState): void
+        public Resume(context: ActivityContext, state: IPauseState): void
         {
             context.Inputs = state.i;
             context.Outputs = state.o;

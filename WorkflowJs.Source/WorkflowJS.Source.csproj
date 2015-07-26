@@ -18,22 +18,46 @@
     <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="AssignActivity.js">
+    <Content Include="Activities\AssignActivity.js">
       <DependentUpon>AssignActivity.ts</DependentUpon>
     </Content>
-    <Content Include="Activity.js">
+    <Content Include="Activities\Activity.js">
       <DependentUpon>Activity.ts</DependentUpon>
     </Content>
-    <Content Include="ActivityContext.js">
+    <Content Include="Activities\ExecuteActivity.js">
+      <DependentUpon>ExecuteActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Activities\Flowchart.js">
+      <DependentUpon>Flowchart.ts</DependentUpon>
+    </Content>
+    <Content Include="Activities\PauseActivity.js">
+      <DependentUpon>PauseActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\ActivityContext.js">
       <DependentUpon>ActivityContext.ts</DependentUpon>
     </Content>
-    <Content Include="Dictionary.js">
+    <Content Include="Models\Dictionary.js">
       <DependentUpon>Dictionary.ts</DependentUpon>
     </Content>
-    <Content Include="Execute.js">
-      <DependentUpon>Execute.ts</DependentUpon>
+    <Content Include="Models\IActivity.js">
+      <DependentUpon>IActivity.ts</DependentUpon>
     </Content>
-    <Content Include="IWorkflowMap.js">
+    <Content Include="Models\IAssignActivity.js">
+      <DependentUpon>IAssignActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IExecuteActivity.js">
+      <DependentUpon>IExecuteActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IFlowchart.js">
+      <DependentUpon>IFlowchart.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IPauseState.js">
+      <DependentUpon>IPauseState.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IWorkflowActivity.js">
+      <DependentUpon>IWorkflowActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IWorkflowMap.js">
       <DependentUpon>IWorkflowMap.ts</DependentUpon>
     </Content>
     <Content Include="lib\EvalHelper.js">
@@ -41,9 +65,6 @@
     </Content>
     <Content Include="lib\ObjectHelper.js">
       <DependentUpon>ObjectHelper.ts</DependentUpon>
-    </Content>
-    <Content Include="Pause.js">
-      <DependentUpon>Pause.ts</DependentUpon>
     </Content>
     <Content Include="Resource.js">
       <DependentUpon>Resource.ts</DependentUpon>
@@ -54,16 +75,10 @@
     <Content Include="lib\EvalHelper.js.map">
       <DependentUpon>EvalHelper.ts</DependentUpon>
     </Content>
-    <Content Include="Pause.js.map">
-      <DependentUpon>Pause.ts</DependentUpon>
-    </Content>
-    <Content Include="AssignActivity.js.map">
+    <Content Include="Activities\AssignActivity.js.map">
       <DependentUpon>AssignActivity.ts</DependentUpon>
     </Content>
-    <Content Include="Execute.js.map">
-      <DependentUpon>Execute.ts</DependentUpon>
-    </Content>
-    <Content Include="WorkflowState.js">
+    <Content Include="Models\WorkflowState.js">
       <DependentUpon>WorkflowState.ts</DependentUpon>
     </Content>
     <Content Include="lib\Specification.js">
@@ -79,20 +94,27 @@
     <Content Include="WorkflowInvoker.js">
       <DependentUpon>WorkflowInvoker.ts</DependentUpon>
     </Content>
-    <Content Include="WorkflowState.js.map">
+    <Content Include="Models\WorkflowState.js.map">
       <DependentUpon>WorkflowState.ts</DependentUpon>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Activity.ts" />
-    <TypeScriptCompile Include="ActivityContext.ts" />
-    <TypeScriptCompile Include="AssignActivity.ts" />
-    <TypeScriptCompile Include="Dictionary.ts" />
-    <TypeScriptCompile Include="Execute.ts" />
-    <TypeScriptCompile Include="IWorkflowMap.ts" />
+    <TypeScriptCompile Include="Activities\Activity.ts" />
+    <TypeScriptCompile Include="Activities\Flowchart.ts" />
+    <TypeScriptCompile Include="Models\ActivityContext.ts" />
+    <TypeScriptCompile Include="Activities\AssignActivity.ts" />
+    <TypeScriptCompile Include="Models\Dictionary.ts" />
+    <TypeScriptCompile Include="Activities\ExecuteActivity.ts" />
+    <TypeScriptCompile Include="Models\IActivity.ts" />
+    <TypeScriptCompile Include="Models\IAssignActivity.ts" />
+    <TypeScriptCompile Include="Models\IExecuteActivity.ts" />
+    <TypeScriptCompile Include="Models\IFlowchart.ts" />
+    <TypeScriptCompile Include="Models\IPauseState.ts" />
+    <TypeScriptCompile Include="Models\IWorkflowActivity.ts" />
+    <TypeScriptCompile Include="Models\IWorkflowMap.ts" />
     <TypeScriptCompile Include="lib\EvalHelper.ts" />
     <TypeScriptCompile Include="lib\ObjectHelper.ts" />
-    <TypeScriptCompile Include="Pause.ts" />
+    <TypeScriptCompile Include="Activities\PauseActivity.ts" />
     <TypeScriptCompile Include="Resource.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
@@ -106,22 +128,22 @@
     <TypeScriptCompile Include="Specifications.ts" />
     <TypeScriptCompile Include="Workflow.ts" />
     <TypeScriptCompile Include="WorkflowInvoker.ts" />
-    <TypeScriptCompile Include="WorkflowState.ts" />
+    <TypeScriptCompile Include="Models\WorkflowState.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Activity.js.map">
+    <Content Include="Activities\Activity.js.map">
       <DependentUpon>Activity.ts</DependentUpon>
     </Content>
-    <Content Include="ActivityContext.js.map">
+    <Content Include="Models\ActivityContext.js.map">
       <DependentUpon>ActivityContext.ts</DependentUpon>
     </Content>
-    <Content Include="Dictionary.js.map">
+    <Content Include="Models\Dictionary.js.map">
       <DependentUpon>Dictionary.ts</DependentUpon>
     </Content>
     <Content Include="Resource.js.map">
       <DependentUpon>Resource.ts</DependentUpon>
     </Content>
-    <Content Include="IWorkflowMap.js.map">
+    <Content Include="Models\IWorkflowMap.js.map">
       <DependentUpon>IWorkflowMap.ts</DependentUpon>
     </Content>
     <Content Include="packages.config" />
@@ -130,6 +152,33 @@
     </Content>
     <Content Include="Specifications.js.map">
       <DependentUpon>Specifications.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IActivity.js.map">
+      <DependentUpon>IActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IWorkflowActivity.js.map">
+      <DependentUpon>IWorkflowActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Activities\ExecuteActivity.js.map">
+      <DependentUpon>ExecuteActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IAssignActivity.js.map">
+      <DependentUpon>IAssignActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Activities\PauseActivity.js.map">
+      <DependentUpon>PauseActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IExecuteActivity.js.map">
+      <DependentUpon>IExecuteActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IPauseState.js.map">
+      <DependentUpon>IPauseState.ts</DependentUpon>
+    </Content>
+    <Content Include="Activities\Flowchart.js.map">
+      <DependentUpon>Flowchart.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IFlowchart.js.map">
+      <DependentUpon>IFlowchart.ts</DependentUpon>
     </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
@@ -164,8 +213,7 @@
           <IISUrl>http://localhost:53201/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <CustomServerUrl></CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
@@ -184,6 +232,8 @@
   <PropertyGroup>
     <PostBuildEvent>cd $(ProjectDir)
 dir lib\*.ts /s /b &gt;ts-files
+dir Models\*.ts /s /b &gt;&gt;ts-files
+dir Activities\*.ts /s /b &gt;&gt;ts-files
 dir *.ts /b &gt;&gt;ts-files
 tsc @ts-files --out bin\workflow.js --declaration
 copy bin\workflow.js ..\WorkflowJS.Examples\scripts\lib\workflow.js

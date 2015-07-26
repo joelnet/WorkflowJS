@@ -1,6 +1,6 @@
 ﻿module wfjsExample.Activities
 {
-    export var GetTypeActivity: wfjs.IFlowchartMap = {
+    export var GetTypeActivity: wfjs.IFlowchart = {
         $outputs: ['result'],
         activities: 
         {

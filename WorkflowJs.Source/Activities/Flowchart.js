@@ -1,7 +1,7 @@
 var wfjs;
 (function (wfjs) {
-    wfjs.Execute = function (options) {
+    wfjs.Flowchart = function (options) {
         return options;
     };
 })(wfjs || (wfjs = {}));
-//# sourceMappingURL=Execute.js.map
+//# sourceMappingURL=Flowchart.js.map

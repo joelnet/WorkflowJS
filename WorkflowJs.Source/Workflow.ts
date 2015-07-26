@@ -11,11 +11,11 @@
         public $outputs: string[];
         public State: WorkflowState = WorkflowState.None;
 
-        private _activities: Dictionary<IMapBase>;
+        private _activities: Dictionary<IActivityBase>;
         private _extensions: Dictionary<any>;
         private _stateData: IPauseState;
 
-        constructor(map: IFlowchartMap, state?: IPauseState)
+        constructor(map: IFlowchart, state?: IPauseState)
         {
             if (map == null)
             {
@@ -72,7 +72,7 @@
         /**
          * _ExecuteLoop Execution loop that executes every Activity.
          */
-        private _ExecuteLoop(context: ActivityContext, activity: IMapBase, done: (err?: Error) => void): void
+        private _ExecuteLoop(context: ActivityContext, activity: IActivityBase, done: (err?: Error) => void): void
         {
             var innerContext = Workflow._CreateNextActivityContext(context);
 
@@ -104,11 +104,11 @@
             }
 
             // TODO: use InternalMapBase globally.
-            var iActivity = <InternalMapBase>activity;
+            var iActivity = <InternalActivityBase>activity;
 
-            if ((<ActivityMap>activity).activity != null)
+            if ((<IWorkflowActivity>activity).activity != null)
             {
-                this._ExecuteActivity(innerContext, <ActivityMap>activity, err => next(err, innerContext));
+                this._ExecuteActivity(innerContext, <IWorkflowActivity>activity, err => next(err, innerContext));
             }
             else if ((<IAssignActivity>activity).values != null)
             {
@@ -124,7 +124,7 @@
             }
             else if (iActivity._type == 'pause')
             {
-                this._ExecutePause(context, <WorkflowPause>activity, err => next(err, context));
+                this._ExecutePause(context, <PauseActivity>activity, err => next(err, context));
             }
             else
             {
@@ -135,7 +135,7 @@
         /**
          * _ExecutePause Pause / Resume the workflow.
          */
-        private _ExecutePause(context: ActivityContext, activity: WorkflowPause, done: (err: Error) => void): void
+        private _ExecutePause(context: ActivityContext, activity: PauseActivity, done: (err: Error) => void): void
         {
             var err: Error = null;
 
@@ -154,7 +154,7 @@
         /**
          * _ExecuteActivity Executes the actual Activity.
          */
-        private _ExecuteActivity(context: ActivityContext, activity: ActivityMap, done: (err?: Error) => void): void
+        private _ExecuteActivity(context: ActivityContext, activity: IWorkflowActivity, done: (err?: Error) => void): void
         {
             var inputs = Workflow._GetInputs(context, activity.$inputs);
 
@@ -297,7 +297,7 @@
         /**
          * _GetFirstActivity Gets the Activity to be executed first.
          */
-        private static _GetFirstActivity(activities: Dictionary<IMapBase>, state: IPauseState): IMapBase
+        private static _GetFirstActivity(activities: Dictionary<IActivityBase>, state: IPauseState): IActivityBase
         {
             var hasStateNext = state != null && state.n != null;
             var activityName: string = hasStateNext ? state.n : Object.keys(activities)[0];
@@ -308,16 +308,16 @@
         /**
          * _GetNextActivity returns the next Activity or null.
          */
-        private static _GetNextActivity(activity: IMapBase, activities: Dictionary<IMapBase>): IMapBase
+        private static _GetNextActivity(activity: IActivityBase, activities: Dictionary<IActivityBase>): IActivityBase
         {
             if (activity == null)
             {
                 return null;
             }
 
-            if ((<ActivityMap>activity).next != null)
+            if ((<IWorkflowActivity>activity).next != null)
             {
-                return activities[(<ActivityMap>activity).next] || null
+                return activities[(<IWorkflowActivity>activity).next] || null
             }
 
             return null;

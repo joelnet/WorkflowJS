@@ -2,8 +2,7 @@
 {
     export var GetMathProblemWorkflow = () =>
     {
-        return <wfjs.IFlowchartMap>
-        {
+        return wfjs.Flowchart({
             $outputs: ['correct'],
 
             activities:
@@ -26,6 +25,6 @@
                     }
                 })
             }
-        };
+        });
     }
 }

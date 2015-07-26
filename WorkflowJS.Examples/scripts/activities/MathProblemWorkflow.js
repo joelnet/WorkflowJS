@@ -3,7 +3,7 @@ var wfjsExample;
     var Activities;
     (function (Activities) {
         Activities.GetMathProblemWorkflow = function () {
-            return {
+            return wfjs.Flowchart({
                 $outputs: ['correct'],
                 activities: {
                     'CreateAccount': wfjs.Activity({
@@ -23,7 +23,7 @@ var wfjsExample;
                         }
                     })
                 }
-            };
+            });
         };
     })(Activities = wfjsExample.Activities || (wfjsExample.Activities = {}));
 })(wfjsExample || (wfjsExample = {}));

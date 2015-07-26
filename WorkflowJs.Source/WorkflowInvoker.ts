@@ -7,7 +7,7 @@
         private _extensions: Dictionary<string> = null
         private _stateData: IPauseState = null;
 
-        constructor(activity: IActivity | IFlowchartMap)
+        constructor(activity: IActivity | IFlowchart)
         {
             if (activity == null)
             {
@@ -20,11 +20,11 @@
             }
             else
             {
-                this._activity = new Workflow(<IFlowchartMap>activity);
+                this._activity = new Workflow(<IFlowchart>activity);
             }
         }
 
-        public static CreateActivity(activity: IActivity | IFlowchartMap): WorkflowInvoker
+        public static CreateActivity(activity: IActivity | IFlowchart): WorkflowInvoker
         {
             return new WorkflowInvoker(activity);
         }

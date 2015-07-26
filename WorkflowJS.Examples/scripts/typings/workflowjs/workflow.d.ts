@@ -20,20 +20,6 @@ declare module wfjs {
     }
 }
 declare module wfjs {
-    interface IActivity {
-        $inputs?: string[];
-        $outputs?: string[];
-        Execute(context: ActivityContext, done: (err?: Error) => void): void;
-    }
-    interface IWorkflowActivity {
-        activity: IActivity;
-        $inputs?: Dictionary<any>;
-        $outputs?: Dictionary<string>;
-        next?: string;
-    }
-    var Activity: (options: IWorkflowActivity) => IWorkflowActivity;
-}
-declare module wfjs {
     interface ActivityContextOptions {
         Extensions?: Dictionary<any>;
         Inputs?: Dictionary<any>;
@@ -49,47 +35,35 @@ declare module wfjs {
     }
 }
 declare module wfjs {
-    interface IAssignActivity extends IMapBase {
-        values: Dictionary<any>;
-        next?: string;
-    }
-    var Assign: (options: IAssignActivity) => IAssignActivity;
-}
-declare module wfjs {
     interface Dictionary<T> {
         [key: string]: T;
     }
 }
 declare module wfjs {
-    interface IExecuteActivity extends IMapBase {
+    interface IActivity {
+        $inputs?: string[];
+        $outputs?: string[];
+        Execute(context: ActivityContext, done: (err?: Error) => void): void;
+    }
+}
+declare module wfjs {
+    interface IAssignActivity extends IActivityBase {
+        values: Dictionary<any>;
+        next?: string;
+    }
+}
+declare module wfjs {
+    interface IExecuteActivity extends IActivityBase {
         execute: (context: ActivityContext, done: (err?: Error) => void) => void;
         next?: string;
     }
-    var Execute: (options: IExecuteActivity) => IExecuteActivity;
 }
 declare module wfjs {
-    interface IFlowchartMap {
+    interface IFlowchart {
         $inputs?: string[];
         $outputs?: string[];
         $extensions?: Dictionary<any>;
-        activities: wfjs.Dictionary<IMapBase>;
-    }
-    interface IMapBase {
-    }
-    interface InternalMapBase extends IMapBase {
-        _type: string;
-    }
-    interface ActivityMap extends IMapBase {
-        activity: wfjs.IActivity;
-        $inputs?: Dictionary<string>;
-        $outputs?: Dictionary<string>;
-        next: string;
-    }
-    interface IDecisionActivity extends IMapBase {
-        condition: string;
-        ontrue: string;
-        onfalse: string;
-        next: string;
+        activities: wfjs.Dictionary<IActivityBase>;
     }
 }
 declare module wfjs {
@@ -98,16 +72,60 @@ declare module wfjs {
         o: wfjs.Dictionary<any>;
         n: string;
     }
+}
+declare module wfjs {
+    interface IWorkflowActivity {
+        activity: IActivity;
+        $inputs?: Dictionary<any>;
+        $outputs?: Dictionary<string>;
+        next?: string;
+    }
+}
+declare module wfjs {
+    interface IActivityBase {
+    }
+    interface InternalActivityBase extends IActivityBase {
+        _type: string;
+    }
+    interface IDecisionActivity extends IActivityBase {
+        condition: string;
+        ontrue: string;
+        onfalse: string;
+        next: string;
+    }
+}
+declare module wfjs {
+    enum WorkflowState {
+        None = 0,
+        Running = 1,
+        Complete = 2,
+        Paused = 3,
+        Fault = 4,
+    }
+}
+declare module wfjs {
+    var Activity: (options: IWorkflowActivity) => IWorkflowActivity;
+}
+declare module wfjs {
+    var Assign: (options: IAssignActivity) => IAssignActivity;
+}
+declare module wfjs {
+    var Execute: (options: IExecuteActivity) => IExecuteActivity;
+}
+declare module wfjs {
+    var Flowchart: (options: IFlowchart) => IFlowchart;
+}
+declare module wfjs {
     interface IPauseOptions {
         next: string;
     }
-    var Pause: (options: IPauseOptions) => WorkflowPause;
-    class WorkflowPause implements IMapBase {
+    var Pause: (options: IPauseOptions) => PauseActivity;
+    class PauseActivity implements IActivityBase {
         private _type;
         next: string;
         constructor(options: IPauseOptions);
-        Pause(context: wfjs.ActivityContext): IPauseState;
-        Resume(context: wfjs.ActivityContext, state: IPauseState): void;
+        Pause(context: ActivityContext): IPauseState;
+        Resume(context: ActivityContext, state: IPauseState): void;
     }
 }
 declare module wfjs {
@@ -133,7 +151,7 @@ declare module wfjs {
         private _activities;
         private _extensions;
         private _stateData;
-        constructor(map: IFlowchartMap, state?: IPauseState);
+        constructor(map: IFlowchart, state?: IPauseState);
         /**
          * Execution point that will be entered via WorkflowInvoker.
          */
@@ -190,8 +208,8 @@ declare module wfjs {
         private _inputs;
         private _extensions;
         private _stateData;
-        constructor(activity: IActivity | IFlowchartMap);
-        static CreateActivity(activity: IActivity | IFlowchartMap): WorkflowInvoker;
+        constructor(activity: IActivity | IFlowchart);
+        static CreateActivity(activity: IActivity | IFlowchart): WorkflowInvoker;
         Inputs(inputs: Dictionary<any>): WorkflowInvoker;
         State(state: IPauseState): WorkflowInvoker;
         Extensions(extensions: Dictionary<any>): WorkflowInvoker;
@@ -200,14 +218,5 @@ declare module wfjs {
         private static _CreateContext(activity, inputs, state, extensions, callback);
         private static _CreateStateContext(activity, inputs, state, extensions);
         private static _GetValueDictionary(keys, values, valueType, callback);
-    }
-}
-declare module wfjs {
-    enum WorkflowState {
-        None = 0,
-        Running = 1,
-        Complete = 2,
-        Paused = 3,
-        Fault = 4,
     }
 }

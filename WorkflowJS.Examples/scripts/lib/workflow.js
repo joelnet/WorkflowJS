@@ -78,12 +78,6 @@ var wfjs;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
-    wfjs.Activity = function (options) {
-        return options;
-    };
-})(wfjs || (wfjs = {}));
-var wfjs;
-(function (wfjs) {
     var ActivityContext = (function () {
         function ActivityContext(options) {
             this.Extensions = options.Extensions || {};
@@ -93,6 +87,23 @@ var wfjs;
         return ActivityContext;
     })();
     wfjs.ActivityContext = ActivityContext;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    (function (WorkflowState) {
+        WorkflowState[WorkflowState["None"] = 0] = "None";
+        WorkflowState[WorkflowState["Running"] = 1] = "Running";
+        WorkflowState[WorkflowState["Complete"] = 2] = "Complete";
+        WorkflowState[WorkflowState["Paused"] = 3] = "Paused";
+        WorkflowState[WorkflowState["Fault"] = 4] = "Fault";
+    })(wfjs.WorkflowState || (wfjs.WorkflowState = {}));
+    var WorkflowState = wfjs.WorkflowState;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    wfjs.Activity = function (options) {
+        return options;
+    };
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
@@ -108,31 +119,37 @@ var wfjs;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
-    wfjs.Pause = function (options) {
-        return new WorkflowPause(options);
+    wfjs.Flowchart = function (options) {
+        return options;
     };
-    var WorkflowPause = (function () {
-        function WorkflowPause(options) {
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    wfjs.Pause = function (options) {
+        return new PauseActivity(options);
+    };
+    var PauseActivity = (function () {
+        function PauseActivity(options) {
             this._type = 'pause';
             if (options != null) {
                 this.next = options.next;
             }
         }
-        WorkflowPause.prototype.Pause = function (context) {
+        PauseActivity.prototype.Pause = function (context) {
             return {
                 i: context.Inputs,
                 o: context.Outputs,
                 n: this.next
             };
         };
-        WorkflowPause.prototype.Resume = function (context, state) {
+        PauseActivity.prototype.Resume = function (context, state) {
             context.Inputs = state.i;
             context.Outputs = state.o;
             this.next = state.n;
         };
-        return WorkflowPause;
+        return PauseActivity;
     })();
-    wfjs.WorkflowPause = WorkflowPause;
+    wfjs.PauseActivity = PauseActivity;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
@@ -488,15 +505,4 @@ var wfjs;
         return WorkflowInvoker;
     })();
     wfjs.WorkflowInvoker = WorkflowInvoker;
-})(wfjs || (wfjs = {}));
-var wfjs;
-(function (wfjs) {
-    (function (WorkflowState) {
-        WorkflowState[WorkflowState["None"] = 0] = "None";
-        WorkflowState[WorkflowState["Running"] = 1] = "Running";
-        WorkflowState[WorkflowState["Complete"] = 2] = "Complete";
-        WorkflowState[WorkflowState["Paused"] = 3] = "Paused";
-        WorkflowState[WorkflowState["Fault"] = 4] = "Fault";
-    })(wfjs.WorkflowState || (wfjs.WorkflowState = {}));
-    var WorkflowState = wfjs.WorkflowState;
 })(wfjs || (wfjs = {}));

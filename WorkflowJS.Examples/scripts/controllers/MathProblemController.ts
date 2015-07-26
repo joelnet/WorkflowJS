@@ -56,7 +56,7 @@ module wfjsExample.Controllers
             this.$scope.model = <any>{};
         }
 
-        private _InvokeWorkflow(activity: wfjs.IFlowchartMap, inputs: wfjs.Dictionary<any>, state: wfjs.IPauseState): void
+        private _InvokeWorkflow(activity: wfjs.IFlowchart, inputs: wfjs.Dictionary<any>, state: wfjs.IPauseState): void
         {
             wfjs.WorkflowInvoker
                 .CreateActivity(activity)

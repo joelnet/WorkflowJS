@@ -1,29 +1,29 @@
 var wfjs;
 (function (wfjs) {
     wfjs.Pause = function (options) {
-        return new WorkflowPause(options);
+        return new PauseActivity(options);
     };
-    var WorkflowPause = (function () {
-        function WorkflowPause(options) {
+    var PauseActivity = (function () {
+        function PauseActivity(options) {
             this._type = 'pause';
             if (options != null) {
                 this.next = options.next;
             }
         }
-        WorkflowPause.prototype.Pause = function (context) {
+        PauseActivity.prototype.Pause = function (context) {
             return {
                 i: context.Inputs,
                 o: context.Outputs,
                 n: this.next
             };
         };
-        WorkflowPause.prototype.Resume = function (context, state) {
+        PauseActivity.prototype.Resume = function (context, state) {
             context.Inputs = state.i;
             context.Outputs = state.o;
             this.next = state.n;
         };
-        return WorkflowPause;
+        return PauseActivity;
     })();
-    wfjs.WorkflowPause = WorkflowPause;
+    wfjs.PauseActivity = PauseActivity;
 })(wfjs || (wfjs = {}));
-//# sourceMappingURL=Pause.js.map
+//# sourceMappingURL=PauseActivity.js.map
