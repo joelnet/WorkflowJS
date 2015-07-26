@@ -13,7 +13,7 @@ var wfjsExample;
                     $outputs: { 'result': 'input' },
                     next: 'SetInputType'
                 }),
-                'SetInputType': {
+                'SetInputType': wfjs.Execute({
                     execute: function (context, done) {
                         var input = context.Inputs['input'];
                         if (!isNaN(input) && input != null && input.trim() != '') {
@@ -25,8 +25,8 @@ var wfjsExample;
                         done();
                     },
                     next: 'Switch:DisplayInputType'
-                },
-                'Switch:DisplayInputType': {
+                }),
+                'Switch:DisplayInputType': wfjs.Execute({
                     execute: function (context, done) {
                         var inputType = context.Inputs['inputType'];
                         switch (inputType) {
@@ -47,11 +47,19 @@ var wfjsExample;
                         done();
                     },
                     next: null
-                },
-                'CreateMessage:NoValue': { output: 'result', value: '"You did not enter a value!"' },
-                'CreateMessage:String': { output: 'result', value: '"You entered a string!"' },
-                'CreateMessage:Number': { output: 'result', value: '"You entered a number!"' },
-                'CreateMessage:Unknown': { output: 'result', value: '"You entered something unknown!"' }
+                }),
+                'CreateMessage:NoValue': wfjs.Assign({
+                    values: { 'result': '"You did not enter a value!"' }
+                }),
+                'CreateMessage:String': wfjs.Assign({
+                    values: { 'result': '"You entered a string!"' }
+                }),
+                'CreateMessage:Number': wfjs.Assign({
+                    values: { 'result': '"You entered a number!"' }
+                }),
+                'CreateMessage:Unknown': wfjs.Assign({
+                    values: { 'result': '"You entered something unknown!"' }
+                })
             },
         };
     })(Activities = wfjsExample.Activities || (wfjsExample.Activities = {}));

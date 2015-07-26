@@ -117,7 +117,7 @@ var wfjs;
                 var values = context.Inputs;
                 wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
                 var condition = wfjs.EvalHelper.Eval(values, activity.condition);
-                activity.next = condition ? activity.ontrue : activity.onfalse;
+                activity.next = condition ? activity.true : activity.false;
             }
             catch (ex) {
                 err = ex;

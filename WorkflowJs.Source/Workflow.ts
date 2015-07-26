@@ -104,7 +104,7 @@
             }
 
             // TODO: use InternalMapBase globally.
-            var iActivity = <InternalActivityBase>activity;
+            var iActivity = <IInternalActivityBase>activity;
 
             if ((<IWorkflowActivity>activity).activity != null)
             {
@@ -188,7 +188,7 @@
 
                 var condition: boolean = EvalHelper.Eval(values, activity.condition);
 
-                activity.next = condition ? activity.ontrue : activity.onfalse;
+                activity.next = condition ? activity.true : activity.false;
             }
             catch (ex)
             {

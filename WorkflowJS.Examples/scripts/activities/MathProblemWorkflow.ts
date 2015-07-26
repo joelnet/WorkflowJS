@@ -2,12 +2,14 @@
 {
     export var GetMathProblemWorkflow = () =>
     {
-        return wfjs.Flowchart({
+        return wfjs.Flowchart
+        ({
             $outputs: ['correct'],
 
             activities:
             {
-                'CreateAccount': wfjs.Activity({
+                'CreateAccount': wfjs.Activity
+                ({
                     activity: new CreateMathActivity(),
                     $outputs: {
                         'problem': 'problem',
@@ -15,10 +17,12 @@
                     },
                     next: 'WaitForAnswer'
                 }),
-                'WaitForAnswer': wfjs.Pause({
+                'WaitForAnswer': wfjs.Pause
+                ({
                     next: 'ValidateAnswer'
                 }),
-                'ValidateAnswer': wfjs.Assign({
+                'ValidateAnswer': wfjs.Assign
+                ({
                     values:
                     {
                         'correct': 'this.solution == this.answer'

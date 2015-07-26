@@ -42,8 +42,14 @@
     <Content Include="Models\IActivity.js">
       <DependentUpon>IActivity.ts</DependentUpon>
     </Content>
+    <Content Include="Models\IActivityBase.js">
+      <DependentUpon>IActivityBase.ts</DependentUpon>
+    </Content>
     <Content Include="Models\IAssignActivity.js">
       <DependentUpon>IAssignActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IDecisionActivity.js">
+      <DependentUpon>IDecisionActivity.ts</DependentUpon>
     </Content>
     <Content Include="Models\IExecuteActivity.js">
       <DependentUpon>IExecuteActivity.ts</DependentUpon>
@@ -56,9 +62,6 @@
     </Content>
     <Content Include="Models\IWorkflowActivity.js">
       <DependentUpon>IWorkflowActivity.ts</DependentUpon>
-    </Content>
-    <Content Include="Models\IWorkflowMap.js">
-      <DependentUpon>IWorkflowMap.ts</DependentUpon>
     </Content>
     <Content Include="lib\EvalHelper.js">
       <DependentUpon>EvalHelper.ts</DependentUpon>
@@ -100,18 +103,21 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Activities\Activity.ts" />
+    <TypeScriptCompile Include="Activities\DecisionActivity.ts" />
     <TypeScriptCompile Include="Activities\Flowchart.ts" />
     <TypeScriptCompile Include="Models\ActivityContext.ts" />
     <TypeScriptCompile Include="Activities\AssignActivity.ts" />
     <TypeScriptCompile Include="Models\Dictionary.ts" />
     <TypeScriptCompile Include="Activities\ExecuteActivity.ts" />
     <TypeScriptCompile Include="Models\IActivity.ts" />
+    <TypeScriptCompile Include="Models\IActivityBase.ts" />
     <TypeScriptCompile Include="Models\IAssignActivity.ts" />
     <TypeScriptCompile Include="Models\IExecuteActivity.ts" />
     <TypeScriptCompile Include="Models\IFlowchart.ts" />
+    <TypeScriptCompile Include="Models\IInternalActivityBase.ts" />
     <TypeScriptCompile Include="Models\IPauseState.ts" />
     <TypeScriptCompile Include="Models\IWorkflowActivity.ts" />
-    <TypeScriptCompile Include="Models\IWorkflowMap.ts" />
+    <TypeScriptCompile Include="Models\IDecisionActivity.ts" />
     <TypeScriptCompile Include="lib\EvalHelper.ts" />
     <TypeScriptCompile Include="lib\ObjectHelper.ts" />
     <TypeScriptCompile Include="Activities\PauseActivity.ts" />
@@ -142,9 +148,6 @@
     </Content>
     <Content Include="Resource.js.map">
       <DependentUpon>Resource.ts</DependentUpon>
-    </Content>
-    <Content Include="Models\IWorkflowMap.js.map">
-      <DependentUpon>IWorkflowMap.ts</DependentUpon>
     </Content>
     <Content Include="packages.config" />
     <Content Include="lib\Specification.js.map">
@@ -180,6 +183,12 @@
     <Content Include="Models\IFlowchart.js.map">
       <DependentUpon>IFlowchart.ts</DependentUpon>
     </Content>
+    <Content Include="Models\IActivityBase.js.map">
+      <DependentUpon>IActivityBase.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IDecisionActivity.js.map">
+      <DependentUpon>IDecisionActivity.ts</DependentUpon>
+    </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -213,7 +222,8 @@
           <IISUrl>http://localhost:53201/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl></CustomServerUrl>
+          <CustomServerUrl>
+          </CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

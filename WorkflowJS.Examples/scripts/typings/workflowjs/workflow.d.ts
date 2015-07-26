@@ -47,8 +47,20 @@ declare module wfjs {
     }
 }
 declare module wfjs {
+    interface IActivityBase {
+    }
+}
+declare module wfjs {
     interface IAssignActivity extends IActivityBase {
         values: Dictionary<any>;
+        next?: string;
+    }
+}
+declare module wfjs {
+    interface IDecisionActivity extends IActivityBase {
+        condition: string;
+        true: string;
+        false: string;
         next?: string;
     }
 }
@@ -67,6 +79,11 @@ declare module wfjs {
     }
 }
 declare module wfjs {
+    interface IInternalActivityBase extends IActivityBase {
+        _type: string;
+    }
+}
+declare module wfjs {
     interface IPauseState {
         i: wfjs.Dictionary<any>;
         o: wfjs.Dictionary<any>;
@@ -79,19 +96,6 @@ declare module wfjs {
         $inputs?: Dictionary<any>;
         $outputs?: Dictionary<string>;
         next?: string;
-    }
-}
-declare module wfjs {
-    interface IActivityBase {
-    }
-    interface InternalActivityBase extends IActivityBase {
-        _type: string;
-    }
-    interface IDecisionActivity extends IActivityBase {
-        condition: string;
-        ontrue: string;
-        onfalse: string;
-        next: string;
     }
 }
 declare module wfjs {
@@ -108,6 +112,9 @@ declare module wfjs {
 }
 declare module wfjs {
     var Assign: (options: IAssignActivity) => IAssignActivity;
+}
+declare module wfjs {
+    var Decision: (options: IDecisionActivity) => IDecisionActivity;
 }
 declare module wfjs {
     var Execute: (options: IExecuteActivity) => IExecuteActivity;

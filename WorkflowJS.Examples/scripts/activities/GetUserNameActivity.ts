@@ -14,22 +14,26 @@
                 $outputs: { 'result': 'name' },
                 next: 'Decision:IsCancelled'
             }),
-            'Decision:IsCancelled':
-            {
+            'Decision:IsCancelled': wfjs.Decision
+            ({
                 condition: 'this.name == null || this.name == ""',
-                ontrue: 'CreateMessage:NameRefusal',
-                onfalse: 'CreateMessage:Hello'
-            },
-            'CreateMessage:NameRefusal':
-            {
-                output: 'result',
-                value: '"You did not enter a name!"',
-            },
-            'CreateMessage:Hello':
-            {
-                output: 'result',
-                value: '"Hello " + this.name + "!"',
-            }
+                true: 'CreateMessage:NameRefusal',
+                false: 'CreateMessage:Hello'
+            }),
+            'CreateMessage:NameRefusal': wfjs.Assign
+            ({
+                values:
+                {
+                    result: '"You did not enter a name!"'
+                }
+            }),
+            'CreateMessage:Hello': wfjs.Assign
+            ({
+                values:
+                {
+                    result: '"Hello " + this.name + "!"'
+                }
+            })
         }
     };
 } 
