@@ -2,12 +2,12 @@ var wfjs;
 (function (wfjs) {
     wfjs.Assign = function (options) {
         options = options || {};
-        return {
+        return wfjs.Activity({
             $inputs: { '*': '*' },
             $outputs: { '*': '*' },
             activity: new AssignActivity(options.values),
             next: options.next
-        };
+        });
     };
     /**
      * AssignActivity Assigns values to Outputs.
@@ -19,17 +19,10 @@ var wfjs;
             this._values = values || {};
         }
         AssignActivity.prototype.Execute = function (context, done) {
-            try {
-                // TODO: test if we can use just Inputs or if we have to use Inputs AND Outputs
-                var values = wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
-                for (var key in this._values) {
-                    context.Outputs[key] = wfjs.EvalHelper.Eval(values, this._values[key]);
-                }
-                done();
+            for (var key in this._values) {
+                context.Outputs[key] = wfjs.EvalHelper.Eval(context.Inputs, this._values[key]);
             }
-            catch (ex) {
-                done(ex);
-            }
+            done();
         };
         return AssignActivity;
     })();

@@ -43,10 +43,10 @@
                     switch (inputType)
                     {
                         case 'null':
-                        case 'undefined': this.next = 'CreateMessage:NoValue'; break;
-                        case 'string':    this.next = 'CreateMessage:String';  break;
-                        case 'number':    this.next = 'CreateMessage:Number';  break;
-                        default:          this.next = 'CreateMessage:Unknown'; break;
+                        case 'undefined': context.Outputs['$next'] = 'CreateMessage:NoValue'; break;
+                        case 'string':    context.Outputs['$next'] = 'CreateMessage:String';  break;
+                        case 'number':    context.Outputs['$next'] = 'CreateMessage:Number';  break;
+                        default:          context.Outputs['$next'] = 'CreateMessage:Unknown'; break;
                     }
 
                     done();

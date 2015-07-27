@@ -25,6 +25,9 @@ var wfjs;
             }
             var value = null;
             var length = (params || []).length;
+            if (length == 0) {
+                return obj;
+            }
             for (var i = 0; i < length; i++) {
                 obj = obj[params[i]];
                 if (obj == null) {

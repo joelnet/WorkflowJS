@@ -3,7 +3,7 @@ var wfjs;
     var Workflow = (function () {
         function Workflow(map, state) {
             this.debug = true;
-            this.State = wfjs.WorkflowState.None;
+            this.State = 0 /* None */;
             if (map == null) {
                 throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'map'));
             }
@@ -21,7 +21,7 @@ var wfjs;
          */
         Workflow.prototype.Execute = function (context, done) {
             var _this = this;
-            this.State = wfjs.WorkflowState.Running;
+            this.State = 1 /* Running */;
             var activityCount = Object.keys(this._activities).length;
             if (activityCount == 0) {
                 return done();
@@ -29,13 +29,13 @@ var wfjs;
             var activity = Workflow._GetFirstActivity(this._activities, this._stateData);
             this._ExecuteLoop(context, activity, function (err) {
                 if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
-                    _this.State = wfjs.WorkflowState.Paused;
+                    _this.State = 3 /* Paused */;
                 }
                 else if (err != null) {
-                    _this.State = wfjs.WorkflowState.Fault;
+                    _this.State = 4 /* Fault */;
                 }
                 else {
-                    _this.State = wfjs.WorkflowState.Complete;
+                    _this.State = 2 /* Complete */;
                 }
                 done(err);
             });
@@ -66,33 +66,19 @@ var wfjs;
             // TODO: use InternalMapBase globally.
             var iActivity = activity;
             if (this.debug) {
+                //console.log('context:', innerContext);
                 console.log('Activity:', iActivity);
             }
             if (activity.activity != null) {
                 this._ExecuteActivity(innerContext, activity, function (err) { return next(err, innerContext); });
             }
-            else if (activity.execute != null) {
-                this._ExecuteCodeActivity(context, activity, function (err) { return next(err, context); });
-            }
             else if (iActivity._type == 'pause') {
-                this._ExecutePause(context, activity, function (err) { return next(err, context); });
+                context.StateData = activity.Pause(context);
+                next(null, context);
             }
             else {
                 done(new Error(wfjs.Resources.Error_Activity_Invalid));
             }
-        };
-        /**
-         * _ExecutePause Pause / Resume the workflow.
-         */
-        Workflow.prototype._ExecutePause = function (context, activity, done) {
-            var err = null;
-            try {
-                context.StateData = activity.Pause(context);
-            }
-            catch (ex) {
-                err = ex;
-            }
-            done(err);
         };
         /**
          * _ExecuteActivity Executes the Activity.
@@ -106,27 +92,6 @@ var wfjs;
                 }
                 done(err);
             });
-        };
-        /**
-         * _ExecuteCodeActivity Executes an IExecuteActivity block.
-         */
-        Workflow.prototype._ExecuteCodeActivity = function (context, activity, done) {
-            var err = null;
-            try {
-                var innerContext = Workflow._CreateNextActivityContext(context);
-                activity.execute(innerContext, function (err) {
-                    if (innerContext != null) {
-                        wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
-                    }
-                    done(err);
-                });
-            }
-            catch (ex) {
-                err = ex;
-            }
-            finally {
-                done(err);
-            }
         };
         /**
          * _GetInputs Returns a collection of input values.

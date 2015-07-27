@@ -4,12 +4,12 @@
     {
         options = options || <IAssignActivity>{};
 
-        return <IWorkflowActivity>{
+        return Activity({
             $inputs: { '*': '*' },
             $outputs: { '*': '*' },
             activity: new AssignActivity(options.values),
             next: options.next
-        };
+        });
     };
 
     /**
@@ -29,22 +29,12 @@
 
         public Execute(context: ActivityContext, done: (err?: Error) => void): void
         {
-            try
+            for (var key in this._values)
             {
-                // TODO: test if we can use just Inputs or if we have to use Inputs AND Outputs
-                var values: Dictionary<any> = ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
-
-                for (var key in this._values)
-                {
-                    context.Outputs[key] = EvalHelper.Eval(values, this._values[key]);
-                }
-
-                done();
+                context.Outputs[key] = EvalHelper.Eval(context.Inputs, this._values[key]);
             }
-            catch (ex)
-            {
-                done(ex);
-            }
+
+            done();
         }
     }
 }

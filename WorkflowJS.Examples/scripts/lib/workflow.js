@@ -40,6 +40,9 @@ var wfjs;
             }
             var value = null;
             var length = (params || []).length;
+            if (length == 0) {
+                return obj;
+            }
             for (var i = 0; i < length; i++) {
                 obj = obj[params[i]];
                 if (obj == null) {
@@ -133,12 +136,12 @@ var wfjs;
 (function (wfjs) {
     wfjs.Assign = function (options) {
         options = options || {};
-        return {
+        return wfjs.Activity({
             $inputs: { '*': '*' },
             $outputs: { '*': '*' },
             activity: new AssignActivity(options.values),
             next: options.next
-        };
+        });
     };
     /**
      * AssignActivity Assigns values to Outputs.
@@ -150,17 +153,10 @@ var wfjs;
             this._values = values || {};
         }
         AssignActivity.prototype.Execute = function (context, done) {
-            try {
-                // TODO: test if we can use just Inputs or if we have to use Inputs AND Outputs
-                var values = wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
-                for (var key in this._values) {
-                    context.Outputs[key] = wfjs.EvalHelper.Eval(values, this._values[key]);
-                }
-                done();
+            for (var key in this._values) {
+                context.Outputs[key] = wfjs.EvalHelper.Eval(context.Inputs, this._values[key]);
             }
-            catch (ex) {
-                done(ex);
-            }
+            done();
         };
         return AssignActivity;
     })();
@@ -170,12 +166,12 @@ var wfjs;
 (function (wfjs) {
     wfjs.Decision = function (options) {
         options = options || {};
-        return {
+        return wfjs.Activity({
             $inputs: { '*': '*' },
             $outputs: { '$next': '$next' },
             activity: new DecisionActivity(options),
             next: options.next
-        };
+        });
     };
     /**
      * AssignActivity Assigns values to Outputs.
@@ -187,9 +183,7 @@ var wfjs;
             this._options = options || {};
         }
         DecisionActivity.prototype.Execute = function (context, done) {
-            // TODO: test if we can use just Inputs or if we have to use Inputs AND Outputs
-            var values = wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
-            var result = wfjs.EvalHelper.Eval(values, this._options.condition);
+            var result = wfjs.EvalHelper.Eval(context.Inputs, this._options.condition);
             context.Outputs['$next'] = result ? this._options.true : this._options.false;
             done();
         };
@@ -200,8 +194,29 @@ var wfjs;
 var wfjs;
 (function (wfjs) {
     wfjs.Execute = function (options) {
-        return options;
+        options = options || {};
+        return wfjs.Activity({
+            $inputs: { '*': '*' },
+            $outputs: { '*': '*' },
+            activity: new ExecuteActivity(options),
+            next: options.next
+        });
     };
+    /**
+     * AssignActivity Assigns values to Outputs.
+     */
+    var ExecuteActivity = (function () {
+        function ExecuteActivity(options) {
+            this.$inputs = ['*'];
+            this.$outputs = ['*'];
+            this._options = options || {};
+        }
+        ExecuteActivity.prototype.Execute = function (context, done) {
+            this._options.execute(context, done);
+        };
+        return ExecuteActivity;
+    })();
+    wfjs.ExecuteActivity = ExecuteActivity;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
@@ -310,13 +325,6 @@ var wfjs;
                     return done(err);
                 }
                 var $next = wfjs.ObjectHelper.GetValue(innerContext, 'Outputs', '$next');
-                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
-                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
-                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
-                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
-                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
-                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
-                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
                 var nextActivity = !wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext) ? _this._activities[$next] || Workflow._GetNextActivity(activity, _this._activities) : null;
                 var activityExecute = nextActivity != null ? _this._ExecuteLoop.bind(_this) : function (innerContext, nextActivity, callback) {
                     callback();
@@ -332,36 +340,19 @@ var wfjs;
             // TODO: use InternalMapBase globally.
             var iActivity = activity;
             if (this.debug) {
+                //console.log('context:', innerContext);
                 console.log('Activity:', iActivity);
             }
             if (activity.activity != null) {
                 this._ExecuteActivity(innerContext, activity, function (err) { return next(err, innerContext); });
             }
-            else if (activity.condition != null) {
-                this._ExecuteDecision(context, activity, function (err) { return next(err, context); });
-            }
-            else if (activity.execute != null) {
-                this._ExecuteCodeActivity(context, activity, function (err) { return next(err, context); });
-            }
             else if (iActivity._type == 'pause') {
-                this._ExecutePause(context, activity, function (err) { return next(err, context); });
+                context.StateData = activity.Pause(context);
+                next(null, context);
             }
             else {
                 done(new Error(wfjs.Resources.Error_Activity_Invalid));
             }
-        };
-        /**
-         * _ExecutePause Pause / Resume the workflow.
-         */
-        Workflow.prototype._ExecutePause = function (context, activity, done) {
-            var err = null;
-            try {
-                context.StateData = activity.Pause(context);
-            }
-            catch (ex) {
-                err = ex;
-            }
-            done(err);
         };
         /**
          * _ExecuteActivity Executes the Activity.
@@ -375,45 +366,6 @@ var wfjs;
                 }
                 done(err);
             });
-        };
-        /**
-         * _ExecuteDecision Evaluates the condition (to true or false) and executes next activity.
-         */
-        Workflow.prototype._ExecuteDecision = function (context, activity, done) {
-            var err = null;
-            try {
-                var values = context.Inputs;
-                wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
-                var condition = wfjs.EvalHelper.Eval(values, activity.condition);
-                activity.next = condition ? activity.true : activity.false;
-            }
-            catch (ex) {
-                err = ex;
-            }
-            finally {
-                done(err);
-            }
-        };
-        /**
-         * _ExecuteCodeActivity Executes an IExecuteActivity block.
-         */
-        Workflow.prototype._ExecuteCodeActivity = function (context, activity, done) {
-            var err = null;
-            try {
-                var innerContext = Workflow._CreateNextActivityContext(context);
-                activity.execute(innerContext, function (err) {
-                    if (innerContext != null) {
-                        wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
-                    }
-                    done(err);
-                });
-            }
-            catch (ex) {
-                err = ex;
-            }
-            finally {
-                done(err);
-            }
         };
         /**
          * _GetInputs Returns a collection of input values.

@@ -32,16 +32,16 @@ var wfjsExample;
                         switch (inputType) {
                             case 'null':
                             case 'undefined':
-                                this.next = 'CreateMessage:NoValue';
+                                context.Outputs['$next'] = 'CreateMessage:NoValue';
                                 break;
                             case 'string':
-                                this.next = 'CreateMessage:String';
+                                context.Outputs['$next'] = 'CreateMessage:String';
                                 break;
                             case 'number':
-                                this.next = 'CreateMessage:Number';
+                                context.Outputs['$next'] = 'CreateMessage:Number';
                                 break;
                             default:
-                                this.next = 'CreateMessage:Unknown';
+                                context.Outputs['$next'] = 'CreateMessage:Unknown';
                                 break;
                         }
                         done();

@@ -133,14 +133,23 @@ declare module wfjs {
     class DecisionActivity implements IActivity {
         $inputs: string[];
         $outputs: string[];
-        private _values;
         private _options;
         constructor(options: IDecisionActivity);
         Execute(context: ActivityContext, done: (err?: Error) => void): void;
     }
 }
 declare module wfjs {
-    var Execute: (options: IExecuteActivity) => IExecuteActivity;
+    var Execute: (options: IExecuteActivity) => IWorkflowActivity;
+    /**
+     * AssignActivity Assigns values to Outputs.
+     */
+    class ExecuteActivity implements IActivity {
+        $inputs: string[];
+        $outputs: string[];
+        private _options;
+        constructor(options: IExecuteActivity);
+        Execute(context: ActivityContext, done: (err?: Error) => void): void;
+    }
 }
 declare module wfjs {
     var Flowchart: (options: IFlowchart) => IFlowchart;
@@ -194,21 +203,9 @@ declare module wfjs {
          */
         private _ExecuteLoop(context, activity, done);
         /**
-         * _ExecutePause Pause / Resume the workflow.
-         */
-        private _ExecutePause(context, activity, done);
-        /**
          * _ExecuteActivity Executes the Activity.
          */
         private _ExecuteActivity(context, activity, done);
-        /**
-         * _ExecuteDecision Evaluates the condition (to true or false) and executes next activity.
-         */
-        private _ExecuteDecision(context, activity, done);
-        /**
-         * _ExecuteCodeActivity Executes an IExecuteActivity block.
-         */
-        private _ExecuteCodeActivity(context, activity, done);
         /**
          * _GetInputs Returns a collection of input values.
          */

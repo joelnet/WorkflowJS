@@ -20,7 +20,7 @@ module wfjsExample.Inputs
                 {
                     if (err != null)
                     {
-                        this.result.text('Finished with error: ' + err.toString());
+                        this.result.text('Finished with error: ' + err);
                     }
                     else
                     {

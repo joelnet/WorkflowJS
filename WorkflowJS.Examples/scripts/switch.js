@@ -15,7 +15,7 @@ var wfjsExample;
                     window: window
                 }).Invoke(function (err, ctx) {
                     if (err != null) {
-                        _this.result.text('Finished with error: ' + err.toString());
+                        _this.result.text('Finished with error: ' + err);
                     }
                     else {
                         _this.result.text(ctx.Outputs['result']);

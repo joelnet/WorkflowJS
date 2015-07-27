@@ -111,6 +111,7 @@
 
             if (this.debug)
             {
+                //console.log('context:', innerContext);
                 console.log('Activity:', iActivity);
             }
 
@@ -118,37 +119,15 @@
             {
                 this._ExecuteActivity(innerContext, <IWorkflowActivity>activity, err => next(err, innerContext));
             }
-            else if ((<IExecuteActivity>activity).execute != null)
-            {
-                this._ExecuteCodeActivity(context, <IExecuteActivity>activity, err => next(err, context));
-            }
             else if (iActivity._type == 'pause')
             {
-                this._ExecutePause(context, <PauseActivity>activity, err => next(err, context));
+                context.StateData = (<PauseActivity>activity).Pause(context);
+                next(null, context);
             }
             else
             {
                 done(new Error(Resources.Error_Activity_Invalid));
             }
-        }
-
-        /**
-         * _ExecutePause Pause / Resume the workflow.
-         */
-        private _ExecutePause(context: ActivityContext, activity: PauseActivity, done: (err: Error) => void): void
-        {
-            var err: Error = null;
-
-            try
-            {
-                context.StateData = activity.Pause(context);
-            }
-            catch (ex)
-            {
-                err = ex;
-            }
-
-            done(err);
         }
 
         /**
@@ -172,37 +151,6 @@
 
                     done(err);
                 });
-        }
-
-        /**
-         * _ExecuteCodeActivity Executes an IExecuteActivity block.
-         */
-        private _ExecuteCodeActivity(context: ActivityContext, activity: IExecuteActivity, done: (err?: Error) => void): void
-        {
-            var err: Error = null;
-
-            try
-            {
-                var innerContext = Workflow._CreateNextActivityContext(context);
-
-                activity.execute(innerContext, err =>
-                {
-                    if (innerContext != null)
-                    {
-                        ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
-                    }
-
-                    done(err);
-                });
-            }
-            catch (ex)
-            {
-                err = ex;
-            }
-            finally
-            {
-                done(err);
-            }
         }
 
         /**
