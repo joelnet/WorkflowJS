@@ -2,6 +2,19 @@
 {
     export class ObjectHelper
     {
+        public static CopyProperties(source, destination): void
+        {
+            if (source == null || destination == null)
+            {
+                return;
+            }
+
+            for (var key in source)
+            {
+                destination[key] = source[key];
+            }
+        }
+
         public static GetKeys(obj): string[]
         {
             var keys: string[] = [];
@@ -14,17 +27,26 @@
             return keys;
         }
 
-        public static CopyProperties(source, destination): void
+        public static GetValue(obj, ...params: any[]): any
         {
-            if (source == null || destination == null)
+            var value = null;
+            var length = (params||[]).length;
+
+            for (var i = 0; i < length; i++)
             {
-                return;
+                obj = obj[params[i]];
+
+                if (obj == null)
+                {
+                    break;
+                }
+                else if (i == length - 1)
+                {
+                    value = obj;
+                }
             }
 
-            for (var key in source)
-            {
-                destination[key] = source[key];
-            }
+            return value;
         }
 
         public static ShallowClone(obj): any

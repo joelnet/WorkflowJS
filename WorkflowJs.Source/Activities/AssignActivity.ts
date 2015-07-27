@@ -31,6 +31,7 @@
         {
             try
             {
+                // TODO: test if we can use just Inputs or if we have to use Inputs AND Outputs
                 var values: Dictionary<any> = ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
 
                 for (var key in this._values)

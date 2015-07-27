@@ -83,9 +83,11 @@
                 {
                     return done(err);
                 }
-                
+
+                var $next: string = ObjectHelper.GetValue(innerContext, 'Outputs', '$next');
+
                 var nextActivity = !_Specifications.IsPaused.IsSatisfiedBy(innerContext)
-                    ? Workflow._GetNextActivity(activity, this._activities)
+                    ? this._activities[$next] || Workflow._GetNextActivity(activity, this._activities)
                     : null;
                 var activityExecute = nextActivity != null
                     ? this._ExecuteLoop.bind(this)
@@ -115,10 +117,6 @@
             if ((<IWorkflowActivity>activity).activity != null)
             {
                 this._ExecuteActivity(innerContext, <IWorkflowActivity>activity, err => next(err, innerContext));
-            }
-            else if ((<IDecisionActivity>activity).condition != null)
-            {
-                this._ExecuteDecision(context, <IDecisionActivity>activity, err => next(err, context));
             }
             else if ((<IExecuteActivity>activity).execute != null)
             {
@@ -174,32 +172,6 @@
 
                     done(err);
                 });
-        }
-
-        /**
-         * _ExecuteDecision Evaluates the condition (to true or false) and executes next activity.
-         */
-        private _ExecuteDecision(context: ActivityContext, activity: IDecisionActivity, done: (err?: Error) => void): void
-        {
-            var err: Error = null;
-
-            try
-            {
-                var values: Dictionary<any> = context.Inputs;
-                ObjectHelper.CopyProperties(context.Outputs, values);
-
-                var condition: boolean = EvalHelper.Eval(values, activity.condition);
-
-                activity.next = condition ? activity.true : activity.false;
-            }
-            catch (ex)
-            {
-                err = ex;
-            }
-            finally
-            {
-                done(err);
-            }
         }
 
         /**

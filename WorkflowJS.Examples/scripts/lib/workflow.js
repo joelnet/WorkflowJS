@@ -18,13 +18,6 @@ var wfjs;
     var ObjectHelper = (function () {
         function ObjectHelper() {
         }
-        ObjectHelper.GetKeys = function (obj) {
-            var keys = [];
-            for (var key in (obj || {})) {
-                keys.push(key);
-            }
-            return keys;
-        };
         ObjectHelper.CopyProperties = function (source, destination) {
             if (source == null || destination == null) {
                 return;
@@ -32,6 +25,31 @@ var wfjs;
             for (var key in source) {
                 destination[key] = source[key];
             }
+        };
+        ObjectHelper.GetKeys = function (obj) {
+            var keys = [];
+            for (var key in (obj || {})) {
+                keys.push(key);
+            }
+            return keys;
+        };
+        ObjectHelper.GetValue = function (obj) {
+            var params = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                params[_i - 1] = arguments[_i];
+            }
+            var value = null;
+            var length = (params || []).length;
+            for (var i = 0; i < length; i++) {
+                obj = obj[params[i]];
+                if (obj == null) {
+                    break;
+                }
+                else if (i == length - 1) {
+                    value = obj;
+                }
+            }
+            return value;
         };
         ObjectHelper.ShallowClone = function (obj) {
             if (obj == null) {
@@ -133,6 +151,7 @@ var wfjs;
         }
         AssignActivity.prototype.Execute = function (context, done) {
             try {
+                // TODO: test if we can use just Inputs or if we have to use Inputs AND Outputs
                 var values = wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
                 for (var key in this._values) {
                     context.Outputs[key] = wfjs.EvalHelper.Eval(values, this._values[key]);
@@ -150,8 +169,33 @@ var wfjs;
 var wfjs;
 (function (wfjs) {
     wfjs.Decision = function (options) {
-        return options;
+        options = options || {};
+        return {
+            $inputs: { '*': '*' },
+            $outputs: { '$next': '$next' },
+            activity: new DecisionActivity(options),
+            next: options.next
+        };
     };
+    /**
+     * AssignActivity Assigns values to Outputs.
+     */
+    var DecisionActivity = (function () {
+        function DecisionActivity(options) {
+            this.$inputs = ['*'];
+            this.$outputs = ['$next'];
+            this._options = options || {};
+        }
+        DecisionActivity.prototype.Execute = function (context, done) {
+            // TODO: test if we can use just Inputs or if we have to use Inputs AND Outputs
+            var values = wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
+            var result = wfjs.EvalHelper.Eval(values, this._options.condition);
+            context.Outputs['$next'] = result ? this._options.true : this._options.false;
+            done();
+        };
+        return DecisionActivity;
+    })();
+    wfjs.DecisionActivity = DecisionActivity;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
@@ -265,7 +309,15 @@ var wfjs;
                 if (err != null) {
                     return done(err);
                 }
-                var nextActivity = !wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext) ? Workflow._GetNextActivity(activity, _this._activities) : null;
+                var $next = wfjs.ObjectHelper.GetValue(innerContext, 'Outputs', '$next');
+                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
+                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
+                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
+                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
+                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
+                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
+                // TODO: catch $next and SOMEWHERE set the NEXT variable!!!
+                var nextActivity = !wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext) ? _this._activities[$next] || Workflow._GetNextActivity(activity, _this._activities) : null;
                 var activityExecute = nextActivity != null ? _this._ExecuteLoop.bind(_this) : function (innerContext, nextActivity, callback) {
                     callback();
                 };

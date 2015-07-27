@@ -20,6 +20,7 @@ var wfjs;
         }
         AssignActivity.prototype.Execute = function (context, done) {
             try {
+                // TODO: test if we can use just Inputs or if we have to use Inputs AND Outputs
                 var values = wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
                 for (var key in this._values) {
                     context.Outputs[key] = wfjs.EvalHelper.Eval(values, this._values[key]);

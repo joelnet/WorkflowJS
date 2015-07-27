@@ -5,8 +5,9 @@ declare module wfjs {
 }
 declare module wfjs {
     class ObjectHelper {
-        static GetKeys(obj: any): string[];
         static CopyProperties(source: any, destination: any): void;
+        static GetKeys(obj: any): string[];
+        static GetValue(obj: any, ...params: any[]): any;
         static ShallowClone(obj: any): any;
         static CombineObjects(obj1: any, obj2: any): any;
         private static ShallowCloneArray(obj);
@@ -125,7 +126,18 @@ declare module wfjs {
     }
 }
 declare module wfjs {
-    var Decision: (options: IDecisionActivity) => IDecisionActivity;
+    var Decision: (options: IDecisionActivity) => IWorkflowActivity;
+    /**
+     * AssignActivity Assigns values to Outputs.
+     */
+    class DecisionActivity implements IActivity {
+        $inputs: string[];
+        $outputs: string[];
+        private _values;
+        private _options;
+        constructor(options: IDecisionActivity);
+        Execute(context: ActivityContext, done: (err?: Error) => void): void;
+    }
 }
 declare module wfjs {
     var Execute: (options: IExecuteActivity) => IExecuteActivity;

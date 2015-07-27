@@ -3,7 +3,7 @@ var wfjs;
     var Workflow = (function () {
         function Workflow(map, state) {
             this.debug = true;
-            this.State = 0 /* None */;
+            this.State = wfjs.WorkflowState.None;
             if (map == null) {
                 throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'map'));
             }
@@ -21,7 +21,7 @@ var wfjs;
          */
         Workflow.prototype.Execute = function (context, done) {
             var _this = this;
-            this.State = 1 /* Running */;
+            this.State = wfjs.WorkflowState.Running;
             var activityCount = Object.keys(this._activities).length;
             if (activityCount == 0) {
                 return done();
@@ -29,13 +29,13 @@ var wfjs;
             var activity = Workflow._GetFirstActivity(this._activities, this._stateData);
             this._ExecuteLoop(context, activity, function (err) {
                 if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
-                    _this.State = 3 /* Paused */;
+                    _this.State = wfjs.WorkflowState.Paused;
                 }
                 else if (err != null) {
-                    _this.State = 4 /* Fault */;
+                    _this.State = wfjs.WorkflowState.Fault;
                 }
                 else {
-                    _this.State = 2 /* Complete */;
+                    _this.State = wfjs.WorkflowState.Complete;
                 }
                 done(err);
             });
@@ -50,7 +50,8 @@ var wfjs;
                 if (err != null) {
                     return done(err);
                 }
-                var nextActivity = !wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext) ? Workflow._GetNextActivity(activity, _this._activities) : null;
+                var $next = wfjs.ObjectHelper.GetValue(innerContext, 'Outputs', '$next');
+                var nextActivity = !wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext) ? _this._activities[$next] || Workflow._GetNextActivity(activity, _this._activities) : null;
                 var activityExecute = nextActivity != null ? _this._ExecuteLoop.bind(_this) : function (innerContext, nextActivity, callback) {
                     callback();
                 };
@@ -69,9 +70,6 @@ var wfjs;
             }
             if (activity.activity != null) {
                 this._ExecuteActivity(innerContext, activity, function (err) { return next(err, innerContext); });
-            }
-            else if (activity.condition != null) {
-                this._ExecuteDecision(context, activity, function (err) { return next(err, context); });
             }
             else if (activity.execute != null) {
                 this._ExecuteCodeActivity(context, activity, function (err) { return next(err, context); });
@@ -108,24 +106,6 @@ var wfjs;
                 }
                 done(err);
             });
-        };
-        /**
-         * _ExecuteDecision Evaluates the condition (to true or false) and executes next activity.
-         */
-        Workflow.prototype._ExecuteDecision = function (context, activity, done) {
-            var err = null;
-            try {
-                var values = context.Inputs;
-                wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
-                var condition = wfjs.EvalHelper.Eval(values, activity.condition);
-                activity.next = condition ? activity.true : activity.false;
-            }
-            catch (ex) {
-                err = ex;
-            }
-            finally {
-                done(err);
-            }
         };
         /**
          * _ExecuteCodeActivity Executes an IExecuteActivity block.

@@ -3,13 +3,6 @@ var wfjs;
     var ObjectHelper = (function () {
         function ObjectHelper() {
         }
-        ObjectHelper.GetKeys = function (obj) {
-            var keys = [];
-            for (var key in (obj || {})) {
-                keys.push(key);
-            }
-            return keys;
-        };
         ObjectHelper.CopyProperties = function (source, destination) {
             if (source == null || destination == null) {
                 return;
@@ -17,6 +10,31 @@ var wfjs;
             for (var key in source) {
                 destination[key] = source[key];
             }
+        };
+        ObjectHelper.GetKeys = function (obj) {
+            var keys = [];
+            for (var key in (obj || {})) {
+                keys.push(key);
+            }
+            return keys;
+        };
+        ObjectHelper.GetValue = function (obj) {
+            var params = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                params[_i - 1] = arguments[_i];
+            }
+            var value = null;
+            var length = (params || []).length;
+            for (var i = 0; i < length; i++) {
+                obj = obj[params[i]];
+                if (obj == null) {
+                    break;
+                }
+                else if (i == length - 1) {
+                    value = obj;
+                }
+            }
+            return value;
         };
         ObjectHelper.ShallowClone = function (obj) {
             if (obj == null) {
