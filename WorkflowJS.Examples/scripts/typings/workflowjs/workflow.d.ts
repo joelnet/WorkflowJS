@@ -81,11 +81,6 @@ declare module wfjs {
     }
 }
 declare module wfjs {
-    interface IInternalActivityBase extends IActivityBase {
-        _type: string;
-    }
-}
-declare module wfjs {
     interface IPauseState {
         i: wfjs.Dictionary<any>;
         o: wfjs.Dictionary<any>;
@@ -99,6 +94,18 @@ declare module wfjs {
         $outputs?: Dictionary<string>;
         next?: string;
     }
+    interface IInternalWorkflowActivity extends IWorkflowActivity {
+        _name: string;
+    }
+}
+declare module wfjs {
+    enum LogType {
+        None = 0,
+        Debug = 1,
+        Info = 2,
+        Warn = 3,
+        Error = 4,
+    }
 }
 declare module wfjs {
     enum WorkflowState {
@@ -107,6 +114,30 @@ declare module wfjs {
         Complete = 2,
         Paused = 3,
         Fault = 4,
+    }
+}
+declare module wfjs._bll {
+    class Logger {
+        /**
+         * _log Sends message and optionalParams to the logger.
+         */
+        static Log(logger: Console, logType: LogType, message: any, ...optionalParams: any[]): void;
+        /**
+         * _getLogFunction returns the log function for the LogType. Falls back to 'log' if others aren't available.
+         */
+        private static _getLogFunction(logger, logType);
+    }
+}
+declare module wfjs._bll {
+    class Workflow {
+        /**
+          * GetStartActivityName Gets the name of the to be executed first.
+          */
+        static GetStartActivityName(activities: Dictionary<IActivityBase>, state: IPauseState): string;
+        /**
+         * GetNextActivityName returns the name of the next Activity or null.
+         */
+        static GetNextActivityName(activity: IActivityBase, activities: Dictionary<IActivityBase>): string;
     }
 }
 declare module wfjs {
@@ -179,6 +210,7 @@ declare module wfjs {
         static IsPaused: Specification<ActivityContext>;
         static IsWildcardDictionary: Specification<Dictionary<any>>;
         static IsWildcardArray: Specification<string[]>;
+        static Has$next: Specification<ActivityContext>;
     }
 }
 declare module wfjs {
@@ -186,10 +218,10 @@ declare module wfjs {
         _stateData: IPauseState;
     }
     class Workflow implements IActivity {
-        debug: boolean;
         $inputs: string[];
         $outputs: string[];
         State: WorkflowState;
+        logger: Console;
         private _activities;
         private _extensions;
         private _stateData;
@@ -201,11 +233,12 @@ declare module wfjs {
         /**
          * _ExecuteLoop Execution loop that executes every Activity.
          */
-        private _ExecuteLoop(context, activity, done);
+        private _ExecuteLoop(activityName, context, activity, done);
         /**
          * _ExecuteActivity Executes the Activity.
          */
         private _ExecuteActivity(context, activity, done);
+        private _log(logType, message, ...optionalParams);
         /**
          * _GetInputs Returns a collection of input values.
          */
@@ -214,14 +247,6 @@ declare module wfjs {
          * _GetOutputs Returns a collection out remapped outputs
          */
         private static _GetOutputs(context, outputs);
-        /**
-         * _GetFirstActivity Gets the Activity to be executed first.
-         */
-        private static _GetFirstActivity(activities, state);
-        /**
-         * _GetNextActivity returns the next Activity or null.
-         */
-        private static _GetNextActivity(activity, activities);
         /**
          * _CreateNextActivityContext Returns a new context for inner activities.
          */

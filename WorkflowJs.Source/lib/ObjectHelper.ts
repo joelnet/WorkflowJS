@@ -32,7 +32,7 @@
             var value = null;
             var length = (params||[]).length;
 
-            if (length == 0)
+            if (obj == null || length == 0)
             {
                 return obj;
             }

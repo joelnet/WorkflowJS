@@ -36,6 +36,12 @@
     <Content Include="Activities\PauseActivity.js">
       <DependentUpon>PauseActivity.ts</DependentUpon>
     </Content>
+    <Content Include="bll\Logger.js">
+      <DependentUpon>Logger.ts</DependentUpon>
+    </Content>
+    <Content Include="bll\Workflow.js">
+      <DependentUpon>Workflow.ts</DependentUpon>
+    </Content>
     <Content Include="Models\ActivityContext.js">
       <DependentUpon>ActivityContext.ts</DependentUpon>
     </Content>
@@ -60,9 +66,6 @@
     <Content Include="Models\IFlowchart.js">
       <DependentUpon>IFlowchart.ts</DependentUpon>
     </Content>
-    <Content Include="Models\IInternalActivityBase.js">
-      <DependentUpon>IInternalActivityBase.ts</DependentUpon>
-    </Content>
     <Content Include="Models\IPauseState.js">
       <DependentUpon>IPauseState.ts</DependentUpon>
     </Content>
@@ -74,6 +77,9 @@
     </Content>
     <Content Include="lib\ObjectHelper.js">
       <DependentUpon>ObjectHelper.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\LogType.js">
+      <DependentUpon>LogType.ts</DependentUpon>
     </Content>
     <Content Include="Resource.js">
       <DependentUpon>Resource.ts</DependentUpon>
@@ -111,6 +117,8 @@
     <TypeScriptCompile Include="Activities\Activity.ts" />
     <TypeScriptCompile Include="Activities\DecisionActivity.ts" />
     <TypeScriptCompile Include="Activities\Flowchart.ts" />
+    <TypeScriptCompile Include="bll\Logger.ts" />
+    <TypeScriptCompile Include="bll\Workflow.ts" />
     <TypeScriptCompile Include="Models\ActivityContext.ts" />
     <TypeScriptCompile Include="Activities\AssignActivity.ts" />
     <TypeScriptCompile Include="Models\Dictionary.ts" />
@@ -120,13 +128,13 @@
     <TypeScriptCompile Include="Models\IAssignActivity.ts" />
     <TypeScriptCompile Include="Models\IExecuteActivity.ts" />
     <TypeScriptCompile Include="Models\IFlowchart.ts" />
-    <TypeScriptCompile Include="Models\IInternalActivityBase.ts" />
     <TypeScriptCompile Include="Models\IPauseState.ts" />
     <TypeScriptCompile Include="Models\IWorkflowActivity.ts" />
     <TypeScriptCompile Include="Models\IDecisionActivity.ts" />
     <TypeScriptCompile Include="lib\EvalHelper.ts" />
     <TypeScriptCompile Include="lib\ObjectHelper.ts" />
     <TypeScriptCompile Include="Activities\PauseActivity.ts" />
+    <TypeScriptCompile Include="Models\LogType.ts" />
     <TypeScriptCompile Include="Resource.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
@@ -198,8 +206,14 @@
     <Content Include="Activities\DecisionActivity.js.map">
       <DependentUpon>DecisionActivity.ts</DependentUpon>
     </Content>
-    <Content Include="Models\IInternalActivityBase.js.map">
-      <DependentUpon>IInternalActivityBase.ts</DependentUpon>
+    <Content Include="bll\Logger.js.map">
+      <DependentUpon>Logger.ts</DependentUpon>
+    </Content>
+    <Content Include="bll\Workflow.js.map">
+      <DependentUpon>Workflow.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\LogType.js.map">
+      <DependentUpon>LogType.ts</DependentUpon>
     </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
@@ -233,8 +247,7 @@
           <IISUrl>http://localhost:53201/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <CustomServerUrl></CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
@@ -254,6 +267,7 @@
     <PostBuildEvent>cd $(ProjectDir)
 dir lib\*.ts /s /b &gt;ts-files
 dir Models\*.ts /s /b &gt;&gt;ts-files
+dir bll\*.ts /s /b &gt;&gt;ts-files
 dir Activities\*.ts /s /b &gt;&gt;ts-files
 dir *.ts /b &gt;&gt;ts-files
 tsc @ts-files --out bin\workflow.js --declaration

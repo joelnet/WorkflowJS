@@ -7,10 +7,10 @@
 
     export class Workflow implements IActivity
     {
-        public debug: boolean = true;
         public $inputs: string[];
         public $outputs: string[];
         public State: WorkflowState = WorkflowState.None;
+        public logger: Console = console;
 
         private _activities: Dictionary<IActivityBase>;
         private _extensions: Dictionary<any>;
@@ -40,30 +40,40 @@
          */
         public Execute(context: ActivityContext, done: (err?: Error) => void): void
         {
-            this.State = WorkflowState.Running;
+            this.State = context.State = WorkflowState.Running;
 
-            var activityCount = Object.keys(this._activities).length;
+            var firstActivityName: string = _bll.Workflow.GetStartActivityName(this._activities, this._stateData);
+            var activity = this._activities[firstActivityName];
 
-            if (activityCount == 0)
+            if (activity == null)
             {
+                this.State = context.State = WorkflowState.Complete;
                 return done();
             }
 
-            var activity = Workflow._GetFirstActivity(this._activities, this._stateData);
+            if (this._stateData != null)
+            {
+                this._log(LogType.None, 'Workflow Resumed');
+            }
 
-            this._ExecuteLoop(context, activity, err =>
+
+                //if ($next != null && nextActivity != null)
+                //{
+                //}
+
+            this._ExecuteLoop(firstActivityName, context, activity, err =>
             {
                 if (_Specifications.IsPaused.IsSatisfiedBy(context))
                 {
-                    this.State = WorkflowState.Paused;
+                    this.State = context.State = WorkflowState.Paused;
                 }
                 else if (err != null)
                 {
-                    this.State = WorkflowState.Fault;
+                    this.State = context.State = WorkflowState.Fault;
                 }
                 else
                 {
-                    this.State = WorkflowState.Complete;
+                    this.State = context.State = WorkflowState.Complete;
                 }
                 
                 done(err);
@@ -73,7 +83,7 @@
         /**
          * _ExecuteLoop Execution loop that executes every Activity.
          */
-        private _ExecuteLoop(context: ActivityContext, activity: IActivityBase, done: (err?: Error) => void): void
+        private _ExecuteLoop(activityName: string, context: ActivityContext, activity: IActivityBase, done: (err?: Error) => void): void
         {
             var innerContext = Workflow._CreateNextActivityContext(context);
 
@@ -85,15 +95,12 @@
                 }
 
                 var $next: string = ObjectHelper.GetValue(innerContext, 'Outputs', '$next');
+                var nextActivityName: string = $next || _bll.Workflow.GetNextActivityName(activity, this._activities);
+                var nextActivity = !_Specifications.IsPaused.IsSatisfiedBy(innerContext) ? this._activities[nextActivityName] : null;
+                var dummyCallback = (n, i, a, callback) => { callback(); };
+                var activityExecute = nextActivity != null ? this._ExecuteLoop.bind(this) : dummyCallback;
 
-                var nextActivity = !_Specifications.IsPaused.IsSatisfiedBy(innerContext)
-                    ? this._activities[$next] || Workflow._GetNextActivity(activity, this._activities)
-                    : null;
-                var activityExecute = nextActivity != null
-                    ? this._ExecuteLoop.bind(this)
-                    : (innerContext, nextActivity, callback) => { callback(); };
-
-                activityExecute(innerContext, nextActivity, err =>
+                activityExecute(nextActivityName, innerContext, nextActivity, err =>
                 {
                     ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
                     
@@ -106,21 +113,15 @@
                 });
             }
 
-            // TODO: use InternalMapBase globally.
-            var iActivity = <IInternalActivityBase>activity;
-
-            if (this.debug)
-            {
-                //console.log('context:', innerContext);
-                console.log('Activity:', iActivity);
-            }
+            this._log(LogType.None, activityName, { inputs: context.Inputs });
 
             if ((<IWorkflowActivity>activity).activity != null)
             {
-                this._ExecuteActivity(innerContext, <IWorkflowActivity>activity, err => next(err, innerContext));
+                this._ExecuteActivity(innerContext, <IInternalWorkflowActivity>activity, err => next(err, innerContext));
             }
-            else if (iActivity._type == 'pause')
+            else if (typeof (<PauseActivity>activity).Pause == 'function')
             {
+                this._log(LogType.None, 'Workflow Paused');
                 context.StateData = (<PauseActivity>activity).Pause(context);
                 next(null, context);
             }
@@ -133,7 +134,7 @@
         /**
          * _ExecuteActivity Executes the Activity.
          */
-        private _ExecuteActivity(context: ActivityContext, activity: IWorkflowActivity, done: (err?: Error) => void): void
+        private _ExecuteActivity(context: ActivityContext, activity: IInternalWorkflowActivity, done: (err?: Error) => void): void
         {
             var inputs = Workflow._GetInputs(context, activity.$inputs);
 
@@ -151,6 +152,15 @@
 
                     done(err);
                 });
+        }
+
+        private _log(logType: LogType, message: any, ...optionalParams: any[]): void
+        {
+            var args = [this.logger, logType, 'wfjs.Workflow:']
+                .concat([message])
+                .concat(optionalParams || []);
+
+            _bll.Logger.Log.apply(_bll.Logger, args);
         }
 
         /**
@@ -196,35 +206,6 @@
             }
 
             return value;
-        }
-
-        /**
-         * _GetFirstActivity Gets the Activity to be executed first.
-         */
-        private static _GetFirstActivity(activities: Dictionary<IActivityBase>, state: IPauseState): IActivityBase
-        {
-            var hasStateNext = state != null && state.n != null;
-            var activityName: string = hasStateNext ? state.n : Object.keys(activities)[0];
-
-            return activities[activityName];
-        }
-
-        /**
-         * _GetNextActivity returns the next Activity or null.
-         */
-        private static _GetNextActivity(activity: IActivityBase, activities: Dictionary<IActivityBase>): IActivityBase
-        {
-            if (activity == null)
-            {
-                return null;
-            }
-
-            if ((<IWorkflowActivity>activity).next != null)
-            {
-                return activities[(<IWorkflowActivity>activity).next] || null
-            }
-
-            return null;
         }
 
         /**

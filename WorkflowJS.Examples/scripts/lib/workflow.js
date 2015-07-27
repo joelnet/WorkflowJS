@@ -40,7 +40,7 @@ var wfjs;
             }
             var value = null;
             var length = (params || []).length;
-            if (length == 0) {
+            if (obj == null || length == 0) {
                 return obj;
             }
             for (var i = 0; i < length; i++) {
@@ -117,6 +117,17 @@ var wfjs;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
+    (function (LogType) {
+        LogType[LogType["None"] = 0] = "None";
+        LogType[LogType["Debug"] = 1] = "Debug";
+        LogType[LogType["Info"] = 2] = "Info";
+        LogType[LogType["Warn"] = 3] = "Warn";
+        LogType[LogType["Error"] = 4] = "Error";
+    })(wfjs.LogType || (wfjs.LogType = {}));
+    var LogType = wfjs.LogType;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
     (function (WorkflowState) {
         WorkflowState[WorkflowState["None"] = 0] = "None";
         WorkflowState[WorkflowState["Running"] = 1] = "Running";
@@ -125,6 +136,75 @@ var wfjs;
         WorkflowState[WorkflowState["Fault"] = 4] = "Fault";
     })(wfjs.WorkflowState || (wfjs.WorkflowState = {}));
     var WorkflowState = wfjs.WorkflowState;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    var _bll;
+    (function (_bll) {
+        var Logger = (function () {
+            function Logger() {
+            }
+            /**
+             * _log Sends message and optionalParams to the logger.
+             */
+            Logger.Log = function (logger, logType, message) {
+                var optionalParams = [];
+                for (var _i = 3; _i < arguments.length; _i++) {
+                    optionalParams[_i - 3] = arguments[_i];
+                }
+                var log = Logger._getLogFunction(logger, logType);
+                var args = [message].concat(optionalParams || []);
+                if (log != null) {
+                    log.apply(logger, args);
+                }
+            };
+            /**
+             * _getLogFunction returns the log function for the LogType. Falls back to 'log' if others aren't available.
+             */
+            Logger._getLogFunction = function (logger, logType) {
+                var log = wfjs.ObjectHelper.GetValue(logger, 'log');
+                switch (logType) {
+                    case 1 /* Debug */: return wfjs.ObjectHelper.GetValue(logger, 'debug') || log;
+                    case 2 /* Info */: return wfjs.ObjectHelper.GetValue(logger, 'info') || log;
+                    case 3 /* Warn */: return wfjs.ObjectHelper.GetValue(logger, 'warn') || log;
+                    case 4 /* Error */: return wfjs.ObjectHelper.GetValue(logger, 'error') || log;
+                    default: return log;
+                }
+            };
+            return Logger;
+        })();
+        _bll.Logger = Logger;
+    })(_bll = wfjs._bll || (wfjs._bll = {}));
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    var _bll;
+    (function (_bll) {
+        var Workflow = (function () {
+            function Workflow() {
+            }
+            /**
+              * GetStartActivityName Gets the name of the to be executed first.
+              */
+            Workflow.GetStartActivityName = function (activities, state) {
+                var hasStateNext = state != null && state.n != null;
+                var activityName = hasStateNext ? state.n : Object.keys(activities)[0];
+                return activities[activityName] != null ? activityName : null;
+            };
+            /**
+             * GetNextActivityName returns the name of the next Activity or null.
+             */
+            Workflow.GetNextActivityName = function (activity, activities) {
+                if (activity == null) {
+                    return null;
+                }
+                var activityName = wfjs.ObjectHelper.GetValue(activity, 'next');
+                return activities[activityName] != null ? activityName : null;
+            };
+            return Workflow;
+        })();
+        _bll.Workflow = Workflow;
+    })(_bll = wfjs._bll || (wfjs._bll = {}));
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
@@ -265,9 +345,10 @@ var wfjs;
     var _Specifications = (function () {
         function _Specifications() {
         }
-        _Specifications.IsPaused = new wfjs.Specification(function (o) { return o.StateData != null; });
-        _Specifications.IsWildcardDictionary = new wfjs.Specification(function (o) { return o != null && o['*'] != null; });
-        _Specifications.IsWildcardArray = new wfjs.Specification(function (o) { return o != null && o.length == 1 && o[0] == '*'; });
+        _Specifications.IsPaused = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, 'StateData') != null; });
+        _Specifications.IsWildcardDictionary = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, '*') != null; });
+        _Specifications.IsWildcardArray = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, 0) == '*'; });
+        _Specifications.Has$next = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, 'Outputs', '$next') != null; });
         return _Specifications;
     })();
     wfjs._Specifications = _Specifications;
@@ -276,8 +357,8 @@ var wfjs;
 (function (wfjs) {
     var Workflow = (function () {
         function Workflow(map, state) {
-            this.debug = true;
             this.State = 0 /* None */;
+            this.logger = console;
             if (map == null) {
                 throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'map'));
             }
@@ -295,21 +376,28 @@ var wfjs;
          */
         Workflow.prototype.Execute = function (context, done) {
             var _this = this;
-            this.State = 1 /* Running */;
-            var activityCount = Object.keys(this._activities).length;
-            if (activityCount == 0) {
+            this.State = context.State = 1 /* Running */;
+            var firstActivityName = wfjs._bll.Workflow.GetStartActivityName(this._activities, this._stateData);
+            var activity = this._activities[firstActivityName];
+            if (activity == null) {
+                this.State = context.State = 2 /* Complete */;
                 return done();
             }
-            var activity = Workflow._GetFirstActivity(this._activities, this._stateData);
-            this._ExecuteLoop(context, activity, function (err) {
+            if (this._stateData != null) {
+                this._log(0 /* None */, 'Workflow Resumed');
+            }
+            //if ($next != null && nextActivity != null)
+            //{
+            //}
+            this._ExecuteLoop(firstActivityName, context, activity, function (err) {
                 if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
-                    _this.State = 3 /* Paused */;
+                    _this.State = context.State = 3 /* Paused */;
                 }
                 else if (err != null) {
-                    _this.State = 4 /* Fault */;
+                    _this.State = context.State = 4 /* Fault */;
                 }
                 else {
-                    _this.State = 2 /* Complete */;
+                    _this.State = context.State = 2 /* Complete */;
                 }
                 done(err);
             });
@@ -317,7 +405,7 @@ var wfjs;
         /**
          * _ExecuteLoop Execution loop that executes every Activity.
          */
-        Workflow.prototype._ExecuteLoop = function (context, activity, done) {
+        Workflow.prototype._ExecuteLoop = function (activityName, context, activity, done) {
             var _this = this;
             var innerContext = Workflow._CreateNextActivityContext(context);
             var next = function (err, innerContext) {
@@ -325,11 +413,13 @@ var wfjs;
                     return done(err);
                 }
                 var $next = wfjs.ObjectHelper.GetValue(innerContext, 'Outputs', '$next');
-                var nextActivity = !wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext) ? _this._activities[$next] || Workflow._GetNextActivity(activity, _this._activities) : null;
-                var activityExecute = nextActivity != null ? _this._ExecuteLoop.bind(_this) : function (innerContext, nextActivity, callback) {
+                var nextActivityName = $next || wfjs._bll.Workflow.GetNextActivityName(activity, _this._activities);
+                var nextActivity = !wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext) ? _this._activities[nextActivityName] : null;
+                var dummyCallback = function (n, i, a, callback) {
                     callback();
                 };
-                activityExecute(innerContext, nextActivity, function (err) {
+                var activityExecute = nextActivity != null ? _this._ExecuteLoop.bind(_this) : dummyCallback;
+                activityExecute(nextActivityName, innerContext, nextActivity, function (err) {
                     wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
                     if (wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext)) {
                         context.StateData = innerContext.StateData;
@@ -337,16 +427,12 @@ var wfjs;
                     done(err);
                 });
             };
-            // TODO: use InternalMapBase globally.
-            var iActivity = activity;
-            if (this.debug) {
-                //console.log('context:', innerContext);
-                console.log('Activity:', iActivity);
-            }
+            this._log(0 /* None */, activityName, { inputs: context.Inputs });
             if (activity.activity != null) {
                 this._ExecuteActivity(innerContext, activity, function (err) { return next(err, innerContext); });
             }
-            else if (iActivity._type == 'pause') {
+            else if (typeof activity.Pause == 'function') {
+                this._log(0 /* None */, 'Workflow Paused');
                 context.StateData = activity.Pause(context);
                 next(null, context);
             }
@@ -366,6 +452,14 @@ var wfjs;
                 }
                 done(err);
             });
+        };
+        Workflow.prototype._log = function (logType, message) {
+            var optionalParams = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                optionalParams[_i - 2] = arguments[_i];
+            }
+            var args = [this.logger, logType, 'wfjs.Workflow:'].concat([message]).concat(optionalParams || []);
+            wfjs._bll.Logger.Log.apply(wfjs._bll.Logger, args);
         };
         /**
          * _GetInputs Returns a collection of input values.
@@ -395,26 +489,6 @@ var wfjs;
                 value[v] = context.Outputs[key];
             }
             return value;
-        };
-        /**
-         * _GetFirstActivity Gets the Activity to be executed first.
-         */
-        Workflow._GetFirstActivity = function (activities, state) {
-            var hasStateNext = state != null && state.n != null;
-            var activityName = hasStateNext ? state.n : Object.keys(activities)[0];
-            return activities[activityName];
-        };
-        /**
-         * _GetNextActivity returns the next Activity or null.
-         */
-        Workflow._GetNextActivity = function (activity, activities) {
-            if (activity == null) {
-                return null;
-            }
-            if (activity.next != null) {
-                return activities[activity.next] || null;
-            }
-            return null;
         };
         /**
          * _CreateNextActivityContext Returns a new context for inner activities.

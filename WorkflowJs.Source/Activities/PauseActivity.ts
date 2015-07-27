@@ -40,4 +40,4 @@
             this.next = state.n;
         }
     }
-} 
+}
