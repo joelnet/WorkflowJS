@@ -30,6 +30,12 @@ var wfjs;
                 return this.ShallowCloneObject(obj);
             }
         };
+        ObjectHelper.CombineObjects = function (obj1, obj2) {
+            var clone = {};
+            ObjectHelper.CopyProperties(obj1, clone);
+            ObjectHelper.CopyProperties(obj2, clone);
+            return clone;
+        };
         ObjectHelper.ShallowCloneArray = function (obj) {
             var clone = [];
             for (var i = 0; i < obj.length; i++) {

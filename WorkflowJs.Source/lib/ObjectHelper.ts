@@ -27,7 +27,7 @@
             }
         }
 
-        public static ShallowClone(obj)
+        public static ShallowClone(obj): any
         {
             if (obj == null)
             {
@@ -46,7 +46,17 @@
             }
         }
 
-        private static ShallowCloneArray(obj: any[])
+        public static CombineObjects(obj1, obj2): any
+        {
+            var clone = {};
+            
+            ObjectHelper.CopyProperties(obj1, clone);
+            ObjectHelper.CopyProperties(obj2, clone);
+            
+            return clone;
+        }
+
+        private static ShallowCloneArray(obj: any[]): any
         {
             var clone = [];
 
@@ -58,7 +68,7 @@
             return clone;
         }
 
-        private static ShallowCloneObject(obj)
+        private static ShallowCloneObject(obj): any
         {
             var clone = {};
 

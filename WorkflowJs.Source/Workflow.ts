@@ -7,6 +7,7 @@
 
     export class Workflow implements IActivity
     {
+        public debug: boolean = true;
         public $inputs: string[];
         public $outputs: string[];
         public State: WorkflowState = WorkflowState.None;
@@ -106,13 +107,14 @@
             // TODO: use InternalMapBase globally.
             var iActivity = <IInternalActivityBase>activity;
 
+            if (this.debug)
+            {
+                console.log('Activity:', iActivity);
+            }
+
             if ((<IWorkflowActivity>activity).activity != null)
             {
                 this._ExecuteActivity(innerContext, <IWorkflowActivity>activity, err => next(err, innerContext));
-            }
-            else if ((<IAssignActivity>activity).values != null)
-            {
-                this._ExecuteAssign(context, <IAssignActivity>activity, err => next(err, context));
             }
             else if ((<IDecisionActivity>activity).condition != null)
             {
@@ -152,7 +154,7 @@
         }
 
         /**
-         * _ExecuteActivity Executes the actual Activity.
+         * _ExecuteActivity Executes the Activity.
          */
         private _ExecuteActivity(context: ActivityContext, activity: IWorkflowActivity, done: (err?: Error) => void): void
         {
@@ -201,33 +203,6 @@
         }
 
         /**
-         * _ExecuteAssign Assigns a value to an output variable.
-         */
-        private _ExecuteAssign(context: ActivityContext, activity: IAssignActivity, done: (err?: Error) => void): void
-        {
-            var err: Error = null;
-
-            try
-            {
-                var values: Dictionary<any> = context.Inputs;
-                ObjectHelper.CopyProperties(context.Outputs, values);
-
-                for (var key in activity.values)
-                {
-                    context.Outputs[key] = EvalHelper.Eval(values, activity.values[key]);
-                }
-            }
-            catch (ex)
-            {
-                err = ex;
-            }
-            finally
-            {
-                done(err);
-            }
-        }
-
-        /**
          * _ExecuteCodeActivity Executes an IExecuteActivity block.
          */
         private _ExecuteCodeActivity(context: ActivityContext, activity: IExecuteActivity, done: (err?: Error) => void): void
@@ -261,16 +236,20 @@
         /**
          * _GetInputs Returns a collection of input values.
          */
-        private static _GetInputs(context: ActivityContext, inputs: Dictionary<string>): Dictionary<any>
+        private static _GetInputs(context: ActivityContext, inputs: Dictionary<any>): Dictionary<any>
         {
             var value: Dictionary<any> = {};
 
-            var combinedValues: Dictionary<any> = context.Inputs;
-            ObjectHelper.CopyProperties(context.Outputs, combinedValues);
+            var allValues: Dictionary<any> = ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
+
+            if (_Specifications.IsWildcardDictionary.IsSatisfiedBy(inputs))
+            {
+                return allValues;
+            }
 
             for (var key in inputs)
             {
-                value[key] = EvalHelper.Eval(combinedValues, inputs[key]);
+                value[key] = EvalHelper.Eval(allValues, inputs[key]);
             }
 
             return value;
@@ -285,10 +264,15 @@
 
             var value: Dictionary<any> = {};
 
-            for (var k in outputs)
+            if (_Specifications.IsWildcardDictionary.IsSatisfiedBy(outputs))
             {
-                var v = outputs[k];
-                value[v] = context.Outputs[k];
+                return ObjectHelper.ShallowClone(context.Outputs);
+            }
+
+            for (var key in outputs)
+            {
+                var v = outputs[key];
+                value[v] = context.Outputs[key];
             }
 
             return value;

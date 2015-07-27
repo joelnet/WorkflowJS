@@ -2,6 +2,7 @@ var wfjs;
 (function (wfjs) {
     var Workflow = (function () {
         function Workflow(map, state) {
+            this.debug = true;
             this.State = 0 /* None */;
             if (map == null) {
                 throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'map'));
@@ -63,11 +64,11 @@ var wfjs;
             };
             // TODO: use InternalMapBase globally.
             var iActivity = activity;
+            if (this.debug) {
+                console.log('Activity:', iActivity);
+            }
             if (activity.activity != null) {
                 this._ExecuteActivity(innerContext, activity, function (err) { return next(err, innerContext); });
-            }
-            else if (activity.values != null) {
-                this._ExecuteAssign(context, activity, function (err) { return next(err, context); });
             }
             else if (activity.condition != null) {
                 this._ExecuteDecision(context, activity, function (err) { return next(err, context); });
@@ -96,7 +97,7 @@ var wfjs;
             done(err);
         };
         /**
-         * _ExecuteActivity Executes the actual Activity.
+         * _ExecuteActivity Executes the Activity.
          */
         Workflow.prototype._ExecuteActivity = function (context, activity, done) {
             var inputs = Workflow._GetInputs(context, activity.$inputs);
@@ -118,25 +119,6 @@ var wfjs;
                 wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
                 var condition = wfjs.EvalHelper.Eval(values, activity.condition);
                 activity.next = condition ? activity.true : activity.false;
-            }
-            catch (ex) {
-                err = ex;
-            }
-            finally {
-                done(err);
-            }
-        };
-        /**
-         * _ExecuteAssign Assigns a value to an output variable.
-         */
-        Workflow.prototype._ExecuteAssign = function (context, activity, done) {
-            var err = null;
-            try {
-                var values = context.Inputs;
-                wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
-                for (var key in activity.values) {
-                    context.Outputs[key] = wfjs.EvalHelper.Eval(values, activity.values[key]);
-                }
             }
             catch (ex) {
                 err = ex;
@@ -171,10 +153,12 @@ var wfjs;
          */
         Workflow._GetInputs = function (context, inputs) {
             var value = {};
-            var combinedValues = context.Inputs;
-            wfjs.ObjectHelper.CopyProperties(context.Outputs, combinedValues);
+            var allValues = wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
+            if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(inputs)) {
+                return allValues;
+            }
             for (var key in inputs) {
-                value[key] = wfjs.EvalHelper.Eval(combinedValues, inputs[key]);
+                value[key] = wfjs.EvalHelper.Eval(allValues, inputs[key]);
             }
             return value;
         };
@@ -184,9 +168,12 @@ var wfjs;
         Workflow._GetOutputs = function (context, outputs) {
             outputs = outputs || {};
             var value = {};
-            for (var k in outputs) {
-                var v = outputs[k];
-                value[v] = context.Outputs[k];
+            if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(outputs)) {
+                return wfjs.ObjectHelper.ShallowClone(context.Outputs);
+            }
+            for (var key in outputs) {
+                var v = outputs[key];
+                value[v] = context.Outputs[key];
             }
             return value;
         };

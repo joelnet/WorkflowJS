@@ -78,7 +78,7 @@
                             return callback(null, context);
                         }
 
-                        WorkflowInvoker._GetValueDictionary(activity.$outputs, context.Outputs, 'output', (err, values) =>
+                        this._GetValueDictionary(activity.$outputs, context.Outputs, 'output', (err, values) =>
                         {
                             context.Outputs = values;
                             callback(err, context);
@@ -133,10 +133,21 @@
         private static _GetValueDictionary(keys: string[], values: Dictionary<any>, valueType: string, callback: (err: Error, values?: Dictionary<any>) => void): void
         {
             var result: Dictionary<any> = {};
+            var key: string;
+
+            if (_Specifications.IsWildcardArray.IsSatisfiedBy(keys))
+            {
+                for (key in values)
+                {
+                    result[key] = values[key];
+                }
+
+                return callback(null, result);
+            }
 
             for (var i = 0; i < (keys || []).length; i++)
             {
-                var key = keys[i];
+                key = keys[i];
 
                 if (values != null && values[key] !== undefined)
                 {

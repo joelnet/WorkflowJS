@@ -24,6 +24,9 @@
     <Content Include="Activities\Activity.js">
       <DependentUpon>Activity.ts</DependentUpon>
     </Content>
+    <Content Include="Activities\DecisionActivity.js">
+      <DependentUpon>DecisionActivity.ts</DependentUpon>
+    </Content>
     <Content Include="Activities\ExecuteActivity.js">
       <DependentUpon>ExecuteActivity.ts</DependentUpon>
     </Content>
@@ -56,6 +59,9 @@
     </Content>
     <Content Include="Models\IFlowchart.js">
       <DependentUpon>IFlowchart.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IInternalActivityBase.js">
+      <DependentUpon>IInternalActivityBase.ts</DependentUpon>
     </Content>
     <Content Include="Models\IPauseState.js">
       <DependentUpon>IPauseState.ts</DependentUpon>
@@ -189,6 +195,12 @@
     <Content Include="Models\IDecisionActivity.js.map">
       <DependentUpon>IDecisionActivity.ts</DependentUpon>
     </Content>
+    <Content Include="Activities\DecisionActivity.js.map">
+      <DependentUpon>DecisionActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IInternalActivityBase.js.map">
+      <DependentUpon>IInternalActivityBase.ts</DependentUpon>
+    </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -222,8 +234,7 @@
           <IISUrl>http://localhost:53201/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <CustomServerUrl></CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

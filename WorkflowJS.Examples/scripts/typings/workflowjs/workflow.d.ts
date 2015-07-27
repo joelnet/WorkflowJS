@@ -7,7 +7,8 @@ declare module wfjs {
     class ObjectHelper {
         static GetKeys(obj: any): string[];
         static CopyProperties(source: any, destination: any): void;
-        static ShallowClone(obj: any): {};
+        static ShallowClone(obj: any): any;
+        static CombineObjects(obj1: any, obj2: any): any;
         private static ShallowCloneArray(obj);
         private static ShallowCloneObject(obj);
     }
@@ -111,7 +112,17 @@ declare module wfjs {
     var Activity: (options: IWorkflowActivity) => IWorkflowActivity;
 }
 declare module wfjs {
-    var Assign: (options: IAssignActivity) => IAssignActivity;
+    var Assign: (options: IAssignActivity) => IWorkflowActivity;
+    /**
+     * AssignActivity Assigns values to Outputs.
+     */
+    class AssignActivity implements IActivity {
+        $inputs: string[];
+        $outputs: string[];
+        private _values;
+        constructor(values: Dictionary<any>);
+        Execute(context: ActivityContext, done: (err?: Error) => void): void;
+    }
 }
 declare module wfjs {
     var Decision: (options: IDecisionActivity) => IDecisionActivity;
@@ -145,6 +156,8 @@ declare module wfjs {
 declare module wfjs {
     class _Specifications {
         static IsPaused: Specification<ActivityContext>;
+        static IsWildcardDictionary: Specification<Dictionary<any>>;
+        static IsWildcardArray: Specification<string[]>;
     }
 }
 declare module wfjs {
@@ -152,6 +165,7 @@ declare module wfjs {
         _stateData: IPauseState;
     }
     class Workflow implements IActivity {
+        debug: boolean;
         $inputs: string[];
         $outputs: string[];
         State: WorkflowState;
@@ -172,17 +186,13 @@ declare module wfjs {
          */
         private _ExecutePause(context, activity, done);
         /**
-         * _ExecuteActivity Executes the actual Activity.
+         * _ExecuteActivity Executes the Activity.
          */
         private _ExecuteActivity(context, activity, done);
         /**
          * _ExecuteDecision Evaluates the condition (to true or false) and executes next activity.
          */
         private _ExecuteDecision(context, activity, done);
-        /**
-         * _ExecuteAssign Assigns a value to an output variable.
-         */
-        private _ExecuteAssign(context, activity, done);
         /**
          * _ExecuteCodeActivity Executes an IExecuteActivity block.
          */

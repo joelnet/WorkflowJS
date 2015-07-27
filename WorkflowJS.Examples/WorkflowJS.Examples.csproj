@@ -5,8 +5,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>
-    </ProductVersion>
+    <ProductVersion></ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{DDF9933C-8839-44B5-A8BF-B59357B7C2AD}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -81,8 +80,8 @@
     <Content Include="scripts\activities\GetTypeActivity.js">
       <DependentUpon>GetTypeActivity.ts</DependentUpon>
     </Content>
-    <Content Include="scripts\activities\GetUserNameActivity.js">
-      <DependentUpon>GetUserNameActivity.ts</DependentUpon>
+    <Content Include="scripts\activities\GreetUserActivity.js">
+      <DependentUpon>GreetUserActivity.ts</DependentUpon>
     </Content>
     <Content Include="scripts\activities\HelloWorldActivity.js">
       <DependentUpon>HelloWorldActivity.ts</DependentUpon>
@@ -147,9 +146,6 @@
     <Content Include="scripts\activities\GetTypeActivity.js.map">
       <DependentUpon>GetTypeActivity.ts</DependentUpon>
     </Content>
-    <Content Include="scripts\activities\GetUserNameActivity.js.map">
-      <DependentUpon>GetUserNameActivity.ts</DependentUpon>
-    </Content>
     <Content Include="scripts\activities\HelloWorldActivity.js.map">
       <DependentUpon>HelloWorldActivity.ts</DependentUpon>
     </Content>
@@ -189,6 +185,9 @@
     <Content Include="scripts\switch.js.map">
       <DependentUpon>switch.ts</DependentUpon>
     </Content>
+    <Content Include="scripts\activities\GreetUserActivity.js.map">
+      <DependentUpon>GreetUserActivity.ts</DependentUpon>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -202,7 +201,7 @@
     <TypeScriptCompile Include="scripts\activities\DivideAsyncActivity.ts" />
     <TypeScriptCompile Include="scripts\activities\GetCustomerActivity.ts" />
     <TypeScriptCompile Include="scripts\activities\GetTypeActivity.ts" />
-    <TypeScriptCompile Include="scripts\activities\GetUserNameActivity.ts" />
+    <TypeScriptCompile Include="scripts\activities\GreetUserActivity.ts" />
     <TypeScriptCompile Include="scripts\activities\HelloWorldActivity.ts" />
     <TypeScriptCompile Include="scripts\activities\MathProblemWorkflow.ts" />
     <TypeScriptCompile Include="scripts\activities\MultiplyActivity.ts" />
@@ -246,8 +245,7 @@
           <IISUrl>http://localhost:58360/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <CustomServerUrl></CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

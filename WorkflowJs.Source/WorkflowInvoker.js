@@ -37,6 +37,7 @@ var wfjs;
             WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, callback);
         };
         WorkflowInvoker._InvokeActivity = function (activity, inputs, state, extensions, callback) {
+            var _this = this;
             WorkflowInvoker._CreateContext(activity, inputs, state, extensions, function (err, context) {
                 if (err != null) {
                     return callback(err, context);
@@ -49,7 +50,7 @@ var wfjs;
                         if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
                             return callback(null, context);
                         }
-                        WorkflowInvoker._GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
+                        _this._GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
                             context.Outputs = values;
                             callback(err, context);
                         });
@@ -88,8 +89,15 @@ var wfjs;
         };
         WorkflowInvoker._GetValueDictionary = function (keys, values, valueType, callback) {
             var result = {};
+            var key;
+            if (wfjs._Specifications.IsWildcardArray.IsSatisfiedBy(keys)) {
+                for (key in values) {
+                    result[key] = values[key];
+                }
+                return callback(null, result);
+            }
             for (var i = 0; i < (keys || []).length; i++) {
-                var key = keys[i];
+                key = keys[i];
                 if (values != null && values[key] !== undefined) {
                     result[key] = values[key];
                 }

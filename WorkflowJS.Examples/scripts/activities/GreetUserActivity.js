@@ -32,4 +32,4 @@ var wfjsExample;
         };
     })(Activities = wfjsExample.Activities || (wfjsExample.Activities = {}));
 })(wfjsExample || (wfjsExample = {}));
-//# sourceMappingURL=GetUserNameActivity.js.map
+//# sourceMappingURL=GreetUserActivity.js.map

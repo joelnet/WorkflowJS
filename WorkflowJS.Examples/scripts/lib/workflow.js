@@ -45,6 +45,12 @@ var wfjs;
                 return this.ShallowCloneObject(obj);
             }
         };
+        ObjectHelper.CombineObjects = function (obj1, obj2) {
+            var clone = {};
+            ObjectHelper.CopyProperties(obj1, clone);
+            ObjectHelper.CopyProperties(obj2, clone);
+            return clone;
+        };
         ObjectHelper.ShallowCloneArray = function (obj) {
             var clone = [];
             for (var i = 0; i < obj.length; i++) {
@@ -108,8 +114,38 @@ var wfjs;
 var wfjs;
 (function (wfjs) {
     wfjs.Assign = function (options) {
-        return options;
+        options = options || {};
+        return {
+            $inputs: { '*': '*' },
+            $outputs: { '*': '*' },
+            activity: new AssignActivity(options.values),
+            next: options.next
+        };
     };
+    /**
+     * AssignActivity Assigns values to Outputs.
+     */
+    var AssignActivity = (function () {
+        function AssignActivity(values) {
+            this.$inputs = ['*'];
+            this.$outputs = ['*'];
+            this._values = values || {};
+        }
+        AssignActivity.prototype.Execute = function (context, done) {
+            try {
+                var values = wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
+                for (var key in this._values) {
+                    context.Outputs[key] = wfjs.EvalHelper.Eval(values, this._values[key]);
+                }
+                done();
+            }
+            catch (ex) {
+                done(ex);
+            }
+        };
+        return AssignActivity;
+    })();
+    wfjs.AssignActivity = AssignActivity;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
@@ -171,6 +207,8 @@ var wfjs;
         function _Specifications() {
         }
         _Specifications.IsPaused = new wfjs.Specification(function (o) { return o.StateData != null; });
+        _Specifications.IsWildcardDictionary = new wfjs.Specification(function (o) { return o != null && o['*'] != null; });
+        _Specifications.IsWildcardArray = new wfjs.Specification(function (o) { return o != null && o.length == 1 && o[0] == '*'; });
         return _Specifications;
     })();
     wfjs._Specifications = _Specifications;
@@ -179,6 +217,7 @@ var wfjs;
 (function (wfjs) {
     var Workflow = (function () {
         function Workflow(map, state) {
+            this.debug = true;
             this.State = 0 /* None */;
             if (map == null) {
                 throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'map'));
@@ -240,11 +279,11 @@ var wfjs;
             };
             // TODO: use InternalMapBase globally.
             var iActivity = activity;
+            if (this.debug) {
+                console.log('Activity:', iActivity);
+            }
             if (activity.activity != null) {
                 this._ExecuteActivity(innerContext, activity, function (err) { return next(err, innerContext); });
-            }
-            else if (activity.values != null) {
-                this._ExecuteAssign(context, activity, function (err) { return next(err, context); });
             }
             else if (activity.condition != null) {
                 this._ExecuteDecision(context, activity, function (err) { return next(err, context); });
@@ -273,7 +312,7 @@ var wfjs;
             done(err);
         };
         /**
-         * _ExecuteActivity Executes the actual Activity.
+         * _ExecuteActivity Executes the Activity.
          */
         Workflow.prototype._ExecuteActivity = function (context, activity, done) {
             var inputs = Workflow._GetInputs(context, activity.$inputs);
@@ -295,25 +334,6 @@ var wfjs;
                 wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
                 var condition = wfjs.EvalHelper.Eval(values, activity.condition);
                 activity.next = condition ? activity.true : activity.false;
-            }
-            catch (ex) {
-                err = ex;
-            }
-            finally {
-                done(err);
-            }
-        };
-        /**
-         * _ExecuteAssign Assigns a value to an output variable.
-         */
-        Workflow.prototype._ExecuteAssign = function (context, activity, done) {
-            var err = null;
-            try {
-                var values = context.Inputs;
-                wfjs.ObjectHelper.CopyProperties(context.Outputs, values);
-                for (var key in activity.values) {
-                    context.Outputs[key] = wfjs.EvalHelper.Eval(values, activity.values[key]);
-                }
             }
             catch (ex) {
                 err = ex;
@@ -348,10 +368,12 @@ var wfjs;
          */
         Workflow._GetInputs = function (context, inputs) {
             var value = {};
-            var combinedValues = context.Inputs;
-            wfjs.ObjectHelper.CopyProperties(context.Outputs, combinedValues);
+            var allValues = wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
+            if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(inputs)) {
+                return allValues;
+            }
             for (var key in inputs) {
-                value[key] = wfjs.EvalHelper.Eval(combinedValues, inputs[key]);
+                value[key] = wfjs.EvalHelper.Eval(allValues, inputs[key]);
             }
             return value;
         };
@@ -361,9 +383,12 @@ var wfjs;
         Workflow._GetOutputs = function (context, outputs) {
             outputs = outputs || {};
             var value = {};
-            for (var k in outputs) {
-                var v = outputs[k];
-                value[v] = context.Outputs[k];
+            if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(outputs)) {
+                return wfjs.ObjectHelper.ShallowClone(context.Outputs);
+            }
+            for (var key in outputs) {
+                var v = outputs[key];
+                value[v] = context.Outputs[key];
             }
             return value;
         };
@@ -445,6 +470,7 @@ var wfjs;
             WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, callback);
         };
         WorkflowInvoker._InvokeActivity = function (activity, inputs, state, extensions, callback) {
+            var _this = this;
             WorkflowInvoker._CreateContext(activity, inputs, state, extensions, function (err, context) {
                 if (err != null) {
                     return callback(err, context);
@@ -457,7 +483,7 @@ var wfjs;
                         if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
                             return callback(null, context);
                         }
-                        WorkflowInvoker._GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
+                        _this._GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
                             context.Outputs = values;
                             callback(err, context);
                         });
@@ -496,8 +522,15 @@ var wfjs;
         };
         WorkflowInvoker._GetValueDictionary = function (keys, values, valueType, callback) {
             var result = {};
+            var key;
+            if (wfjs._Specifications.IsWildcardArray.IsSatisfiedBy(keys)) {
+                for (key in values) {
+                    result[key] = values[key];
+                }
+                return callback(null, result);
+            }
             for (var i = 0; i < (keys || []).length; i++) {
-                var key = keys[i];
+                key = keys[i];
                 if (values != null && values[key] !== undefined) {
                     result[key] = values[key];
                 }
