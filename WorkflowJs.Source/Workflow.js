@@ -71,15 +71,7 @@ var wfjs;
                 });
             };
             if (activity.activity != null) {
-                var inputs = wfjs.ObjectHelper.ShallowClone(innerContext.Inputs);
-                this._ExecuteActivity(innerContext, activity, function (err) {
-                    _this._log(0 /* None */, activityName, {
-                        inputs: inputs,
-                        outputs: innerContext.Outputs,
-                        err: err
-                    });
-                    next(err, innerContext);
-                });
+                this._ExecuteActivity(activityName, innerContext, activity, function (err) { return next(err, innerContext); });
             }
             else {
                 this._log(4 /* Error */, activityName + ': ' + wfjs.Resources.Error_Activity_Invalid);
@@ -89,7 +81,8 @@ var wfjs;
         /**
          * _ExecuteActivity Executes the Activity.
          */
-        Workflow.prototype._ExecuteActivity = function (context, activity, done) {
+        Workflow.prototype._ExecuteActivity = function (activityName, context, activity, done) {
+            var _this = this;
             var inputs = Workflow._GetInputs(context, activity.$inputs);
             wfjs.WorkflowInvoker.CreateActivity(activity.activity).Extensions(context.Extensions).Inputs(inputs).Invoke(function (err, innerContext) {
                 if (innerContext != null) {
@@ -99,6 +92,11 @@ var wfjs;
                         context.StateData = innerContext.StateData;
                     }
                 }
+                _this._log(0 /* None */, activityName, wfjs.ObjectHelper.TrimObject({
+                    inputs: inputs,
+                    outputs: wfjs.ObjectHelper.ShallowClone(wfjs.ObjectHelper.GetValue(innerContext, 'Outputs')),
+                    err: err
+                }));
                 done(err);
             });
         };

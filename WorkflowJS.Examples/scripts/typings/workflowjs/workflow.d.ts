@@ -10,6 +10,10 @@ declare module wfjs {
         static GetValue(obj: any, ...params: any[]): any;
         static ShallowClone(obj: any): any;
         static CombineObjects(obj1: any, obj2: any): any;
+        /**
+         * TrimObject Returns the a shallow clone of the object (excluding any values that are null, undefined or have no keys).
+         */
+        static TrimObject<T>(obj: T): T;
         private static ShallowCloneArray(obj);
         private static ShallowCloneObject(obj);
     }
@@ -93,9 +97,6 @@ declare module wfjs {
         $inputs?: Dictionary<any>;
         $outputs?: Dictionary<string>;
         next?: string;
-    }
-    interface IInternalWorkflowActivity extends IWorkflowActivity {
-        _name: string;
     }
 }
 declare module wfjs {
@@ -238,7 +239,7 @@ declare module wfjs {
         /**
          * _ExecuteActivity Executes the Activity.
          */
-        private _ExecuteActivity(context, activity, done);
+        private _ExecuteActivity(activityName, context, activity, done);
         private _log(logType, message, ...optionalParams);
         /**
          * _GetInputs Returns a collection of input values.

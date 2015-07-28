@@ -111,18 +111,7 @@
 
             if ((<IWorkflowActivity>activity).activity != null)
             {
-                var inputs = ObjectHelper.ShallowClone(innerContext.Inputs);
-
-                this._ExecuteActivity(innerContext, <IInternalWorkflowActivity>activity, err =>
-                {
-                    this._log(LogType.None, activityName, {
-                        inputs: inputs,
-                        outputs: innerContext.Outputs,
-                        err: err
-                    });
-
-                    next(err, innerContext);
-                });
+                this._ExecuteActivity(activityName, innerContext, <IWorkflowActivity>activity, err => next(err, innerContext));
             }
             else
             {
@@ -134,7 +123,7 @@
         /**
          * _ExecuteActivity Executes the Activity.
          */
-        private _ExecuteActivity(context: ActivityContext, activity: IInternalWorkflowActivity, done: (err?: Error) => void): void
+        private _ExecuteActivity(activityName: string, context: ActivityContext, activity: IWorkflowActivity, done: (err?: Error) => void): void
         {
             var inputs = Workflow._GetInputs(context, activity.$inputs);
 
@@ -154,6 +143,12 @@
                            context.StateData = innerContext.StateData;
                         }
                     }
+
+                    this._log(LogType.None, activityName, ObjectHelper.TrimObject({
+                        inputs: inputs,
+                        outputs: ObjectHelper.ShallowClone(ObjectHelper.GetValue(innerContext, 'Outputs')),
+                        err: err
+                    }));
 
                     done(err);
                 });

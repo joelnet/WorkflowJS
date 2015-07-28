@@ -72,6 +72,19 @@ var wfjs;
             ObjectHelper.CopyProperties(obj2, clone);
             return clone;
         };
+        /**
+         * TrimObject Returns the a shallow clone of the object (excluding any values that are null, undefined or have no keys).
+         */
+        ObjectHelper.TrimObject = function (obj) {
+            var clone = ObjectHelper.ShallowClone(obj);
+            for (var key in clone || {}) {
+                var keys = ObjectHelper.GetKeys(clone[key]);
+                if (clone[key] == null || keys.length == 0 || clone.length == 0) {
+                    delete clone[key];
+                }
+            }
+            return clone;
+        };
         ObjectHelper.ShallowCloneArray = function (obj) {
             var clone = [];
             for (var i = 0; i < obj.length; i++) {
@@ -435,15 +448,7 @@ var wfjs;
                 });
             };
             if (activity.activity != null) {
-                var inputs = wfjs.ObjectHelper.ShallowClone(innerContext.Inputs);
-                this._ExecuteActivity(innerContext, activity, function (err) {
-                    _this._log(0 /* None */, activityName, {
-                        inputs: inputs,
-                        outputs: innerContext.Outputs,
-                        err: err
-                    });
-                    next(err, innerContext);
-                });
+                this._ExecuteActivity(activityName, innerContext, activity, function (err) { return next(err, innerContext); });
             }
             else {
                 this._log(4 /* Error */, activityName + ': ' + wfjs.Resources.Error_Activity_Invalid);
@@ -453,7 +458,8 @@ var wfjs;
         /**
          * _ExecuteActivity Executes the Activity.
          */
-        Workflow.prototype._ExecuteActivity = function (context, activity, done) {
+        Workflow.prototype._ExecuteActivity = function (activityName, context, activity, done) {
+            var _this = this;
             var inputs = Workflow._GetInputs(context, activity.$inputs);
             wfjs.WorkflowInvoker.CreateActivity(activity.activity).Extensions(context.Extensions).Inputs(inputs).Invoke(function (err, innerContext) {
                 if (innerContext != null) {
@@ -463,6 +469,11 @@ var wfjs;
                         context.StateData = innerContext.StateData;
                     }
                 }
+                _this._log(0 /* None */, activityName, wfjs.ObjectHelper.TrimObject({
+                    inputs: inputs,
+                    outputs: wfjs.ObjectHelper.ShallowClone(wfjs.ObjectHelper.GetValue(innerContext, 'Outputs')),
+                    err: err
+                }));
                 done(err);
             });
         };

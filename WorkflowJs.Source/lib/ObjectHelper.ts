@@ -83,6 +83,26 @@
             return clone;
         }
 
+        /**
+         * TrimObject Returns the a shallow clone of the object (excluding any values that are null, undefined or have no keys).
+         */
+        public static TrimObject<T>(obj: T): T
+        {
+            var clone = ObjectHelper.ShallowClone(obj);
+
+            for (var key in clone || {})
+            {
+                var keys = ObjectHelper.GetKeys(clone[key]);
+
+                if (clone[key] == null || keys.length == 0 || clone.length == 0)
+                {
+                    delete clone[key];
+                }
+            }
+
+            return clone;
+        }
+
         private static ShallowCloneArray(obj: any[]): any
         {
             var clone = [];
