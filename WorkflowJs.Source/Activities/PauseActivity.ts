@@ -7,13 +7,20 @@
 
     export var Pause = (options: IPauseOptions) =>
     {
-        return new PauseActivity(options);
+        options = options || <IPauseOptions>{};
+
+        return Activity({
+            $inputs: { '*': '*' },
+            $outputs: { '*': '*' },
+            activity: new PauseActivity(options),
+            next: options.next
+        });
     };
 
     export class PauseActivity implements IActivityBase
     {
-        private _type = 'pause';
-
+        public $inputs: string[] = ['*'];
+        public $outputs: string[] = ['*'];
         public next: string;
 
         constructor(options: IPauseOptions)
@@ -24,17 +31,21 @@
             }
         }
 
-        public Pause(context: ActivityContext): IPauseState
+        public Execute(context: ActivityContext, done: (err?: Error) => void): void
         {
-            return {
+            context.StateData = {
                 i: context.Inputs,
                 o: context.Outputs,
                 n: this.next
-            }
+            };
+
+            done();
         }
 
         public Resume(context: ActivityContext, state: IPauseState): void
         {
+            throw new Error('Not Implemented');
+
             context.Inputs = state.i;
             context.Outputs = state.o;
             this.next = state.n;

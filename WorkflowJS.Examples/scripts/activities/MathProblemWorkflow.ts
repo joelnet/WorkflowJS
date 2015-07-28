@@ -8,7 +8,7 @@
 
             activities:
             {
-                'CreateAccount': wfjs.Activity
+                'CreateMathProblem': wfjs.Activity
                 ({
                     activity: new CreateMathActivity(),
                     $outputs: {

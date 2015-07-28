@@ -189,12 +189,13 @@ declare module wfjs {
     interface IPauseOptions {
         next: string;
     }
-    var Pause: (options: IPauseOptions) => PauseActivity;
+    var Pause: (options: IPauseOptions) => IWorkflowActivity;
     class PauseActivity implements IActivityBase {
-        private _type;
+        $inputs: string[];
+        $outputs: string[];
         next: string;
         constructor(options: IPauseOptions);
-        Pause(context: ActivityContext): IPauseState;
+        Execute(context: ActivityContext, done: (err?: Error) => void): void;
         Resume(context: ActivityContext, state: IPauseState): void;
     }
 }

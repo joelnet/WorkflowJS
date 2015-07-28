@@ -56,15 +56,11 @@
                 this._log(LogType.None, 'Workflow Resumed');
             }
 
-
-                //if ($next != null && nextActivity != null)
-                //{
-                //}
-
             this._ExecuteLoop(firstActivityName, context, activity, err =>
             {
                 if (_Specifications.IsPaused.IsSatisfiedBy(context))
                 {
+                    this._log(LogType.None, 'Workflow Paused');
                     this.State = context.State = WorkflowState.Paused;
                 }
                 else if (err != null)
@@ -75,7 +71,7 @@
                 {
                     this.State = context.State = WorkflowState.Complete;
                 }
-                
+
                 done(err);
             });
         }
@@ -113,20 +109,24 @@
                 });
             }
 
-            this._log(LogType.None, activityName, { inputs: context.Inputs });
-
             if ((<IWorkflowActivity>activity).activity != null)
             {
-                this._ExecuteActivity(innerContext, <IInternalWorkflowActivity>activity, err => next(err, innerContext));
-            }
-            else if (typeof (<PauseActivity>activity).Pause == 'function')
-            {
-                this._log(LogType.None, 'Workflow Paused');
-                context.StateData = (<PauseActivity>activity).Pause(context);
-                next(null, context);
+                var inputs = ObjectHelper.ShallowClone(innerContext.Inputs);
+
+                this._ExecuteActivity(innerContext, <IInternalWorkflowActivity>activity, err =>
+                {
+                    this._log(LogType.None, activityName, {
+                        inputs: inputs,
+                        outputs: innerContext.Outputs,
+                        err: err
+                    });
+
+                    next(err, innerContext);
+                });
             }
             else
             {
+                this._log(LogType.Error, activityName + ': ' + Resources.Error_Activity_Invalid);
                 done(new Error(Resources.Error_Activity_Invalid));
             }
         }
@@ -148,6 +148,11 @@
                     {
                         var outputs = Workflow._GetOutputs(innerContext, activity.$outputs);
                         ObjectHelper.CopyProperties(outputs, context.Outputs);
+                     
+                        if (_Specifications.IsPaused.IsSatisfiedBy(innerContext))
+                        {
+                           context.StateData = innerContext.StateData;
+                        }
                     }
 
                     done(err);

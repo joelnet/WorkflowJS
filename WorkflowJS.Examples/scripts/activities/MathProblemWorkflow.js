@@ -6,7 +6,7 @@ var wfjsExample;
             return wfjs.Flowchart({
                 $outputs: ['correct'],
                 activities: {
-                    'CreateAccount': wfjs.Activity({
+                    'CreateMathProblem': wfjs.Activity({
                         activity: new Activities.CreateMathActivity(),
                         $outputs: {
                             'problem': 'problem',

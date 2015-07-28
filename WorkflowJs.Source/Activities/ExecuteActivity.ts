@@ -1,5 +1,4 @@
-﻿
-module wfjs
+﻿module wfjs
 {
     export var Execute = (options: IExecuteActivity) =>
     {

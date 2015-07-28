@@ -307,23 +307,32 @@ var wfjs;
 var wfjs;
 (function (wfjs) {
     wfjs.Pause = function (options) {
-        return new PauseActivity(options);
+        options = options || {};
+        return wfjs.Activity({
+            $inputs: { '*': '*' },
+            $outputs: { '*': '*' },
+            activity: new PauseActivity(options),
+            next: options.next
+        });
     };
     var PauseActivity = (function () {
         function PauseActivity(options) {
-            this._type = 'pause';
+            this.$inputs = ['*'];
+            this.$outputs = ['*'];
             if (options != null) {
                 this.next = options.next;
             }
         }
-        PauseActivity.prototype.Pause = function (context) {
-            return {
+        PauseActivity.prototype.Execute = function (context, done) {
+            context.StateData = {
                 i: context.Inputs,
                 o: context.Outputs,
                 n: this.next
             };
+            done();
         };
         PauseActivity.prototype.Resume = function (context, state) {
+            throw new Error('Not Implemented');
             context.Inputs = state.i;
             context.Outputs = state.o;
             this.next = state.n;
@@ -386,11 +395,9 @@ var wfjs;
             if (this._stateData != null) {
                 this._log(0 /* None */, 'Workflow Resumed');
             }
-            //if ($next != null && nextActivity != null)
-            //{
-            //}
             this._ExecuteLoop(firstActivityName, context, activity, function (err) {
                 if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
+                    _this._log(0 /* None */, 'Workflow Paused');
                     _this.State = context.State = 3 /* Paused */;
                 }
                 else if (err != null) {
@@ -427,16 +434,19 @@ var wfjs;
                     done(err);
                 });
             };
-            this._log(0 /* None */, activityName, { inputs: context.Inputs });
             if (activity.activity != null) {
-                this._ExecuteActivity(innerContext, activity, function (err) { return next(err, innerContext); });
-            }
-            else if (typeof activity.Pause == 'function') {
-                this._log(0 /* None */, 'Workflow Paused');
-                context.StateData = activity.Pause(context);
-                next(null, context);
+                var inputs = wfjs.ObjectHelper.ShallowClone(innerContext.Inputs);
+                this._ExecuteActivity(innerContext, activity, function (err) {
+                    _this._log(0 /* None */, activityName, {
+                        inputs: inputs,
+                        outputs: innerContext.Outputs,
+                        err: err
+                    });
+                    next(err, innerContext);
+                });
             }
             else {
+                this._log(4 /* Error */, activityName + ': ' + wfjs.Resources.Error_Activity_Invalid);
                 done(new Error(wfjs.Resources.Error_Activity_Invalid));
             }
         };
@@ -449,6 +459,9 @@ var wfjs;
                 if (innerContext != null) {
                     var outputs = Workflow._GetOutputs(innerContext, activity.$outputs);
                     wfjs.ObjectHelper.CopyProperties(outputs, context.Outputs);
+                    if (wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext)) {
+                        context.StateData = innerContext.StateData;
+                    }
                 }
                 done(err);
             });
