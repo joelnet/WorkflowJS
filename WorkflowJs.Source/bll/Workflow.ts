@@ -23,7 +23,7 @@
                 return null;
             }
 
-            var activityName: string = ObjectHelper.GetValue(activity, 'next');
+            var activityName: string = ObjectHelper.GetValue<string>(activity, 'next');
 
             return activities[activityName] != null ? activityName : null;
         }

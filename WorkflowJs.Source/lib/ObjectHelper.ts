@@ -27,7 +27,7 @@
             return keys;
         }
 
-        public static GetValue(obj, ...params: any[]): any
+        public static GetValue<T>(obj, ...params: any[]): T
         {
             var value = null;
             var length = (params||[]).length;

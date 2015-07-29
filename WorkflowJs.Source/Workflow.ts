@@ -56,30 +56,27 @@
                 this._log(LogType.None, 'Workflow Resumed');
             }
 
-            this._ExecuteLoop(firstActivityName, context, activity, err =>
+            this._ExecuteNextActivity(firstActivityName, context, activity, err =>
             {
-                if (_Specifications.IsPaused.IsSatisfiedBy(context))
+                if (err != null)
                 {
-                    this._log(LogType.None, 'Workflow Paused');
-                    this.State = context.State = WorkflowState.Paused;
+                    context.State = WorkflowState.Fault;
                 }
-                else if (err != null)
+                else if (ObjectHelper.GetValue(context, 'State') == null)
                 {
-                    this.State = context.State = WorkflowState.Fault;
+                    context.State = WorkflowState.Complete;
                 }
-                else
-                {
-                    this.State = context.State = WorkflowState.Complete;
-                }
+
+                this.State = context.State;
 
                 done(err);
             });
         }
 
         /**
-         * _ExecuteLoop Execution loop that executes every Activity.
+         * _ExecuteNextActivity Execution loop that executes every Activity.
          */
-        private _ExecuteLoop(activityName: string, context: ActivityContext, activity: IActivityBase, done: (err?: Error) => void): void
+        private _ExecuteNextActivity(activityName: string, context: ActivityContext, activity: IActivityBase, done: (err?: Error) => void): void
         {
             var innerContext = Workflow._CreateNextActivityContext(context);
 
@@ -90,11 +87,25 @@
                     return done(err);
                 }
 
-                var $next: string = ObjectHelper.GetValue(innerContext, 'Outputs', '$next');
+                var $next: string = ObjectHelper.GetValue<string>(innerContext, 'Outputs', '$next');
                 var nextActivityName: string = $next || _bll.Workflow.GetNextActivityName(activity, this._activities);
                 var nextActivity = !_Specifications.IsPaused.IsSatisfiedBy(innerContext) ? this._activities[nextActivityName] : null;
                 var dummyCallback = (n, i, a, callback) => { callback(); };
-                var activityExecute = nextActivity != null ? this._ExecuteLoop.bind(this) : dummyCallback;
+                var activityExecute = nextActivity != null ? this._ExecuteNextActivity.bind(this) : dummyCallback;
+
+                if (ObjectHelper.GetValue<WorkflowState>(innerContext, 'State') == WorkflowState.Paused)
+                {
+                    context.StateData = {
+                        i: ObjectHelper.ShallowClone(context.Inputs),
+                        o: ObjectHelper.ShallowClone(context.Outputs),
+                        n: nextActivityName
+                    };
+
+                    this._log(LogType.None, 'Workflow Paused');
+                    this.State = context.State;
+
+                    return done();
+                }
 
                 activityExecute(nextActivityName, innerContext, nextActivity, err =>
                 {
@@ -137,10 +148,10 @@
                     {
                         var outputs = Workflow._GetOutputs(innerContext, activity.$outputs);
                         ObjectHelper.CopyProperties(outputs, context.Outputs);
-                     
-                        if (_Specifications.IsPaused.IsSatisfiedBy(innerContext))
+                        
+                        if (innerContext.State != null)
                         {
-                           context.StateData = innerContext.StateData;
+                            context.State = innerContext.State;
                         }
                     }
 

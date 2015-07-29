@@ -33,22 +33,9 @@
 
         public Execute(context: ActivityContext, done: (err?: Error) => void): void
         {
-            context.StateData = {
-                i: context.Inputs,
-                o: context.Outputs,
-                n: this.next
-            };
+            context.State = WorkflowState.Paused;
 
             done();
-        }
-
-        public Resume(context: ActivityContext, state: IPauseState): void
-        {
-            throw new Error('Not Implemented');
-
-            context.Inputs = state.i;
-            context.Outputs = state.o;
-            this.next = state.n;
         }
     }
 }

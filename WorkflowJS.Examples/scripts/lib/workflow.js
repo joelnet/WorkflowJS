@@ -337,18 +337,8 @@ var wfjs;
             }
         }
         PauseActivity.prototype.Execute = function (context, done) {
-            context.StateData = {
-                i: context.Inputs,
-                o: context.Outputs,
-                n: this.next
-            };
+            context.State = 3 /* Paused */;
             done();
-        };
-        PauseActivity.prototype.Resume = function (context, state) {
-            throw new Error('Not Implemented');
-            context.Inputs = state.i;
-            context.Outputs = state.o;
-            this.next = state.n;
         };
         return PauseActivity;
     })();
@@ -408,24 +398,21 @@ var wfjs;
             if (this._stateData != null) {
                 this._log(0 /* None */, 'Workflow Resumed');
             }
-            this._ExecuteLoop(firstActivityName, context, activity, function (err) {
-                if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
-                    _this._log(0 /* None */, 'Workflow Paused');
-                    _this.State = context.State = 3 /* Paused */;
+            this._ExecuteNextActivity(firstActivityName, context, activity, function (err) {
+                if (err != null) {
+                    context.State = 4 /* Fault */;
                 }
-                else if (err != null) {
-                    _this.State = context.State = 4 /* Fault */;
+                else if (wfjs.ObjectHelper.GetValue(context, 'State') == null) {
+                    context.State = 2 /* Complete */;
                 }
-                else {
-                    _this.State = context.State = 2 /* Complete */;
-                }
+                _this.State = context.State;
                 done(err);
             });
         };
         /**
-         * _ExecuteLoop Execution loop that executes every Activity.
+         * _ExecuteNextActivity Execution loop that executes every Activity.
          */
-        Workflow.prototype._ExecuteLoop = function (activityName, context, activity, done) {
+        Workflow.prototype._ExecuteNextActivity = function (activityName, context, activity, done) {
             var _this = this;
             var innerContext = Workflow._CreateNextActivityContext(context);
             var next = function (err, innerContext) {
@@ -438,7 +425,17 @@ var wfjs;
                 var dummyCallback = function (n, i, a, callback) {
                     callback();
                 };
-                var activityExecute = nextActivity != null ? _this._ExecuteLoop.bind(_this) : dummyCallback;
+                var activityExecute = nextActivity != null ? _this._ExecuteNextActivity.bind(_this) : dummyCallback;
+                if (wfjs.ObjectHelper.GetValue(innerContext, 'State') == 3 /* Paused */) {
+                    context.StateData = {
+                        i: wfjs.ObjectHelper.ShallowClone(context.Inputs),
+                        o: wfjs.ObjectHelper.ShallowClone(context.Outputs),
+                        n: nextActivityName
+                    };
+                    _this._log(0 /* None */, 'Workflow Paused');
+                    _this.State = context.State;
+                    return done();
+                }
                 activityExecute(nextActivityName, innerContext, nextActivity, function (err) {
                     wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
                     if (wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext)) {
@@ -465,8 +462,8 @@ var wfjs;
                 if (innerContext != null) {
                     var outputs = Workflow._GetOutputs(innerContext, activity.$outputs);
                     wfjs.ObjectHelper.CopyProperties(outputs, context.Outputs);
-                    if (wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext)) {
-                        context.StateData = innerContext.StateData;
+                    if (innerContext.State != null) {
+                        context.State = innerContext.State;
                     }
                 }
                 _this._log(0 /* None */, activityName, wfjs.ObjectHelper.TrimObject({

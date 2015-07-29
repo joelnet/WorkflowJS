@@ -18,18 +18,8 @@ var wfjs;
             }
         }
         PauseActivity.prototype.Execute = function (context, done) {
-            context.StateData = {
-                i: context.Inputs,
-                o: context.Outputs,
-                n: this.next
-            };
+            context.State = 3 /* Paused */;
             done();
-        };
-        PauseActivity.prototype.Resume = function (context, state) {
-            throw new Error('Not Implemented');
-            context.Inputs = state.i;
-            context.Outputs = state.o;
-            this.next = state.n;
         };
         return PauseActivity;
     })();

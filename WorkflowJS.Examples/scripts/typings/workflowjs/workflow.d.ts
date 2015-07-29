@@ -7,7 +7,7 @@ declare module wfjs {
     class ObjectHelper {
         static CopyProperties(source: any, destination: any): void;
         static GetKeys(obj: any): string[];
-        static GetValue(obj: any, ...params: any[]): any;
+        static GetValue<T>(obj: any, ...params: any[]): T;
         static ShallowClone(obj: any): any;
         static CombineObjects(obj1: any, obj2: any): any;
         /**
@@ -197,7 +197,6 @@ declare module wfjs {
         next: string;
         constructor(options: IPauseOptions);
         Execute(context: ActivityContext, done: (err?: Error) => void): void;
-        Resume(context: ActivityContext, state: IPauseState): void;
     }
 }
 declare module wfjs {
@@ -233,9 +232,9 @@ declare module wfjs {
          */
         Execute(context: ActivityContext, done: (err?: Error) => void): void;
         /**
-         * _ExecuteLoop Execution loop that executes every Activity.
+         * _ExecuteNextActivity Execution loop that executes every Activity.
          */
-        private _ExecuteLoop(activityName, context, activity, done);
+        private _ExecuteNextActivity(activityName, context, activity, done);
         /**
          * _ExecuteActivity Executes the Activity.
          */
