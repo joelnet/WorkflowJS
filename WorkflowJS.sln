@@ -7,6 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkflowJS.Source", "Workfl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkflowJS.Examples", "WorkflowJS.Examples\WorkflowJS.Examples.csproj", "{DDF9933C-8839-44B5-A8BF-B59357B7C2AD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkflowJS.Tests", "WorkflowJS.Tests\WorkflowJS.Tests.csproj", "{CE4C6C84-2564-4F35-A98F-63FD90F28C18}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6E30A7DC-6095-4A69-AF64-3F9685B0D06B}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +28,10 @@ Global
 		{DDF9933C-8839-44B5-A8BF-B59357B7C2AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDF9933C-8839-44B5-A8BF-B59357B7C2AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDF9933C-8839-44B5-A8BF-B59357B7C2AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE4C6C84-2564-4F35-A98F-63FD90F28C18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE4C6C84-2564-4F35-A98F-63FD90F28C18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE4C6C84-2564-4F35-A98F-63FD90F28C18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE4C6C84-2564-4F35-A98F-63FD90F28C18}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

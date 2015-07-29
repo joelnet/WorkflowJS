@@ -222,6 +222,7 @@
     <Content Include="Models\IInternalWorkflow.js.map">
       <DependentUpon>IInternalWorkflow.ts</DependentUpon>
     </Content>
+    <Content Include="README.md" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -235,6 +236,7 @@
       <DependentUpon>Workflow.ts</DependentUpon>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>
@@ -254,7 +256,8 @@
           <IISUrl>http://localhost:53201/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl></CustomServerUrl>
+          <CustomServerUrl>
+          </CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
@@ -279,7 +282,10 @@ dir Activities\*.ts /s /b &gt;&gt;ts-files
 dir *.ts /b &gt;&gt;ts-files
 tsc @ts-files --out bin\workflow.js --declaration
 copy bin\workflow.js ..\WorkflowJS.Examples\scripts\lib\workflow.js
+copy bin\workflow.js ..\WorkflowJS.Tests\lib\workflow.js
 copy bin\workflow.d.ts ..\WorkflowJS.Examples\scripts\typings\workflowjs\workflow.d.ts
-del ts-files</PostBuildEvent>
+copy bin\workflow.d.ts ..\WorkflowJS.Tests\lib\workflow.d.ts
+del ts-files
+del bin\WorkflowJs.Source.*</PostBuildEvent>
   </PropertyGroup>
 </Project>
