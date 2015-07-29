@@ -207,12 +207,118 @@ var wfjs;
             /**
              * GetNextActivityName returns the name of the next Activity or null.
              */
-            Workflow.GetNextActivityName = function (activity, activities) {
+            Workflow.GetNextActivityName = function (activity, context, activities) {
                 if (activity == null) {
                     return null;
                 }
-                var activityName = wfjs.ObjectHelper.GetValue(activity, 'next');
-                return activities[activityName] != null ? activityName : null;
+                // the Activity sets $next
+                var $next = wfjs.ObjectHelper.GetValue(context, 'Outputs', '$next');
+                // 'next' value on the Activity.
+                var nextActivityName = $next || wfjs.ObjectHelper.GetValue(activity, 'next');
+                return activities[nextActivityName] != null ? nextActivityName : null;
+            };
+            /**
+             * GetInputs Returns a collection of input values.
+             */
+            Workflow.GetInputs = function (context, inputs) {
+                var value = {};
+                var allValues = wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
+                if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(inputs)) {
+                    return allValues;
+                }
+                for (var key in inputs) {
+                    value[key] = wfjs.EvalHelper.Eval(allValues, inputs[key]);
+                }
+                return value;
+            };
+            /**
+             * GetOutputs Returns a collection out remapped outputs
+             */
+            Workflow.GetOutputs = function (context, outputs) {
+                outputs = outputs || {};
+                var value = {};
+                if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(outputs)) {
+                    return wfjs.ObjectHelper.ShallowClone(context.Outputs);
+                }
+                for (var key in outputs) {
+                    var v = outputs[key];
+                    value[v] = context.Outputs[key];
+                }
+                return value;
+            };
+            /**
+             * CreateContext Creates a new Context for the Activity.
+             */
+            Workflow.CreateContext = function (activity, inputs, state, extensions, callback) {
+                if (state != null) {
+                    return callback(null, new wfjs.ActivityContext({
+                        Extensions: extensions,
+                        Inputs: wfjs.ObjectHelper.CombineObjects(state.i, inputs) || {},
+                        Outputs: wfjs.ObjectHelper.ShallowClone(state.o) || {}
+                    }));
+                }
+                Workflow.GetValueDictionary(activity.$inputs, inputs, 'input', function (err, values) {
+                    var context = err != null ? null : new wfjs.ActivityContext({
+                        Extensions: extensions,
+                        Inputs: values,
+                        Outputs: (state || {}).o || {}
+                    });
+                    return callback(err, context);
+                });
+            };
+            /**
+             * GetValueDictionary Returns a Dictionary<any> from 'values' that have matching 'keys'.
+             */
+            Workflow.GetValueDictionary = function (keys, values, valueType, callback) {
+                var result = {};
+                var key;
+                if (wfjs._Specifications.IsWildcardArray.IsSatisfiedBy(keys)) {
+                    return callback(null, wfjs.ObjectHelper.ShallowClone(values));
+                }
+                for (var i = 0; i < (keys || []).length; i++) {
+                    key = keys[i];
+                    if (values != null && values[key] !== undefined) {
+                        result[key] = values[key];
+                    }
+                    else {
+                        var message = wfjs.Resources.Error_Activity_Argument_Null.replace(/\{0}/g, valueType).replace(/\{1}/g, key);
+                        return callback(new Error(message));
+                    }
+                }
+                callback(null, result);
+            };
+            /**
+             * CreateChildActivityContext Returns a new context for inner activities.
+             */
+            Workflow.CreateChildActivityContext = function (context) {
+                return context == null ? null : {
+                    Extensions: wfjs.ObjectHelper.ShallowClone(context.Extensions),
+                    Inputs: wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs),
+                    Outputs: {}
+                };
+            };
+            /**
+             * CopyInnerContextToOuterContext Copies the outputs of innerContext to the outerContext.
+             */
+            Workflow.CopyInnerContextToOuterContext = function (innerContext, outerContext, activity) {
+                if (innerContext == null || outerContext == null) {
+                    return;
+                }
+                var outputs = _bll.Workflow.GetOutputs(innerContext, activity.$outputs);
+                wfjs.ObjectHelper.CopyProperties(outputs, outerContext.Outputs);
+                if (innerContext.State != null) {
+                    outerContext.State = innerContext.State;
+                }
+            };
+            /**
+             * GetPauseState Returns an IPauseState from the ActivityContext and nextActivityName.
+             */
+            Workflow.GetPauseState = function (context, nextActivityName) {
+                return {
+                    i: wfjs.ObjectHelper.ShallowClone(wfjs.ObjectHelper.GetValue(context, 'Inputs')),
+                    o: wfjs.ObjectHelper.ShallowClone(wfjs.ObjectHelper.GetValue(context, 'Outputs')),
+                    n: nextActivityName
+                };
             };
             return Workflow;
         })();
@@ -357,10 +463,12 @@ var wfjs;
     var _Specifications = (function () {
         function _Specifications() {
         }
-        _Specifications.IsPaused = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, 'StateData') != null; });
+        _Specifications.IsPaused = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, 'State') == 3 /* Paused */ || wfjs.ObjectHelper.GetValue(o, 'StateData') != null; });
         _Specifications.IsWildcardDictionary = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, '*') != null; });
         _Specifications.IsWildcardArray = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, 0) == '*'; });
         _Specifications.Has$next = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, 'Outputs', '$next') != null; });
+        _Specifications.IsWorkflowActivity = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, 'activity') != null; });
+        _Specifications.IsExecutableActivity = new wfjs.Specification(function (o) { return typeof wfjs.ObjectHelper.GetValue(o, 'Execute') == 'function'; });
         return _Specifications;
     })();
     wfjs._Specifications = _Specifications;
@@ -368,19 +476,19 @@ var wfjs;
 var wfjs;
 (function (wfjs) {
     var Workflow = (function () {
-        function Workflow(map, state) {
+        function Workflow(flowchart, state) {
             this.State = 0 /* None */;
             this.logger = console;
-            if (map == null) {
-                throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'map'));
+            if (flowchart == null) {
+                throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'flowchart'));
             }
-            if (map.activities == null) {
-                throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'map.activities'));
+            if (flowchart.activities == null) {
+                throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'flowchart.activities'));
             }
-            this.$inputs = map.$inputs || [];
-            this.$outputs = map.$outputs || [];
-            this._activities = map.activities || {};
-            this._extensions = map.$extensions || {};
+            this.$inputs = flowchart.$inputs || [];
+            this.$outputs = flowchart.$outputs || [];
+            this._activities = flowchart.activities || {};
+            this._extensions = flowchart.$extensions || {};
             this._stateData = state || null;
         }
         /**
@@ -392,6 +500,7 @@ var wfjs;
             var firstActivityName = wfjs._bll.Workflow.GetStartActivityName(this._activities, this._stateData);
             var activity = this._activities[firstActivityName];
             if (activity == null) {
+                this._log(0 /* None */, 'Workflow Complete');
                 this.State = context.State = 2 /* Complete */;
                 return done();
             }
@@ -402,10 +511,23 @@ var wfjs;
                 if (err != null) {
                     context.State = 4 /* Fault */;
                 }
-                else if (wfjs.ObjectHelper.GetValue(context, 'State') == null) {
-                    context.State = 2 /* Complete */;
+                else {
+                    context.State = _this.State == 1 /* Running */ ? 2 /* Complete */ : _this.State;
                 }
-                _this.State = context.State;
+                switch (context.State) {
+                    case 2 /* Complete */:
+                        _this._log(0 /* None */, 'Workflow Complete');
+                        break;
+                    case 4 /* Fault */:
+                        _this._log(0 /* None */, 'Workflow Faulted');
+                        break;
+                    case 3 /* Paused */:
+                        _this._log(0 /* None */, 'Workflow Paused');
+                        break;
+                    case 1 /* Running */:
+                        _this._log(0 /* None */, 'Workflow Running');
+                        break;
+                }
                 done(err);
             });
         };
@@ -414,38 +536,31 @@ var wfjs;
          */
         Workflow.prototype._ExecuteNextActivity = function (activityName, context, activity, done) {
             var _this = this;
-            var innerContext = Workflow._CreateNextActivityContext(context);
-            var next = function (err, innerContext) {
-                if (err != null) {
-                    return done(err);
-                }
-                var $next = wfjs.ObjectHelper.GetValue(innerContext, 'Outputs', '$next');
-                var nextActivityName = $next || wfjs._bll.Workflow.GetNextActivityName(activity, _this._activities);
-                var nextActivity = !wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext) ? _this._activities[nextActivityName] : null;
-                var dummyCallback = function (n, i, a, callback) {
-                    callback();
-                };
-                var activityExecute = nextActivity != null ? _this._ExecuteNextActivity.bind(_this) : dummyCallback;
-                if (wfjs.ObjectHelper.GetValue(innerContext, 'State') == 3 /* Paused */) {
-                    context.StateData = {
-                        i: wfjs.ObjectHelper.ShallowClone(context.Inputs),
-                        o: wfjs.ObjectHelper.ShallowClone(context.Outputs),
-                        n: nextActivityName
-                    };
-                    _this._log(0 /* None */, 'Workflow Paused');
-                    _this.State = context.State;
-                    return done();
-                }
-                activityExecute(nextActivityName, innerContext, nextActivity, function (err) {
-                    wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
-                    if (wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext)) {
-                        context.StateData = innerContext.StateData;
+            if (activity == null) {
+                return done();
+            }
+            var innerContext = wfjs._bll.Workflow.CreateChildActivityContext(context);
+            if (wfjs._Specifications.IsWorkflowActivity.IsSatisfiedBy(activity)) {
+                this._ExecuteActivity(activityName, innerContext, activity, function (err) {
+                    if (err != null) {
+                        _this.State = 4 /* Fault */;
+                        return done(err);
                     }
-                    done(err);
+                    var nextActivityName = wfjs._bll.Workflow.GetNextActivityName(activity, innerContext, _this._activities);
+                    var nextActivity = _this._activities[nextActivityName] || null;
+                    if (wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext)) {
+                        context.StateData = wfjs._bll.Workflow.GetPauseState(context, nextActivityName);
+                        _this.State = innerContext.State;
+                        return done();
+                    }
+                    _this._ExecuteNextActivity(nextActivityName, innerContext, nextActivity, function (err) {
+                        wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                        if (wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext)) {
+                            context.StateData = innerContext.StateData;
+                        }
+                        done(err);
+                    });
                 });
-            };
-            if (activity.activity != null) {
-                this._ExecuteActivity(activityName, innerContext, activity, function (err) { return next(err, innerContext); });
             }
             else {
                 this._log(4 /* Error */, activityName + ': ' + wfjs.Resources.Error_Activity_Invalid);
@@ -453,19 +568,13 @@ var wfjs;
             }
         };
         /**
-         * _ExecuteActivity Executes the Activity.
+         * _ExecuteActivity Calls WorkflowInvoker to execute the Activity.
          */
         Workflow.prototype._ExecuteActivity = function (activityName, context, activity, done) {
             var _this = this;
-            var inputs = Workflow._GetInputs(context, activity.$inputs);
+            var inputs = wfjs._bll.Workflow.GetInputs(context, activity.$inputs);
             wfjs.WorkflowInvoker.CreateActivity(activity.activity).Extensions(context.Extensions).Inputs(inputs).Invoke(function (err, innerContext) {
-                if (innerContext != null) {
-                    var outputs = Workflow._GetOutputs(innerContext, activity.$outputs);
-                    wfjs.ObjectHelper.CopyProperties(outputs, context.Outputs);
-                    if (innerContext.State != null) {
-                        context.State = innerContext.State;
-                    }
-                }
+                wfjs._bll.Workflow.CopyInnerContextToOuterContext(innerContext, context, activity);
                 _this._log(0 /* None */, activityName, wfjs.ObjectHelper.TrimObject({
                     inputs: inputs,
                     outputs: wfjs.ObjectHelper.ShallowClone(wfjs.ObjectHelper.GetValue(innerContext, 'Outputs')),
@@ -474,6 +583,9 @@ var wfjs;
                 done(err);
             });
         };
+        /**
+         * Helper method for logging
+         */
         Workflow.prototype._log = function (logType, message) {
             var optionalParams = [];
             for (var _i = 2; _i < arguments.length; _i++) {
@@ -481,50 +593,6 @@ var wfjs;
             }
             var args = [this.logger, logType, 'wfjs.Workflow:'].concat([message]).concat(optionalParams || []);
             wfjs._bll.Logger.Log.apply(wfjs._bll.Logger, args);
-        };
-        /**
-         * _GetInputs Returns a collection of input values.
-         */
-        Workflow._GetInputs = function (context, inputs) {
-            var value = {};
-            var allValues = wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
-            if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(inputs)) {
-                return allValues;
-            }
-            for (var key in inputs) {
-                value[key] = wfjs.EvalHelper.Eval(allValues, inputs[key]);
-            }
-            return value;
-        };
-        /**
-         * _GetOutputs Returns a collection out remapped outputs
-         */
-        Workflow._GetOutputs = function (context, outputs) {
-            outputs = outputs || {};
-            var value = {};
-            if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(outputs)) {
-                return wfjs.ObjectHelper.ShallowClone(context.Outputs);
-            }
-            for (var key in outputs) {
-                var v = outputs[key];
-                value[v] = context.Outputs[key];
-            }
-            return value;
-        };
-        /**
-         * _CreateNextActivityContext Returns a new context for inner activities.
-         */
-        Workflow._CreateNextActivityContext = function (context) {
-            if (context == null) {
-                return null;
-            }
-            var nextContext = {
-                Extensions: wfjs.ObjectHelper.ShallowClone(context.Extensions),
-                Inputs: context.Inputs,
-                Outputs: {}
-            };
-            wfjs.ObjectHelper.CopyProperties(context.Outputs, nextContext.Inputs);
-            return nextContext;
         };
         return Workflow;
     })();
@@ -537,13 +605,10 @@ var wfjs;
             this._inputs = null;
             this._extensions = null;
             this._stateData = null;
-            if (activity == null) {
-                throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'activity'));
-            }
-            if (typeof activity.Execute == 'function') {
+            if (wfjs._Specifications.IsExecutableActivity.IsSatisfiedBy(activity)) {
                 this._activity = activity;
             }
-            else {
+            else if (activity != null) {
                 this._activity = new wfjs.Workflow(activity);
             }
         }
@@ -555,8 +620,7 @@ var wfjs;
             return this;
         };
         WorkflowInvoker.prototype.State = function (state) {
-            this._stateData = state;
-            this._activity._stateData = state;
+            this._stateData = this._activity._stateData = state;
             return this;
         };
         WorkflowInvoker.prototype.Extensions = function (extensions) {
@@ -569,8 +633,10 @@ var wfjs;
             WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, callback);
         };
         WorkflowInvoker._InvokeActivity = function (activity, inputs, state, extensions, callback) {
-            var _this = this;
-            WorkflowInvoker._CreateContext(activity, inputs, state, extensions, function (err, context) {
+            if (activity == null) {
+                return callback(Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'activity')));
+            }
+            wfjs._bll.Workflow.CreateContext(activity, inputs, state, extensions, function (err, context) {
                 if (err != null) {
                     return callback(err, context);
                 }
@@ -582,7 +648,7 @@ var wfjs;
                         if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
                             return callback(null, context);
                         }
-                        _this._GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
+                        wfjs._bll.Workflow.GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
                             context.Outputs = values;
                             callback(err, context);
                         });
@@ -592,53 +658,6 @@ var wfjs;
                     callback(err);
                 }
             });
-        };
-        WorkflowInvoker._CreateContext = function (activity, inputs, state, extensions, callback) {
-            if (state != null) {
-                return callback(null, this._CreateStateContext(activity, inputs, state, extensions));
-            }
-            this._GetValueDictionary(activity.$inputs, inputs, 'input', function (err, values) {
-                var context = err != null ? null : new wfjs.ActivityContext({
-                    Extensions: extensions,
-                    Inputs: values,
-                    Outputs: (state || {}).o || {}
-                });
-                return callback(err, context);
-            });
-        };
-        WorkflowInvoker._CreateStateContext = function (activity, inputs, state, extensions) {
-            var combinedInputs = {};
-            wfjs.ObjectHelper.CopyProperties(state.i || {}, combinedInputs);
-            wfjs.ObjectHelper.CopyProperties(inputs, combinedInputs);
-            var outputs = {};
-            wfjs.ObjectHelper.CopyProperties(state.o || {}, outputs);
-            var context = new wfjs.ActivityContext({
-                Extensions: extensions,
-                Inputs: combinedInputs,
-                Outputs: outputs
-            });
-            return context;
-        };
-        WorkflowInvoker._GetValueDictionary = function (keys, values, valueType, callback) {
-            var result = {};
-            var key;
-            if (wfjs._Specifications.IsWildcardArray.IsSatisfiedBy(keys)) {
-                for (key in values) {
-                    result[key] = values[key];
-                }
-                return callback(null, result);
-            }
-            for (var i = 0; i < (keys || []).length; i++) {
-                key = keys[i];
-                if (values != null && values[key] !== undefined) {
-                    result[key] = values[key];
-                }
-                else {
-                    var message = wfjs.Resources.Error_Activity_Argument_Null.replace(/\{0}/g, valueType).replace(/\{1}/g, key);
-                    return callback(new Error(message));
-                }
-            }
-            callback(null, result);
         };
         return WorkflowInvoker;
     })();

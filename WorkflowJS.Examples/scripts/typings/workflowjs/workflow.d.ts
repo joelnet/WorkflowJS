@@ -85,6 +85,11 @@ declare module wfjs {
     }
 }
 declare module wfjs {
+    interface IInternalWorkflow {
+        _stateData: IPauseState;
+    }
+}
+declare module wfjs {
     interface IPauseState {
         i: wfjs.Dictionary<any>;
         o: wfjs.Dictionary<any>;
@@ -138,7 +143,35 @@ declare module wfjs._bll {
         /**
          * GetNextActivityName returns the name of the next Activity or null.
          */
-        static GetNextActivityName(activity: IActivityBase, activities: Dictionary<IActivityBase>): string;
+        static GetNextActivityName(activity: IActivityBase, context: ActivityContext, activities: Dictionary<IActivityBase>): string;
+        /**
+         * GetInputs Returns a collection of input values.
+         */
+        static GetInputs(context: ActivityContext, inputs: Dictionary<any>): Dictionary<any>;
+        /**
+         * GetOutputs Returns a collection out remapped outputs
+         */
+        static GetOutputs(context: ActivityContext, outputs: Dictionary<string>): Dictionary<any>;
+        /**
+         * CreateContext Creates a new Context for the Activity.
+         */
+        static CreateContext(activity: IActivity, inputs: Dictionary<any>, state: IPauseState, extensions: Dictionary<any>, callback: (err: Error, context: ActivityContext) => void): void;
+        /**
+         * GetValueDictionary Returns a Dictionary<any> from 'values' that have matching 'keys'.
+         */
+        static GetValueDictionary(keys: string[], values: Dictionary<any>, valueType: string, callback: (err: Error, values?: Dictionary<any>) => void): void;
+        /**
+         * CreateChildActivityContext Returns a new context for inner activities.
+         */
+        static CreateChildActivityContext(context: ActivityContext): ActivityContext;
+        /**
+         * CopyInnerContextToOuterContext Copies the outputs of innerContext to the outerContext.
+         */
+        static CopyInnerContextToOuterContext(innerContext: ActivityContext, outerContext: ActivityContext, activity: IWorkflowActivity): void;
+        /**
+         * GetPauseState Returns an IPauseState from the ActivityContext and nextActivityName.
+         */
+        static GetPauseState(context: ActivityContext, nextActivityName: string): IPauseState;
     }
 }
 declare module wfjs {
@@ -212,12 +245,11 @@ declare module wfjs {
         static IsWildcardDictionary: Specification<Dictionary<any>>;
         static IsWildcardArray: Specification<string[]>;
         static Has$next: Specification<ActivityContext>;
+        static IsWorkflowActivity: Specification<IActivityBase>;
+        static IsExecutableActivity: Specification<IActivity | IFlowchart>;
     }
 }
 declare module wfjs {
-    interface IInternalWorkflow {
-        _stateData: IPauseState;
-    }
     class Workflow implements IActivity {
         $inputs: string[];
         $outputs: string[];
@@ -226,7 +258,7 @@ declare module wfjs {
         private _activities;
         private _extensions;
         private _stateData;
-        constructor(map: IFlowchart, state?: IPauseState);
+        constructor(flowchart: IFlowchart, state?: IPauseState);
         /**
          * Execution point that will be entered via WorkflowInvoker.
          */
@@ -236,22 +268,13 @@ declare module wfjs {
          */
         private _ExecuteNextActivity(activityName, context, activity, done);
         /**
-         * _ExecuteActivity Executes the Activity.
+         * _ExecuteActivity Calls WorkflowInvoker to execute the Activity.
          */
         private _ExecuteActivity(activityName, context, activity, done);
+        /**
+         * Helper method for logging
+         */
         private _log(logType, message, ...optionalParams);
-        /**
-         * _GetInputs Returns a collection of input values.
-         */
-        private static _GetInputs(context, inputs);
-        /**
-         * _GetOutputs Returns a collection out remapped outputs
-         */
-        private static _GetOutputs(context, outputs);
-        /**
-         * _CreateNextActivityContext Returns a new context for inner activities.
-         */
-        private static _CreateNextActivityContext(context);
     }
 }
 declare module wfjs {
@@ -267,8 +290,5 @@ declare module wfjs {
         Extensions(extensions: Dictionary<any>): WorkflowInvoker;
         Invoke(callback?: (err: Error, context?: ActivityContext) => void): void;
         private static _InvokeActivity(activity, inputs, state, extensions, callback);
-        private static _CreateContext(activity, inputs, state, extensions, callback);
-        private static _CreateStateContext(activity, inputs, state, extensions);
-        private static _GetValueDictionary(keys, values, valueType, callback);
     }
 }

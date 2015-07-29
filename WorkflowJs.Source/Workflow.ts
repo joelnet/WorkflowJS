@@ -1,10 +1,5 @@
 ﻿module wfjs
 {
-    export interface IInternalWorkflow
-    {
-        _stateData: IPauseState;
-    }
-
     export class Workflow implements IActivity
     {
         public $inputs: string[];
@@ -16,22 +11,22 @@
         private _extensions: Dictionary<any>;
         private _stateData: IPauseState;
 
-        constructor(map: IFlowchart, state?: IPauseState)
+        constructor(flowchart: IFlowchart, state?: IPauseState)
         {
-            if (map == null)
+            if (flowchart == null)
             {
-                throw new Error(Resources.Error_Argument_Null.replace(/\{0}/g, 'map'));
+                throw new Error(Resources.Error_Argument_Null.replace(/\{0}/g, 'flowchart'));
             }
 
-            if (map.activities == null)
+            if (flowchart.activities == null)
             {
-                throw new Error(Resources.Error_Argument_Null.replace(/\{0}/g, 'map.activities'));
+                throw new Error(Resources.Error_Argument_Null.replace(/\{0}/g, 'flowchart.activities'));
             }
 
-            this.$inputs = map.$inputs || [];
-            this.$outputs = map.$outputs || [];
-            this._activities = map.activities || {};
-            this._extensions = map.$extensions || {};
+            this.$inputs = flowchart.$inputs || [];
+            this.$outputs = flowchart.$outputs || [];
+            this._activities = flowchart.activities || {};
+            this._extensions = flowchart.$extensions || {};
             this._stateData = state || null;
         }
 
@@ -47,6 +42,7 @@
 
             if (activity == null)
             {
+                this._log(LogType.None, 'Workflow Complete');
                 this.State = context.State = WorkflowState.Complete;
                 return done();
             }
@@ -62,12 +58,18 @@
                 {
                     context.State = WorkflowState.Fault;
                 }
-                else if (ObjectHelper.GetValue(context, 'State') == null)
+                else
                 {
-                    context.State = WorkflowState.Complete;
+                    context.State = this.State == WorkflowState.Running ? WorkflowState.Complete : this.State;
                 }
 
-                this.State = context.State;
+                switch (context.State)
+                {
+                    case WorkflowState.Complete: this._log(LogType.None, 'Workflow Complete'); break;
+                    case WorkflowState.Fault: this._log(LogType.None, 'Workflow Faulted'); break;
+                    case WorkflowState.Paused: this._log(LogType.None, 'Workflow Paused'); break;
+                    case WorkflowState.Running: this._log(LogType.None, 'Workflow Running'); break;
+                }
 
                 done(err);
             });
@@ -78,51 +80,45 @@
          */
         private _ExecuteNextActivity(activityName: string, context: ActivityContext, activity: IActivityBase, done: (err?: Error) => void): void
         {
-            var innerContext = Workflow._CreateNextActivityContext(context);
-
-            var next = (err, innerContext: ActivityContext) =>
+            if (activity == null)
             {
-                if (err != null)
-                {
-                    return done(err);
-                }
-
-                var $next: string = ObjectHelper.GetValue<string>(innerContext, 'Outputs', '$next');
-                var nextActivityName: string = $next || _bll.Workflow.GetNextActivityName(activity, this._activities);
-                var nextActivity = !_Specifications.IsPaused.IsSatisfiedBy(innerContext) ? this._activities[nextActivityName] : null;
-                var dummyCallback = (n, i, a, callback) => { callback(); };
-                var activityExecute = nextActivity != null ? this._ExecuteNextActivity.bind(this) : dummyCallback;
-
-                if (ObjectHelper.GetValue<WorkflowState>(innerContext, 'State') == WorkflowState.Paused)
-                {
-                    context.StateData = {
-                        i: ObjectHelper.ShallowClone(context.Inputs),
-                        o: ObjectHelper.ShallowClone(context.Outputs),
-                        n: nextActivityName
-                    };
-
-                    this._log(LogType.None, 'Workflow Paused');
-                    this.State = context.State;
-
-                    return done();
-                }
-
-                activityExecute(nextActivityName, innerContext, nextActivity, err =>
-                {
-                    ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
-                    
-                    if (_Specifications.IsPaused.IsSatisfiedBy(innerContext))
-                    {
-                        context.StateData = innerContext.StateData;
-                    }
-
-                    done(err);
-                });
+                return done();
             }
 
-            if ((<IWorkflowActivity>activity).activity != null)
+            var innerContext = _bll.Workflow.CreateChildActivityContext(context);
+
+            if (_Specifications.IsWorkflowActivity.IsSatisfiedBy(activity))
             {
-                this._ExecuteActivity(activityName, innerContext, <IWorkflowActivity>activity, err => next(err, innerContext));
+                this._ExecuteActivity(activityName, innerContext, <IWorkflowActivity>activity, err =>
+                {
+                    if (err != null)
+                    {
+                        this.State = WorkflowState.Fault;
+                        return done(err);
+                    }
+
+                    var nextActivityName: string = _bll.Workflow.GetNextActivityName(activity, innerContext, this._activities);
+                    var nextActivity = this._activities[nextActivityName] || null;
+
+                    if (_Specifications.IsPaused.IsSatisfiedBy(innerContext))
+                    {
+                        context.StateData = _bll.Workflow.GetPauseState(context, nextActivityName);
+                        this.State = innerContext.State;
+                        return done();
+                    }
+
+                    this._ExecuteNextActivity(nextActivityName, innerContext, nextActivity, err =>
+                    {
+                        ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                    
+                        if (_Specifications.IsPaused.IsSatisfiedBy(innerContext))
+                        {
+                            context.StateData = innerContext.StateData;
+                        }
+
+                        done(err);
+                    });
+                });
             }
             else
             {
@@ -132,11 +128,11 @@
         }
 
         /**
-         * _ExecuteActivity Executes the Activity.
+         * _ExecuteActivity Calls WorkflowInvoker to execute the Activity.
          */
         private _ExecuteActivity(activityName: string, context: ActivityContext, activity: IWorkflowActivity, done: (err?: Error) => void): void
         {
-            var inputs = Workflow._GetInputs(context, activity.$inputs);
+            var inputs = _bll.Workflow.GetInputs(context, activity.$inputs);
 
             WorkflowInvoker
                 .CreateActivity(activity.activity)
@@ -144,16 +140,7 @@
                 .Inputs(inputs)
                 .Invoke((err, innerContext) =>
                 {
-                    if (innerContext != null)
-                    {
-                        var outputs = Workflow._GetOutputs(innerContext, activity.$outputs);
-                        ObjectHelper.CopyProperties(outputs, context.Outputs);
-                        
-                        if (innerContext.State != null)
-                        {
-                            context.State = innerContext.State;
-                        }
-                    }
+                    _bll.Workflow.CopyInnerContextToOuterContext(innerContext, context, activity);
 
                     this._log(LogType.None, activityName, ObjectHelper.TrimObject({
                         inputs: inputs,
@@ -165,6 +152,9 @@
                 });
         }
 
+        /**
+         * Helper method for logging
+         */
         private _log(logType: LogType, message: any, ...optionalParams: any[]): void
         {
             var args = [this.logger, logType, 'wfjs.Workflow:']
@@ -173,71 +163,5 @@
 
             _bll.Logger.Log.apply(_bll.Logger, args);
         }
-
-        /**
-         * _GetInputs Returns a collection of input values.
-         */
-        private static _GetInputs(context: ActivityContext, inputs: Dictionary<any>): Dictionary<any>
-        {
-            var value: Dictionary<any> = {};
-
-            var allValues: Dictionary<any> = ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
-
-            if (_Specifications.IsWildcardDictionary.IsSatisfiedBy(inputs))
-            {
-                return allValues;
-            }
-
-            for (var key in inputs)
-            {
-                value[key] = EvalHelper.Eval(allValues, inputs[key]);
-            }
-
-            return value;
-        }
-
-        /**
-         * _GetOutputs Returns a collection out remapped outputs
-         */
-        private static _GetOutputs(context: ActivityContext, outputs: Dictionary<string>): Dictionary<any>
-        {
-            outputs = outputs || {};
-
-            var value: Dictionary<any> = {};
-
-            if (_Specifications.IsWildcardDictionary.IsSatisfiedBy(outputs))
-            {
-                return ObjectHelper.ShallowClone(context.Outputs);
-            }
-
-            for (var key in outputs)
-            {
-                var v = outputs[key];
-                value[v] = context.Outputs[key];
-            }
-
-            return value;
-        }
-
-        /**
-         * _CreateNextActivityContext Returns a new context for inner activities.
-         */
-        private static _CreateNextActivityContext(context: ActivityContext): ActivityContext
-        {
-            if (context == null)
-            {
-                return null;
-            }
-
-            var nextContext = <ActivityContext>{
-                Extensions: <Dictionary<any>>ObjectHelper.ShallowClone(context.Extensions),
-                Inputs: context.Inputs,
-                Outputs: {}
-            };
-
-            ObjectHelper.CopyProperties(context.Outputs, nextContext.Inputs);
-
-            return nextContext;
-        }
     }
-} 
+}

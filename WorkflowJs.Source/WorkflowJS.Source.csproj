@@ -66,6 +66,9 @@
     <Content Include="Models\IFlowchart.js">
       <DependentUpon>IFlowchart.ts</DependentUpon>
     </Content>
+    <Content Include="Models\IInternalWorkflow.js">
+      <DependentUpon>IInternalWorkflow.ts</DependentUpon>
+    </Content>
     <Content Include="Models\IPauseState.js">
       <DependentUpon>IPauseState.ts</DependentUpon>
     </Content>
@@ -128,6 +131,7 @@
     <TypeScriptCompile Include="Models\IAssignActivity.ts" />
     <TypeScriptCompile Include="Models\IExecuteActivity.ts" />
     <TypeScriptCompile Include="Models\IFlowchart.ts" />
+    <TypeScriptCompile Include="Models\IInternalWorkflow.ts" />
     <TypeScriptCompile Include="Models\IPauseState.ts" />
     <TypeScriptCompile Include="Models\IWorkflowActivity.ts" />
     <TypeScriptCompile Include="Models\IDecisionActivity.ts" />
@@ -214,6 +218,9 @@
     </Content>
     <Content Include="Models\LogType.js.map">
       <DependentUpon>LogType.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\IInternalWorkflow.js.map">
+      <DependentUpon>IInternalWorkflow.ts</DependentUpon>
     </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>

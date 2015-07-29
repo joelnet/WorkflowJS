@@ -9,16 +9,11 @@
 
         constructor(activity: IActivity | IFlowchart)
         {
-            if (activity == null)
-            {
-                throw new Error(Resources.Error_Argument_Null.replace(/\{0}/g, 'activity'));
-            }
-
-            if (typeof (<any>activity).Execute == 'function')
+            if (_Specifications.IsExecutableActivity.IsSatisfiedBy(activity))
             {
                 this._activity = <IActivity>activity;
             }
-            else
+            else if (activity != null)
             {
                 this._activity = new Workflow(<IFlowchart>activity);
             }
@@ -37,8 +32,7 @@
 
         public State(state: IPauseState): WorkflowInvoker
         {
-            this._stateData = state;
-            (<IInternalWorkflow><any>this._activity)._stateData = state;
+            this._stateData = (<IInternalWorkflow><any>this._activity)._stateData = state;
             return this;
         }
 
@@ -57,7 +51,12 @@
 
         private static _InvokeActivity(activity: IActivity, inputs: Dictionary<string>, state: IPauseState, extensions: Dictionary<string>, callback: (err: Error, context?: ActivityContext) => void): void
         {
-            WorkflowInvoker._CreateContext(activity, inputs, state, extensions, (err, context) =>
+            if (activity == null)
+            {
+                return callback(Error(Resources.Error_Argument_Null.replace(/\{0}/g, 'activity')));
+            }
+
+            _bll.Workflow.CreateContext(activity, inputs, state, extensions, (err, context) =>
             {
                 if (err != null)
                 {
@@ -78,7 +77,7 @@
                             return callback(null, context);
                         }
 
-                        this._GetValueDictionary(activity.$outputs, context.Outputs, 'output', (err, values) =>
+                        _bll.Workflow.GetValueDictionary(activity.$outputs, context.Outputs, 'output', (err, values) =>
                         {
                             context.Outputs = values;
                             callback(err, context);
@@ -90,80 +89,6 @@
                     callback(err);
                 }
             });
-        }
-
-        private static _CreateContext(activity: IActivity, inputs: Dictionary<any>, state: IPauseState, extensions: Dictionary<any>, callback: (err: Error, context: ActivityContext) => void): void
-        {
-            if (state != null)
-            {
-                return callback(null, this._CreateStateContext(activity, inputs, state, extensions));
-            }
-
-            this._GetValueDictionary(activity.$inputs, inputs, 'input', (err, values) =>
-            {
-                var context = err != null ? null
-                    : new ActivityContext(<ActivityContextOptions>{
-                        Extensions: extensions,
-                        Inputs: values,
-                        Outputs: (<IPauseState>(state || {})).o || {}
-                      });
-
-                return callback(err, context);
-            });
-        }
-
-        private static _CreateStateContext(activity: IActivity, inputs: Dictionary<any>, state: IPauseState, extensions: Dictionary<any>): ActivityContext
-        {
-            var combinedInputs: Dictionary<any> = {};
-            ObjectHelper.CopyProperties(state.i || {}, combinedInputs);
-            ObjectHelper.CopyProperties(inputs, combinedInputs);
-
-            var outputs: Dictionary<any> = {};
-            ObjectHelper.CopyProperties(state.o || {}, outputs);
-
-            var context = new ActivityContext({
-                Extensions: extensions,
-                Inputs: combinedInputs,
-                Outputs: outputs
-            });
-
-            return context;
-        }
-
-        private static _GetValueDictionary(keys: string[], values: Dictionary<any>, valueType: string, callback: (err: Error, values?: Dictionary<any>) => void): void
-        {
-            var result: Dictionary<any> = {};
-            var key: string;
-
-            if (_Specifications.IsWildcardArray.IsSatisfiedBy(keys))
-            {
-                for (key in values)
-                {
-                    result[key] = values[key];
-                }
-
-                return callback(null, result);
-            }
-
-            for (var i = 0; i < (keys || []).length; i++)
-            {
-                key = keys[i];
-
-                if (values != null && values[key] !== undefined)
-                {
-                    result[key] = values[key];
-                }
-                else
-                {
-                    var message = Resources.Error_Activity_Argument_Null
-                        .replace(/\{0}/g, valueType)
-                        .replace(/\{1}/g, key);
-
-                    return callback(new Error(message));
-                }
-            }
-
-            callback(null, result);
         }
     }
 } 
