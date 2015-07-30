@@ -13,15 +13,8 @@
 
         constructor(flowchart: IFlowchart, state?: IPauseState)
         {
-            if (flowchart == null)
-            {
-                throw new Error(Resources.Error_Argument_Null.replace(/\{0}/g, 'flowchart'));
-            }
-
-            if (flowchart.activities == null)
-            {
-                throw new Error(Resources.Error_Argument_Null.replace(/\{0}/g, 'flowchart.activities'));
-            }
+            flowchart = flowchart || <IFlowchart>{};
+            flowchart.activities = flowchart.activities || {};
 
             this.$inputs = flowchart.$inputs || [];
             this.$outputs = flowchart.$outputs || [];

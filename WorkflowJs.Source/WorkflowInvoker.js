@@ -34,7 +34,7 @@ var wfjs;
         };
         WorkflowInvoker._InvokeActivity = function (activity, inputs, state, extensions, callback) {
             if (activity == null) {
-                return callback(Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'activity')));
+                return callback(null, { Inputs: {}, Outputs: {} });
             }
             wfjs._bll.Workflow.CreateContext(activity, inputs, state, extensions, function (err, context) {
                 if (err != null) {

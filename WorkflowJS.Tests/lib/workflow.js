@@ -479,12 +479,8 @@ var wfjs;
         function Workflow(flowchart, state) {
             this.State = 0 /* None */;
             this.logger = console;
-            if (flowchart == null) {
-                throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'flowchart'));
-            }
-            if (flowchart.activities == null) {
-                throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'flowchart.activities'));
-            }
+            flowchart = flowchart || {};
+            flowchart.activities = flowchart.activities || {};
             this.$inputs = flowchart.$inputs || [];
             this.$outputs = flowchart.$outputs || [];
             this._activities = flowchart.activities || {};
@@ -634,7 +630,7 @@ var wfjs;
         };
         WorkflowInvoker._InvokeActivity = function (activity, inputs, state, extensions, callback) {
             if (activity == null) {
-                return callback(Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'activity')));
+                return callback(null, { Inputs: {}, Outputs: {} });
             }
             wfjs._bll.Workflow.CreateContext(activity, inputs, state, extensions, function (err, context) {
                 if (err != null) {

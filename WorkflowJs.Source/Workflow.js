@@ -4,12 +4,8 @@ var wfjs;
         function Workflow(flowchart, state) {
             this.State = 0 /* None */;
             this.logger = console;
-            if (flowchart == null) {
-                throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'flowchart'));
-            }
-            if (flowchart.activities == null) {
-                throw new Error(wfjs.Resources.Error_Argument_Null.replace(/\{0}/g, 'flowchart.activities'));
-            }
+            flowchart = flowchart || {};
+            flowchart.activities = flowchart.activities || {};
             this.$inputs = flowchart.$inputs || [];
             this.$outputs = flowchart.$outputs || [];
             this._activities = flowchart.activities || {};

@@ -53,7 +53,7 @@
         {
             if (activity == null)
             {
-                return callback(Error(Resources.Error_Argument_Null.replace(/\{0}/g, 'activity')));
+                return callback(null, <ActivityContext>{ Inputs: {}, Outputs: {}});
             }
 
             _bll.Workflow.CreateContext(activity, inputs, state, extensions, (err, context) =>

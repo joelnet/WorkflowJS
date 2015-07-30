@@ -62,10 +62,11 @@
     <Content Include="activities\AddActivity.js" />
     <Content Include="activities\AsyncErrorActivity.js" />
     <Content Include="activities\ErrorActivity.js" />
+    <Content Include="workflowTests.js" />
     <Content Include="lib\chai.js" />
     <Content Include="lib\mocha.js" />
     <Content Include="lib\workflow.js" />
-    <Content Include="activityTest.js" />
+    <Content Include="activityTests.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
