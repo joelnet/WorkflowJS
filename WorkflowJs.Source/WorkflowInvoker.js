@@ -84,15 +84,17 @@ var wfjs;
         WorkflowInvoker._ActivityExecuteAsync = function (activity, context, done) {
             try {
                 if (wfjs._Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute)) {
-                    activity.Execute(context, done);
+                    activity.Execute(context, function (err) {
+                        wfjs.ThreadHelper.NewThread(function () { return done(err); });
+                    });
                 }
                 else {
                     activity.Execute(context);
-                    done();
+                    wfjs.ThreadHelper.NewThread(function () { return done(); });
                 }
             }
             catch (err) {
-                return done(err);
+                done(err);
             }
         };
         return WorkflowInvoker;

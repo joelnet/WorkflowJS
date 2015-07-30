@@ -62,6 +62,7 @@
     <Content Include="activities\AddActivity.js" />
     <Content Include="activities\AsyncErrorActivity.js" />
     <Content Include="activities\ErrorActivity.js" />
+    <Content Include="executeActivityTests.js" />
     <Content Include="flowchartTests.js" />
     <Content Include="lib\chai.js" />
     <Content Include="lib\mocha.js" />

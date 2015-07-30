@@ -21,7 +21,15 @@ var wfjs;
             this._options = options || {};
         }
         ExecuteActivity.prototype.Execute = function (context, done) {
-            this._options.execute(context, done);
+            if (wfjs._Specifications.IsExecuteAsync.IsSatisfiedBy(this._options.execute)) {
+                this._options.execute(context, done);
+            }
+            else {
+                this._options.execute(context);
+                if (done != null) {
+                    done();
+                }
+            }
         };
         return ExecuteActivity;
     })();

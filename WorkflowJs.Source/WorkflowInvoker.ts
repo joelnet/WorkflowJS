@@ -117,17 +117,21 @@
             {
                 if (_Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute))
                 {
-                    activity.Execute(context, done);
+                    activity.Execute(context, err =>
+                    {
+                        ThreadHelper.NewThread(() => done(err));
+                    });
                 }
                 else
                 {
                     activity.Execute(context);
-                    done();
+
+                    ThreadHelper.NewThread(() => done());
                 }
             }
             catch (err)
             {
-                return done(err);
+                done(err);
             }
         }
     }

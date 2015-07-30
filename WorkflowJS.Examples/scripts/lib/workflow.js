@@ -152,6 +152,24 @@ var wfjs;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
+    /**
+     * ThreadHelper Helper methods for dealing with Multi-Threading.
+     */
+    var ThreadHelper = (function () {
+        function ThreadHelper() {
+        }
+        /**
+         * NewThread Creates a new Thread to execute the command
+         */
+        ThreadHelper.NewThread = function (fn) {
+            setTimeout(function () { return fn(); }, 0);
+        };
+        return ThreadHelper;
+    })();
+    wfjs.ThreadHelper = ThreadHelper;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
     var ActivityContext = (function () {
         function ActivityContext(options) {
             this.Extensions = options.Extensions || {};
@@ -452,7 +470,15 @@ var wfjs;
             this._options = options || {};
         }
         ExecuteActivity.prototype.Execute = function (context, done) {
-            this._options.execute(context, done);
+            if (wfjs._Specifications.IsExecuteAsync.IsSatisfiedBy(this._options.execute)) {
+                this._options.execute(context, done);
+            }
+            else {
+                this._options.execute(context);
+                if (done != null) {
+                    done();
+                }
+            }
         };
         return ExecuteActivity;
     })();
@@ -588,30 +614,19 @@ var wfjs;
 (function (wfjs) {
     function Pause(options) {
         options = options || {};
-        return wfjs.Activity({
-            $inputs: { '*': '*' },
-            $outputs: { '*': '*' },
-            activity: new PauseActivity(options),
-            next: options.next
+        return wfjs.Execute({
+            execute: null,
+            next: wfjs._ObjectHelper.GetValue(options, 'next')
         });
+        //return Activity({
+        //    $inputs: { '*': '*' },
+        //    $outputs: { '*': '*' },
+        //    activity: new PauseActivity(options),
+        //    next: options.next
+        //});
     }
     wfjs.Pause = Pause;
     ;
-    var PauseActivity = (function () {
-        function PauseActivity(options) {
-            this.$inputs = ['*'];
-            this.$outputs = ['*'];
-            if (options != null) {
-                this.next = options.next;
-            }
-        }
-        PauseActivity.prototype.Execute = function (context, done) {
-            context.State = 3 /* Paused */;
-            done();
-        };
-        return PauseActivity;
-    })();
-    wfjs.PauseActivity = PauseActivity;
 })(wfjs || (wfjs = {}));
 if (typeof module != 'undefined') {
     module.exports = wfjs;
@@ -729,15 +744,17 @@ var wfjs;
         WorkflowInvoker._ActivityExecuteAsync = function (activity, context, done) {
             try {
                 if (wfjs._Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute)) {
-                    activity.Execute(context, done);
+                    activity.Execute(context, function (err) {
+                        wfjs.ThreadHelper.NewThread(function () { return done(err); });
+                    });
                 }
                 else {
                     activity.Execute(context);
-                    done();
+                    wfjs.ThreadHelper.NewThread(function () { return done(); });
                 }
             }
             catch (err) {
-                return done(err);
+                done(err);
             }
         };
         return WorkflowInvoker;

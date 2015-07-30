@@ -29,7 +29,19 @@
 
         public Execute(context: ActivityContext, done: (err?: Error) => void): void
         {
-            this._options.execute(context, done);
+            if (_Specifications.IsExecuteAsync.IsSatisfiedBy(this._options.execute))
+            {
+                this._options.execute(context, done);
+            }
+            else
+            {
+                this._options.execute(context);
+
+                if (done != null)
+                {
+                    done();
+                }
+            }
         }
     }
 }

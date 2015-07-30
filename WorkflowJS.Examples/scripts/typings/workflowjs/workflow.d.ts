@@ -35,6 +35,17 @@ declare module wfjs {
     }
 }
 declare module wfjs {
+    /**
+     * ThreadHelper Helper methods for dealing with Multi-Threading.
+     */
+    class ThreadHelper {
+        /**
+         * NewThread Creates a new Thread to execute the command
+         */
+        static NewThread(fn: Function): void;
+    }
+}
+declare module wfjs {
     interface ActivityContextOptions {
         Extensions?: Dictionary<any>;
         Inputs?: Dictionary<any>;
@@ -81,7 +92,7 @@ declare module wfjs {
 }
 declare module wfjs {
     interface IExecuteActivity extends IActivityBase {
-        execute: (context: ActivityContext, done: (err?: Error) => void) => void;
+        execute: (context: ActivityContext, done?: (err?: Error) => void) => void;
         next?: string;
     }
 }
@@ -260,13 +271,6 @@ declare module wfjs {
         next: string;
     }
     function Pause(options: IPauseOptions): IWorkflowActivity;
-    class PauseActivity implements IActivityBase {
-        $inputs: string[];
-        $outputs: string[];
-        next: string;
-        constructor(options: IPauseOptions);
-        Execute(context: ActivityContext, done: (err?: Error) => void): void;
-    }
 }
 interface NodeModule {
 }

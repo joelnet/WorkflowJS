@@ -2,7 +2,7 @@
 {
     export interface IExecuteActivity extends IActivityBase
     {
-        execute: (context: ActivityContext, done: (err?: Error) => void) => void;
+        execute: (context: ActivityContext, done?: (err?: Error) => void) => void;
         next?: string;
     }
 } 
