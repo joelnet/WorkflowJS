@@ -1,6 +1,6 @@
 ﻿module wfjs
 {
-    export var Assign = (options: IAssignActivity) =>
+    export function Assign(options: IAssignActivity)
     {
         options = options || <IAssignActivity>{};
 

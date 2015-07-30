@@ -175,10 +175,10 @@ declare module wfjs._bll {
     }
 }
 declare module wfjs {
-    var Activity: (options: IWorkflowActivity) => IWorkflowActivity;
+    function Activity(options: IWorkflowActivity): IWorkflowActivity;
 }
 declare module wfjs {
-    var Assign: (options: IAssignActivity) => IWorkflowActivity;
+    function Assign(options: IAssignActivity): IWorkflowActivity;
     /**
      * AssignActivity Assigns values to Outputs.
      */
@@ -191,7 +191,7 @@ declare module wfjs {
     }
 }
 declare module wfjs {
-    var Decision: (options: IDecisionActivity) => IWorkflowActivity;
+    function Decision(options: IDecisionActivity): IWorkflowActivity;
     /**
      * AssignActivity Assigns values to Outputs.
      */
@@ -204,7 +204,7 @@ declare module wfjs {
     }
 }
 declare module wfjs {
-    var Execute: (options: IExecuteActivity) => IWorkflowActivity;
+    function Execute(options: IExecuteActivity): IWorkflowActivity;
     /**
      * AssignActivity Assigns values to Outputs.
      */
@@ -217,40 +217,9 @@ declare module wfjs {
     }
 }
 declare module wfjs {
-    var Flowchart: (options: IFlowchart) => IFlowchart;
-}
-declare module wfjs {
-    interface IPauseOptions {
-        next: string;
-    }
-    var Pause: (options: IPauseOptions) => IWorkflowActivity;
-    class PauseActivity implements IActivityBase {
-        $inputs: string[];
-        $outputs: string[];
-        next: string;
-        constructor(options: IPauseOptions);
-        Execute(context: ActivityContext, done: (err?: Error) => void): void;
-    }
-}
-declare module wfjs {
-    var Resources: {
-        Error_Argument_Null: string;
-        Error_Activity_Argument_Null: string;
-        Error_Activity_Invalid: string;
-    };
-}
-declare module wfjs {
-    class _Specifications {
-        static IsPaused: Specification<ActivityContext>;
-        static IsWildcardDictionary: Specification<Dictionary<any>>;
-        static IsWildcardArray: Specification<string[]>;
-        static Has$next: Specification<ActivityContext>;
-        static IsWorkflowActivity: Specification<IActivityBase>;
-        static IsExecutableActivity: Specification<IActivity | IFlowchart>;
-    }
-}
-declare module wfjs {
-    class Workflow implements IActivity {
+    function Flowchart(options: IFlowchart): IActivity;
+    function Flowchart(options: IFlowchart, state?: IPauseState): IActivity;
+    class FlowchartActivity implements IActivity {
         $inputs: string[];
         $outputs: string[];
         State: WorkflowState;
@@ -275,6 +244,36 @@ declare module wfjs {
          * Helper method for logging
          */
         private _log(logType, message, ...optionalParams);
+    }
+}
+declare module wfjs {
+    interface IPauseOptions {
+        next: string;
+    }
+    function Pause(options: IPauseOptions): IWorkflowActivity;
+    class PauseActivity implements IActivityBase {
+        $inputs: string[];
+        $outputs: string[];
+        next: string;
+        constructor(options: IPauseOptions);
+        Execute(context: ActivityContext, done: (err?: Error) => void): void;
+    }
+}
+declare module wfjs {
+    var Resources: {
+        Error_Argument_Null: string;
+        Error_Activity_Argument_Null: string;
+        Error_Activity_Invalid: string;
+    };
+}
+declare module wfjs {
+    class _Specifications {
+        static IsPaused: Specification<ActivityContext>;
+        static IsWildcardDictionary: Specification<Dictionary<any>>;
+        static IsWildcardArray: Specification<string[]>;
+        static Has$next: Specification<ActivityContext>;
+        static IsWorkflowActivity: Specification<IActivityBase>;
+        static IsExecutableActivity: Specification<IActivity | IFlowchart>;
     }
 }
 declare module wfjs {

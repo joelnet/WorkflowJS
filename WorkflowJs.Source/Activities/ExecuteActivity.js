@@ -1,6 +1,6 @@
 var wfjs;
 (function (wfjs) {
-    wfjs.Execute = function (options) {
+    function Execute(options) {
         options = options || {};
         return wfjs.Activity({
             $inputs: { '*': '*' },
@@ -8,7 +8,9 @@ var wfjs;
             activity: new ExecuteActivity(options),
             next: options.next
         });
-    };
+    }
+    wfjs.Execute = Execute;
+    ;
     /**
      * AssignActivity Assigns values to Outputs.
      */

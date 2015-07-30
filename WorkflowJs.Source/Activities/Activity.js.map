@@ -1,1 +1,1 @@
-{"version":3,"file":"Activity.js","sourceRoot":"","sources":["Activity.ts"],"names":["wfjs"],"mappings":"AAAA,IAAO,IAAI,CAMV;AAND,WAAO,IAAI,EACX,CAAC;IACcA,aAAQA,GAAGA,UAACA,OAA0BA;QAE7CA,MAAMA,CAACA,OAAOA,CAACA;IACnBA,CAACA,CAAAA;AACLA,CAACA,EANM,IAAI,KAAJ,IAAI,QAMV"}
+{"version":3,"file":"Activity.js","sourceRoot":"","sources":["Activity.ts"],"names":["wfjs","wfjs.Activity"],"mappings":"AAAA,IAAO,IAAI,CAMV;AAND,WAAO,IAAI,EACX,CAAC;IACGA,SAAgBA,QAAQA,CAACA,OAA0BA;QAE/CC,MAAMA,CAACA,OAAOA,CAACA;IACnBA,CAACA;IAHeD,aAAQA,GAARA,QAGfA,CAAAA;AACLA,CAACA,EANM,IAAI,KAAJ,IAAI,QAMV"}

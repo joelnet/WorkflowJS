@@ -2,7 +2,7 @@ var wfjsExample;
 (function (wfjsExample) {
     var Activities;
     (function (Activities) {
-        Activities.GetMathProblemWorkflow = function () {
+        function GetMathProblemWorkflow() {
             return wfjs.Flowchart({
                 $outputs: ['correct'],
                 activities: {
@@ -24,7 +24,8 @@ var wfjsExample;
                     })
                 }
             });
-        };
+        }
+        Activities.GetMathProblemWorkflow = GetMathProblemWorkflow;
     })(Activities = wfjsExample.Activities || (wfjsExample.Activities = {}));
 })(wfjsExample || (wfjsExample = {}));
 //# sourceMappingURL=MathProblemWorkflow.js.map

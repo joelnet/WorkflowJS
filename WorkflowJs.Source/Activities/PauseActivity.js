@@ -1,6 +1,6 @@
 var wfjs;
 (function (wfjs) {
-    wfjs.Pause = function (options) {
+    function Pause(options) {
         options = options || {};
         return wfjs.Activity({
             $inputs: { '*': '*' },
@@ -8,7 +8,9 @@ var wfjs;
             activity: new PauseActivity(options),
             next: options.next
         });
-    };
+    }
+    wfjs.Pause = Pause;
+    ;
     var PauseActivity = (function () {
         function PauseActivity(options) {
             this.$inputs = ['*'];

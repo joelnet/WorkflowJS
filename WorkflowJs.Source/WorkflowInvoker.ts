@@ -15,7 +15,7 @@
             }
             else if (activity != null)
             {
-                this._activity = new Workflow(<IFlowchart>activity);
+                this._activity = new FlowchartActivity(<IFlowchart>activity);
             }
         }
 

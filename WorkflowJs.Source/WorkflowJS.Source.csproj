@@ -106,9 +106,6 @@
       <DependentUpon>Specifications.ts</DependentUpon>
     </Content>
     <Content Include="web.config" />
-    <Content Include="Workflow.js">
-      <DependentUpon>Workflow.ts</DependentUpon>
-    </Content>
     <Content Include="WorkflowInvoker.js">
       <DependentUpon>WorkflowInvoker.ts</DependentUpon>
     </Content>
@@ -119,7 +116,6 @@
   <ItemGroup>
     <TypeScriptCompile Include="Activities\Activity.ts" />
     <TypeScriptCompile Include="Activities\DecisionActivity.ts" />
-    <TypeScriptCompile Include="Activities\Flowchart.ts" />
     <TypeScriptCompile Include="bll\Logger.ts" />
     <TypeScriptCompile Include="bll\Workflow.ts" />
     <TypeScriptCompile Include="Models\ActivityContext.ts" />
@@ -150,7 +146,7 @@
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="lib\Specification.ts" />
     <TypeScriptCompile Include="Specifications.ts" />
-    <TypeScriptCompile Include="Workflow.ts" />
+    <TypeScriptCompile Include="Activities\Flowchart.ts" />
     <TypeScriptCompile Include="WorkflowInvoker.ts" />
     <TypeScriptCompile Include="Models\WorkflowState.ts" />
   </ItemGroup>
@@ -195,9 +191,6 @@
     <Content Include="Models\IPauseState.js.map">
       <DependentUpon>IPauseState.ts</DependentUpon>
     </Content>
-    <Content Include="Activities\Flowchart.js.map">
-      <DependentUpon>Flowchart.ts</DependentUpon>
-    </Content>
     <Content Include="Models\IFlowchart.js.map">
       <DependentUpon>IFlowchart.ts</DependentUpon>
     </Content>
@@ -223,6 +216,9 @@
       <DependentUpon>IInternalWorkflow.ts</DependentUpon>
     </Content>
     <Content Include="README.md" />
+    <Content Include="Activities\Flowchart.js.map">
+      <DependentUpon>Flowchart.ts</DependentUpon>
+    </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -231,9 +227,6 @@
     </None>
     <Content Include="WorkflowInvoker.js.map">
       <DependentUpon>WorkflowInvoker.ts</DependentUpon>
-    </Content>
-    <Content Include="Workflow.js.map">
-      <DependentUpon>Workflow.ts</DependentUpon>
     </Content>
   </ItemGroup>
   <ItemGroup />
@@ -256,8 +249,7 @@
           <IISUrl>http://localhost:53201/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <CustomServerUrl></CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

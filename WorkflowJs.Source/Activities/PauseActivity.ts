@@ -5,7 +5,7 @@
         next: string;
     }
 
-    export var Pause = (options: IPauseOptions) =>
+    export function Pause(options: IPauseOptions)
     {
         options = options || <IPauseOptions>{};
 

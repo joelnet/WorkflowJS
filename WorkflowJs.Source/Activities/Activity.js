@@ -1,7 +1,8 @@
 var wfjs;
 (function (wfjs) {
-    wfjs.Activity = function (options) {
+    function Activity(options) {
         return options;
-    };
+    }
+    wfjs.Activity = Activity;
 })(wfjs || (wfjs = {}));
 //# sourceMappingURL=Activity.js.map

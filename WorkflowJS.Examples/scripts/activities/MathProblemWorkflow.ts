@@ -1,6 +1,6 @@
 ﻿module wfjsExample.Activities
 {
-    export var GetMathProblemWorkflow = () =>
+    export function GetMathProblemWorkflow()
     {
         return wfjs.Flowchart
         ({

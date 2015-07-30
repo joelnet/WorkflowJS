@@ -1,6 +1,6 @@
 ﻿module wfjs
 {
-    export var Activity = (options: IWorkflowActivity) =>
+    export function Activity(options: IWorkflowActivity)
     {
         return options;
     }

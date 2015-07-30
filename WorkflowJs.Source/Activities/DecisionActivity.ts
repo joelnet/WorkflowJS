@@ -1,6 +1,6 @@
 ﻿module wfjs
 {
-    export var Decision = (options: IDecisionActivity) =>
+    export function Decision(options: IDecisionActivity)
     {
         options = options || <IDecisionActivity>{};
 

@@ -9,7 +9,7 @@ var wfjs;
                 this._activity = activity;
             }
             else if (activity != null) {
-                this._activity = new wfjs.Workflow(activity);
+                this._activity = new wfjs.FlowchartActivity(activity);
             }
         }
         WorkflowInvoker.CreateActivity = function (activity) {

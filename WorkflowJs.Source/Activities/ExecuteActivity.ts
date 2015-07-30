@@ -1,6 +1,6 @@
 ﻿module wfjs
 {
-    export var Execute = (options: IExecuteActivity) =>
+    export function Execute(options: IExecuteActivity)
     {
         options = options || <IExecuteActivity>{};
 

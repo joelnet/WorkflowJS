@@ -4,8 +4,8 @@
 
 var expect = chai.expect;
 
-var emptyWorkflow = wfjs.Workflow({});
-var nullWorkflow = wfjs.Workflow(null);
+var emptyWorkflow = wfjs.Flowchart({});
+var nullWorkflow = wfjs.Flowchart(null);
 
 test('Workflow with null argument executes correctly', function (done)
 {
