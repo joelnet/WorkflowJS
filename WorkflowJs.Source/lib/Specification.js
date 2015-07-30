@@ -1,14 +1,14 @@
 var wfjs;
 (function (wfjs) {
-    var Specification = (function () {
-        function Specification(criteria) {
+    var _Specification = (function () {
+        function _Specification(criteria) {
             this._criteria = criteria;
         }
-        Specification.prototype.IsSatisfiedBy = function (value) {
+        _Specification.prototype.IsSatisfiedBy = function (value) {
             return this._criteria(value);
         };
-        return Specification;
+        return _Specification;
     })();
-    wfjs.Specification = Specification;
+    wfjs._Specification = _Specification;
 })(wfjs || (wfjs = {}));
 //# sourceMappingURL=Specification.js.map

@@ -21,7 +21,7 @@ var wfjs;
             this._options = options || {};
         }
         DecisionActivity.prototype.Execute = function (context, done) {
-            var result = wfjs.EvalHelper.Eval(context.Inputs, this._options.condition);
+            var result = wfjs._EvalHelper.Eval(context.Inputs, this._options.condition);
             context.Outputs['$next'] = result ? this._options.true : this._options.false;
             done();
         };

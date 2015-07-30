@@ -29,7 +29,7 @@
 
         public Execute(context: ActivityContext, done: (err?: Error) => void): void
         {
-            var result = EvalHelper.Eval(context.Inputs, this._options.condition);
+            var result = _EvalHelper.Eval(context.Inputs, this._options.condition);
                 
             context.Outputs['$next'] = result ? this._options.true : this._options.false;
 

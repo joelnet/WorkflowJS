@@ -21,14 +21,14 @@
          */
         private static _getLogFunction(logger: Console, logType: LogType): Function
         {
-            var log = ObjectHelper.GetValue<Function>(logger, 'log');
+            var log = _ObjectHelper.GetValue<Function>(logger, 'log');
 
             switch (logType)
             {
-                case LogType.Debug:  return ObjectHelper.GetValue<Function>(logger, 'debug') || log;
-                case LogType.Info:   return ObjectHelper.GetValue<Function>(logger, 'info') || log;
-                case LogType.Warn:   return ObjectHelper.GetValue<Function>(logger, 'warn') || log;
-                case LogType.Error:  return ObjectHelper.GetValue<Function>(logger, 'error') || log;
+                case LogType.Debug:  return _ObjectHelper.GetValue<Function>(logger, 'debug') || log;
+                case LogType.Info:   return _ObjectHelper.GetValue<Function>(logger, 'info') || log;
+                case LogType.Warn:   return _ObjectHelper.GetValue<Function>(logger, 'warn') || log;
+                case LogType.Error:  return _ObjectHelper.GetValue<Function>(logger, 'error') || log;
                 default:             return log;
             }
         }

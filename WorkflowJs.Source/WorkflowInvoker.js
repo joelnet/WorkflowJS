@@ -12,26 +12,44 @@ var wfjs;
                 this._activity = new wfjs.FlowchartActivity(activity);
             }
         }
+        /**
+         * CreateActivity Returns a WorkflowInvoker with attached IActivity.
+         */
         WorkflowInvoker.CreateActivity = function (activity) {
             return new WorkflowInvoker(activity);
         };
+        /**
+         * Inputs Sets the inputs for the IActivity.
+         */
         WorkflowInvoker.prototype.Inputs = function (inputs) {
             this._inputs = inputs;
             return this;
         };
+        /**
+         * State Sets the IPauseState for the IActivity.
+         */
         WorkflowInvoker.prototype.State = function (state) {
             this._stateData = this._activity._stateData = state;
             return this;
         };
+        /**
+         * Extensions Sets the extensions for the IActivity.
+         */
         WorkflowInvoker.prototype.Extensions = function (extensions) {
             this._extensions = extensions;
             return this;
         };
+        /**
+         * Invoke Executes the IActivity and returns an error or context.
+         */
         WorkflowInvoker.prototype.Invoke = function (callback) {
             callback = callback || function () {
             };
             WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, callback);
         };
+        /**
+         * _InvokeActivity Creates an ActivityContext for the IActivity and calls the Execute method.
+         */
         WorkflowInvoker._InvokeActivity = function (activity, inputs, state, extensions, callback) {
             if (activity == null) {
                 return callback(null, { Inputs: {}, Outputs: {} });
@@ -40,24 +58,36 @@ var wfjs;
                 if (err != null) {
                     return callback(err, context);
                 }
-                try {
-                    activity.Execute(context, function (err) {
-                        if (err != null) {
-                            return callback(err, null);
-                        }
-                        if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
-                            return callback(null, context);
-                        }
-                        wfjs._bll.Workflow.GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
-                            context.Outputs = values;
-                            callback(err, context);
-                        });
+                WorkflowInvoker._ActivityExecuteAsync(activity, context, function (err) {
+                    if (err != null) {
+                        return callback(err, context);
+                    }
+                    if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
+                        return callback(null, context);
+                    }
+                    wfjs._bll.Workflow.GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
+                        context.Outputs = values;
+                        callback(err, context);
                     });
-                }
-                catch (err) {
-                    callback(err);
-                }
+                });
             });
+        };
+        /**
+         * _ActivityExecuteAsync Executes either Asynchronous or Synchronous Activity.
+         */
+        WorkflowInvoker._ActivityExecuteAsync = function (activity, context, done) {
+            try {
+                if (wfjs._Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute)) {
+                    activity.Execute(context, done);
+                }
+                else {
+                    activity.Execute(context);
+                    done();
+                }
+            }
+            catch (err) {
+                return done(err);
+            }
         };
         return WorkflowInvoker;
     })();

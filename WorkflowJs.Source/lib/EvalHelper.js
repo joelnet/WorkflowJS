@@ -1,16 +1,16 @@
 var wfjs;
 (function (wfjs) {
-    var EvalHelper = (function () {
-        function EvalHelper() {
+    var _EvalHelper = (function () {
+        function _EvalHelper() {
         }
-        EvalHelper.Eval = function (thisArg, code) {
+        _EvalHelper.Eval = function (thisArg, code) {
             var contextEval = function () {
                 return eval(code);
             };
             return contextEval.call(thisArg);
         };
-        return EvalHelper;
+        return _EvalHelper;
     })();
-    wfjs.EvalHelper = EvalHelper;
+    wfjs._EvalHelper = _EvalHelper;
 })(wfjs || (wfjs = {}));
 //# sourceMappingURL=EvalHelper.js.map

@@ -31,7 +31,7 @@
         {
             for (var key in this._values)
             {
-                context.Outputs[key] = EvalHelper.Eval(context.Inputs, this._values[key]);
+                context.Outputs[key] = _EvalHelper.Eval(context.Inputs, this._values[key]);
             }
 
             done();

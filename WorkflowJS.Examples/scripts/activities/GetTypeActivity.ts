@@ -18,7 +18,7 @@
                 }),
                 'SetInputType': wfjs.Execute
                 ({
-                    execute: function(context: wfjs.ActivityContext, done: (err?: Error) => void)
+                    execute: function(context: wfjs.ActivityContext)
                     {
                         var input = context.Inputs['input'];
 
@@ -31,14 +31,12 @@
                         var inputType = input == null || input == '' ? 'null' : (typeof input);
 
                         context.Outputs['inputType'] = inputType;
-
-                        done();
                     },
                     next: 'Switch:DisplayInputType'
                 }),
                 'Switch:DisplayInputType': wfjs.Execute
                 ({
-                    execute: function(context: wfjs.ActivityContext, done: (err?: Error) => void)
+                    execute: function(context: wfjs.ActivityContext)
                     {
                         var inputType = context.Inputs['inputType'];
 
@@ -50,8 +48,6 @@
                             case 'number':    context.Outputs['$next'] = 'CreateMessage:Number';  break;
                             default:          context.Outputs['$next'] = 'CreateMessage:Unknown'; break;
                         }
-
-                        done();
                     },
                     next: null
                 }),

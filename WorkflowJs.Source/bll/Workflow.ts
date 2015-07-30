@@ -24,10 +24,10 @@
             }
 
             // the Activity sets $next
-            var $next = ObjectHelper.GetValue<string>(context, 'Outputs', '$next');
+            var $next = _ObjectHelper.GetValue<string>(context, 'Outputs', '$next');
 
             // 'next' value on the Activity.
-            var nextActivityName: string = $next || ObjectHelper.GetValue<string>(activity, 'next');
+            var nextActivityName: string = $next || _ObjectHelper.GetValue<string>(activity, 'next');
 
             return activities[nextActivityName] != null ? nextActivityName : null;
         }
@@ -39,7 +39,7 @@
         {
             var value: Dictionary<any> = {};
 
-            var allValues: Dictionary<any> = ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
+            var allValues: Dictionary<any> = _ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
 
             if (_Specifications.IsWildcardDictionary.IsSatisfiedBy(inputs))
             {
@@ -48,7 +48,7 @@
 
             for (var key in inputs)
             {
-                value[key] = EvalHelper.Eval(allValues, inputs[key]);
+                value[key] = _EvalHelper.Eval(allValues, inputs[key]);
             }
 
             return value;
@@ -65,7 +65,7 @@
 
             if (_Specifications.IsWildcardDictionary.IsSatisfiedBy(outputs))
             {
-                return ObjectHelper.ShallowClone(context.Outputs);
+                return _ObjectHelper.ShallowClone(context.Outputs);
             }
 
             for (var key in outputs)
@@ -86,8 +86,8 @@
             {
                 return callback(null, new ActivityContext({
                     Extensions: extensions,
-                    Inputs: ObjectHelper.CombineObjects(state.i, inputs) || {},
-                    Outputs: ObjectHelper.ShallowClone(state.o) || {}
+                    Inputs: _ObjectHelper.CombineObjects(state.i, inputs) || {},
+                    Outputs: _ObjectHelper.ShallowClone(state.o) || {}
                 }));
             }
 
@@ -114,7 +114,7 @@
 
             if (_Specifications.IsWildcardArray.IsSatisfiedBy(keys))
             {
-                return callback(null, ObjectHelper.ShallowClone(values));
+                return callback(null, _ObjectHelper.ShallowClone(values));
             }
 
             for (var i = 0; i < (keys || []).length; i++)
@@ -145,8 +145,8 @@
         {
             return context == null ? null :
                 <ActivityContext>{
-                    Extensions: ObjectHelper.ShallowClone(context.Extensions),
-                    Inputs: ObjectHelper.CombineObjects(context.Inputs, context.Outputs),
+                    Extensions: _ObjectHelper.ShallowClone(context.Extensions),
+                    Inputs: _ObjectHelper.CombineObjects(context.Inputs, context.Outputs),
                     Outputs: {}
                 };
         }
@@ -162,7 +162,7 @@
             }
 
             var outputs = _bll.Workflow.GetOutputs(innerContext, activity.$outputs);
-            ObjectHelper.CopyProperties(outputs, outerContext.Outputs);
+            _ObjectHelper.CopyProperties(outputs, outerContext.Outputs);
                         
             if (innerContext.State != null)
             {
@@ -176,8 +176,8 @@
         public static GetPauseState(context: ActivityContext, nextActivityName: string): IPauseState
         {
             return <IPauseState>{
-                i: ObjectHelper.ShallowClone(ObjectHelper.GetValue(context, 'Inputs')),
-                o: ObjectHelper.ShallowClone(ObjectHelper.GetValue(context, 'Outputs')),
+                i: _ObjectHelper.ShallowClone(_ObjectHelper.GetValue(context, 'Inputs')),
+                o: _ObjectHelper.ShallowClone(_ObjectHelper.GetValue(context, 'Outputs')),
                 n: nextActivityName
             };
         }

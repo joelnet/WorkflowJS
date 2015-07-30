@@ -12,7 +12,7 @@
         public $inputs: string[];
         public $outputs: string[];
         public State: WorkflowState = WorkflowState.None;
-        public logger: Console = console;
+        public logger: Console = null;
 
         private _activities: Dictionary<IActivityBase>;
         private _extensions: Dictionary<any>;
@@ -109,7 +109,7 @@
 
                     this._ExecuteNextActivity(nextActivityName, innerContext, nextActivity, err =>
                     {
-                        ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                        _ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
                     
                         if (_Specifications.IsPaused.IsSatisfiedBy(innerContext))
                         {
@@ -142,9 +142,9 @@
                 {
                     _bll.Workflow.CopyInnerContextToOuterContext(innerContext, context, activity);
 
-                    this._log(LogType.None, activityName, ObjectHelper.TrimObject({
+                    this._log(LogType.None, activityName, _ObjectHelper.TrimObject({
                         inputs: inputs,
-                        outputs: ObjectHelper.ShallowClone(ObjectHelper.GetValue(innerContext, 'Outputs')),
+                        outputs: _ObjectHelper.ShallowClone(_ObjectHelper.GetValue(innerContext, 'Outputs')),
                         err: err
                     }));
 

@@ -22,7 +22,7 @@ var wfjs;
         }
         AssignActivity.prototype.Execute = function (context, done) {
             for (var key in this._values) {
-                context.Outputs[key] = wfjs.EvalHelper.Eval(context.Inputs, this._values[key]);
+                context.Outputs[key] = wfjs._EvalHelper.Eval(context.Inputs, this._values[key]);
             }
             done();
         };

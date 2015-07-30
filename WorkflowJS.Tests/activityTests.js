@@ -107,7 +107,7 @@ test('Activity context has correct number of Inputs', function (done)
             expect(err, 'We expect err to be null').to.not.exist;
             expect(context, 'We expect context to be null').to.exist;
             expect(context.Inputs, 'We expect context.Inputs to not be null').to.exist;
-            expect(wfjs.ObjectHelper.GetKeys(context.Inputs).length, 'We expect context.Inputs length to be 2').to.equal(2);
+            expect(wfjs._ObjectHelper.GetKeys(context.Inputs).length, 'We expect context.Inputs length to be 2').to.equal(2);
 
             done();
         });
@@ -125,7 +125,7 @@ test('Activity context has correct number of Outputs', function (done)
             expect(err, 'We expect err to be null').to.not.exist;
             expect(context, 'We expect context to be null').to.exist;
             expect(context.Outputs, 'We expect context.Outputs to be null').to.exist;
-            expect(wfjs.ObjectHelper.GetKeys(context.Outputs).length, 'We expect context.Outputs length to be 1').to.equal(1);
+            expect(wfjs._ObjectHelper.GetKeys(context.Outputs).length, 'We expect context.Outputs length to be 1').to.equal(1);
 
             done();
         });

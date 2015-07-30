@@ -4,11 +4,9 @@
     {
         public $outputs = ['response'];
 
-        public Execute(context: wfjs.ActivityContext, done: (err?: Error) => void): void
+        public Execute(context: wfjs.ActivityContext): void
         {
             context.Outputs['response'] = 'Hello World!'
-
-            done();
         }
     }
 }

@@ -7,7 +7,7 @@ var wfjsExample;
                 this.$inputs = ['message'];
                 this.$outputs = ['result'];
             }
-            PromptActivity.prototype.Execute = function (context, done) {
+            PromptActivity.prototype.Execute = function (context) {
                 /* window is passed in as an extension */
                 var window = context.Extensions['window'];
                 if (window == null) {
@@ -15,7 +15,6 @@ var wfjsExample;
                 }
                 var response = window.prompt(context.Inputs['message']);
                 context.Outputs['result'] = response;
-                done();
             };
             return PromptActivity;
         })();

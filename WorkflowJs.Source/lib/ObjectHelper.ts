@@ -1,6 +1,6 @@
 ﻿module wfjs
 {
-    export class ObjectHelper
+    export class _ObjectHelper
     {
         public static CopyProperties(source, destination): void
         {
@@ -77,8 +77,8 @@
         {
             var clone = {};
             
-            ObjectHelper.CopyProperties(obj1, clone);
-            ObjectHelper.CopyProperties(obj2, clone);
+            _ObjectHelper.CopyProperties(obj1, clone);
+            _ObjectHelper.CopyProperties(obj2, clone);
             
             return clone;
         }
@@ -88,11 +88,11 @@
          */
         public static TrimObject<T>(obj: T): T
         {
-            var clone = ObjectHelper.ShallowClone(obj);
+            var clone = _ObjectHelper.ShallowClone(obj);
 
             for (var key in clone || {})
             {
-                var keys = ObjectHelper.GetKeys(clone[key]);
+                var keys = _ObjectHelper.GetKeys(clone[key]);
 
                 if (clone[key] == null || keys.length == 0 || clone.length == 0)
                 {

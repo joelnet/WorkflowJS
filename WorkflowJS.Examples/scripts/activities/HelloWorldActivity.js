@@ -6,9 +6,8 @@ var wfjsExample;
             function HelloWorldActivity() {
                 this.$outputs = ['response'];
             }
-            HelloWorldActivity.prototype.Execute = function (context, done) {
+            HelloWorldActivity.prototype.Execute = function (context) {
                 context.Outputs['response'] = 'Hello World!';
-                done();
             };
             return HelloWorldActivity;
         })();

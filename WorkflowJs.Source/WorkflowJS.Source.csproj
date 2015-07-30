@@ -42,6 +42,7 @@
     <Content Include="bll\Workflow.js">
       <DependentUpon>Workflow.ts</DependentUpon>
     </Content>
+    <Content Include="lib\FunctionHelper.js" />
     <Content Include="Models\ActivityContext.js">
       <DependentUpon>ActivityContext.ts</DependentUpon>
     </Content>
@@ -118,6 +119,7 @@
     <TypeScriptCompile Include="Activities\DecisionActivity.ts" />
     <TypeScriptCompile Include="bll\Logger.ts" />
     <TypeScriptCompile Include="bll\Workflow.ts" />
+    <TypeScriptCompile Include="lib\FunctionHelper.ts" />
     <TypeScriptCompile Include="Models\ActivityContext.ts" />
     <TypeScriptCompile Include="Activities\AssignActivity.ts" />
     <TypeScriptCompile Include="Models\Dictionary.ts" />
@@ -219,6 +221,7 @@
     <Content Include="Activities\Flowchart.js.map">
       <DependentUpon>Flowchart.ts</DependentUpon>
     </Content>
+    <Content Include="lib\FunctionHelper.js.map" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -249,7 +252,8 @@
           <IISUrl>http://localhost:53201/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl></CustomServerUrl>
+          <CustomServerUrl>
+          </CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

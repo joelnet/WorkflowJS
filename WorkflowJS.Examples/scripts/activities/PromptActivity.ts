@@ -5,7 +5,7 @@
         public $inputs = ['message'];
         public $outputs = ['result'];
 
-        public Execute(context: wfjs.ActivityContext, done: (err?: Error) => void): void
+        public Execute(context: wfjs.ActivityContext): void
         {
             /* window is passed in as an extension */
             var window: Window = context.Extensions['window'];
@@ -18,8 +18,6 @@
             var response = window.prompt(context.Inputs['message']);
 
             context.Outputs['result'] = response;
-
-            done();
         }
     }
 }

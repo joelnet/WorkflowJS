@@ -1,6 +1,6 @@
 module wfjs
 {
-    export class Specification<T>
+    export class _Specification<T>
     {
         private _criteria: (obj: T) => boolean;
 

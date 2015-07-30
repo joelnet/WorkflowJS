@@ -15,7 +15,7 @@ var wfjsExample;
                         next: 'SetInputType'
                     }),
                     'SetInputType': wfjs.Execute({
-                        execute: function (context, done) {
+                        execute: function (context) {
                             var input = context.Inputs['input'];
                             if (!isNaN(input) && input != null && input.trim() != '') {
                                 input = parseFloat(input);
@@ -23,12 +23,11 @@ var wfjsExample;
                             /* this is a fix for typeof null returning object. */
                             var inputType = input == null || input == '' ? 'null' : (typeof input);
                             context.Outputs['inputType'] = inputType;
-                            done();
                         },
                         next: 'Switch:DisplayInputType'
                     }),
                     'Switch:DisplayInputType': wfjs.Execute({
-                        execute: function (context, done) {
+                        execute: function (context) {
                             var inputType = context.Inputs['inputType'];
                             switch (inputType) {
                                 case 'null':
@@ -45,7 +44,6 @@ var wfjsExample;
                                     context.Outputs['$next'] = 'CreateMessage:Unknown';
                                     break;
                             }
-                            done();
                         },
                         next: null
                     }),

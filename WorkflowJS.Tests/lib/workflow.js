@@ -1,24 +1,58 @@
 var wfjs;
 (function (wfjs) {
-    var EvalHelper = (function () {
-        function EvalHelper() {
+    var _EvalHelper = (function () {
+        function _EvalHelper() {
         }
-        EvalHelper.Eval = function (thisArg, code) {
+        _EvalHelper.Eval = function (thisArg, code) {
             var contextEval = function () {
                 return eval(code);
             };
             return contextEval.call(thisArg);
         };
-        return EvalHelper;
+        return _EvalHelper;
     })();
-    wfjs.EvalHelper = EvalHelper;
+    wfjs._EvalHelper = _EvalHelper;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
-    var ObjectHelper = (function () {
-        function ObjectHelper() {
+    var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
+    var FN_ARG_SPLIT = /,/;
+    var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
+    var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+    var _FunctionHelper = (function () {
+        function _FunctionHelper() {
         }
-        ObjectHelper.CopyProperties = function (source, destination) {
+        _FunctionHelper.ParameterCount = function (fn) {
+            return _FunctionHelper.FormalParameterList(fn).length;
+        };
+        /**
+         * FormalParameterList returns a string array of parameter names
+         */
+        _FunctionHelper.FormalParameterList = function (fn) {
+            // code from: http://stackoverflow.com/questions/6921588/is-it-possible-to-reflect-the-arguments-of-a-javascript-function
+            var fnText, argDecl;
+            var args = [];
+            fnText = fn.toString().replace(STRIP_COMMENTS, '');
+            argDecl = fnText.match(FN_ARGS);
+            var r = argDecl[1].split(FN_ARG_SPLIT);
+            for (var a in r) {
+                var arg = r[a];
+                arg.replace(FN_ARG, function (all, underscore, name) {
+                    args.push(name);
+                });
+            }
+            return args;
+        };
+        return _FunctionHelper;
+    })();
+    wfjs._FunctionHelper = _FunctionHelper;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    var _ObjectHelper = (function () {
+        function _ObjectHelper() {
+        }
+        _ObjectHelper.CopyProperties = function (source, destination) {
             if (source == null || destination == null) {
                 return;
             }
@@ -26,14 +60,14 @@ var wfjs;
                 destination[key] = source[key];
             }
         };
-        ObjectHelper.GetKeys = function (obj) {
+        _ObjectHelper.GetKeys = function (obj) {
             var keys = [];
             for (var key in (obj || {})) {
                 keys.push(key);
             }
             return keys;
         };
-        ObjectHelper.GetValue = function (obj) {
+        _ObjectHelper.GetValue = function (obj) {
             var params = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 params[_i - 1] = arguments[_i];
@@ -54,7 +88,7 @@ var wfjs;
             }
             return value;
         };
-        ObjectHelper.ShallowClone = function (obj) {
+        _ObjectHelper.ShallowClone = function (obj) {
             if (obj == null) {
                 return null;
             }
@@ -66,55 +100,55 @@ var wfjs;
                 return this.ShallowCloneObject(obj);
             }
         };
-        ObjectHelper.CombineObjects = function (obj1, obj2) {
+        _ObjectHelper.CombineObjects = function (obj1, obj2) {
             var clone = {};
-            ObjectHelper.CopyProperties(obj1, clone);
-            ObjectHelper.CopyProperties(obj2, clone);
+            _ObjectHelper.CopyProperties(obj1, clone);
+            _ObjectHelper.CopyProperties(obj2, clone);
             return clone;
         };
         /**
          * TrimObject Returns the a shallow clone of the object (excluding any values that are null, undefined or have no keys).
          */
-        ObjectHelper.TrimObject = function (obj) {
-            var clone = ObjectHelper.ShallowClone(obj);
+        _ObjectHelper.TrimObject = function (obj) {
+            var clone = _ObjectHelper.ShallowClone(obj);
             for (var key in clone || {}) {
-                var keys = ObjectHelper.GetKeys(clone[key]);
+                var keys = _ObjectHelper.GetKeys(clone[key]);
                 if (clone[key] == null || keys.length == 0 || clone.length == 0) {
                     delete clone[key];
                 }
             }
             return clone;
         };
-        ObjectHelper.ShallowCloneArray = function (obj) {
+        _ObjectHelper.ShallowCloneArray = function (obj) {
             var clone = [];
             for (var i = 0; i < obj.length; i++) {
                 clone.push(obj[i]);
             }
             return clone;
         };
-        ObjectHelper.ShallowCloneObject = function (obj) {
+        _ObjectHelper.ShallowCloneObject = function (obj) {
             var clone = {};
             for (var key in obj) {
                 clone[key] = obj[key];
             }
             return clone;
         };
-        return ObjectHelper;
+        return _ObjectHelper;
     })();
-    wfjs.ObjectHelper = ObjectHelper;
+    wfjs._ObjectHelper = _ObjectHelper;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
-    var Specification = (function () {
-        function Specification(criteria) {
+    var _Specification = (function () {
+        function _Specification(criteria) {
             this._criteria = criteria;
         }
-        Specification.prototype.IsSatisfiedBy = function (value) {
+        _Specification.prototype.IsSatisfiedBy = function (value) {
             return this._criteria(value);
         };
-        return Specification;
+        return _Specification;
     })();
-    wfjs.Specification = Specification;
+    wfjs._Specification = _Specification;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
@@ -175,12 +209,12 @@ var wfjs;
              * _getLogFunction returns the log function for the LogType. Falls back to 'log' if others aren't available.
              */
             Logger._getLogFunction = function (logger, logType) {
-                var log = wfjs.ObjectHelper.GetValue(logger, 'log');
+                var log = wfjs._ObjectHelper.GetValue(logger, 'log');
                 switch (logType) {
-                    case 1 /* Debug */: return wfjs.ObjectHelper.GetValue(logger, 'debug') || log;
-                    case 2 /* Info */: return wfjs.ObjectHelper.GetValue(logger, 'info') || log;
-                    case 3 /* Warn */: return wfjs.ObjectHelper.GetValue(logger, 'warn') || log;
-                    case 4 /* Error */: return wfjs.ObjectHelper.GetValue(logger, 'error') || log;
+                    case 1 /* Debug */: return wfjs._ObjectHelper.GetValue(logger, 'debug') || log;
+                    case 2 /* Info */: return wfjs._ObjectHelper.GetValue(logger, 'info') || log;
+                    case 3 /* Warn */: return wfjs._ObjectHelper.GetValue(logger, 'warn') || log;
+                    case 4 /* Error */: return wfjs._ObjectHelper.GetValue(logger, 'error') || log;
                     default: return log;
                 }
             };
@@ -212,9 +246,9 @@ var wfjs;
                     return null;
                 }
                 // the Activity sets $next
-                var $next = wfjs.ObjectHelper.GetValue(context, 'Outputs', '$next');
+                var $next = wfjs._ObjectHelper.GetValue(context, 'Outputs', '$next');
                 // 'next' value on the Activity.
-                var nextActivityName = $next || wfjs.ObjectHelper.GetValue(activity, 'next');
+                var nextActivityName = $next || wfjs._ObjectHelper.GetValue(activity, 'next');
                 return activities[nextActivityName] != null ? nextActivityName : null;
             };
             /**
@@ -222,12 +256,12 @@ var wfjs;
              */
             Workflow.GetInputs = function (context, inputs) {
                 var value = {};
-                var allValues = wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
+                var allValues = wfjs._ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
                 if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(inputs)) {
                     return allValues;
                 }
                 for (var key in inputs) {
-                    value[key] = wfjs.EvalHelper.Eval(allValues, inputs[key]);
+                    value[key] = wfjs._EvalHelper.Eval(allValues, inputs[key]);
                 }
                 return value;
             };
@@ -238,7 +272,7 @@ var wfjs;
                 outputs = outputs || {};
                 var value = {};
                 if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(outputs)) {
-                    return wfjs.ObjectHelper.ShallowClone(context.Outputs);
+                    return wfjs._ObjectHelper.ShallowClone(context.Outputs);
                 }
                 for (var key in outputs) {
                     var v = outputs[key];
@@ -253,8 +287,8 @@ var wfjs;
                 if (state != null) {
                     return callback(null, new wfjs.ActivityContext({
                         Extensions: extensions,
-                        Inputs: wfjs.ObjectHelper.CombineObjects(state.i, inputs) || {},
-                        Outputs: wfjs.ObjectHelper.ShallowClone(state.o) || {}
+                        Inputs: wfjs._ObjectHelper.CombineObjects(state.i, inputs) || {},
+                        Outputs: wfjs._ObjectHelper.ShallowClone(state.o) || {}
                     }));
                 }
                 Workflow.GetValueDictionary(activity.$inputs, inputs, 'input', function (err, values) {
@@ -273,7 +307,7 @@ var wfjs;
                 var result = {};
                 var key;
                 if (wfjs._Specifications.IsWildcardArray.IsSatisfiedBy(keys)) {
-                    return callback(null, wfjs.ObjectHelper.ShallowClone(values));
+                    return callback(null, wfjs._ObjectHelper.ShallowClone(values));
                 }
                 for (var i = 0; i < (keys || []).length; i++) {
                     key = keys[i];
@@ -292,8 +326,8 @@ var wfjs;
              */
             Workflow.CreateChildActivityContext = function (context) {
                 return context == null ? null : {
-                    Extensions: wfjs.ObjectHelper.ShallowClone(context.Extensions),
-                    Inputs: wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs),
+                    Extensions: wfjs._ObjectHelper.ShallowClone(context.Extensions),
+                    Inputs: wfjs._ObjectHelper.CombineObjects(context.Inputs, context.Outputs),
                     Outputs: {}
                 };
             };
@@ -305,7 +339,7 @@ var wfjs;
                     return;
                 }
                 var outputs = _bll.Workflow.GetOutputs(innerContext, activity.$outputs);
-                wfjs.ObjectHelper.CopyProperties(outputs, outerContext.Outputs);
+                wfjs._ObjectHelper.CopyProperties(outputs, outerContext.Outputs);
                 if (innerContext.State != null) {
                     outerContext.State = innerContext.State;
                 }
@@ -315,8 +349,8 @@ var wfjs;
              */
             Workflow.GetPauseState = function (context, nextActivityName) {
                 return {
-                    i: wfjs.ObjectHelper.ShallowClone(wfjs.ObjectHelper.GetValue(context, 'Inputs')),
-                    o: wfjs.ObjectHelper.ShallowClone(wfjs.ObjectHelper.GetValue(context, 'Outputs')),
+                    i: wfjs._ObjectHelper.ShallowClone(wfjs._ObjectHelper.GetValue(context, 'Inputs')),
+                    o: wfjs._ObjectHelper.ShallowClone(wfjs._ObjectHelper.GetValue(context, 'Outputs')),
                     n: nextActivityName
                 };
             };
@@ -356,7 +390,7 @@ var wfjs;
         }
         AssignActivity.prototype.Execute = function (context, done) {
             for (var key in this._values) {
-                context.Outputs[key] = wfjs.EvalHelper.Eval(context.Inputs, this._values[key]);
+                context.Outputs[key] = wfjs._EvalHelper.Eval(context.Inputs, this._values[key]);
             }
             done();
         };
@@ -387,7 +421,7 @@ var wfjs;
             this._options = options || {};
         }
         DecisionActivity.prototype.Execute = function (context, done) {
-            var result = wfjs.EvalHelper.Eval(context.Inputs, this._options.condition);
+            var result = wfjs._EvalHelper.Eval(context.Inputs, this._options.condition);
             context.Outputs['$next'] = result ? this._options.true : this._options.false;
             done();
         };
@@ -434,7 +468,7 @@ var wfjs;
     var FlowchartActivity = (function () {
         function FlowchartActivity(flowchart, state) {
             this.State = 0 /* None */;
-            this.logger = console;
+            this.logger = null;
             flowchart = flowchart || {};
             flowchart.activities = flowchart.activities || {};
             this.$inputs = flowchart.$inputs || [];
@@ -506,7 +540,7 @@ var wfjs;
                         return done();
                     }
                     _this._ExecuteNextActivity(nextActivityName, innerContext, nextActivity, function (err) {
-                        wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                        wfjs._ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
                         if (wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext)) {
                             context.StateData = innerContext.StateData;
                         }
@@ -527,9 +561,9 @@ var wfjs;
             var inputs = wfjs._bll.Workflow.GetInputs(context, activity.$inputs);
             wfjs.WorkflowInvoker.CreateActivity(activity.activity).Extensions(context.Extensions).Inputs(inputs).Invoke(function (err, innerContext) {
                 wfjs._bll.Workflow.CopyInnerContextToOuterContext(innerContext, context, activity);
-                _this._log(0 /* None */, activityName, wfjs.ObjectHelper.TrimObject({
+                _this._log(0 /* None */, activityName, wfjs._ObjectHelper.TrimObject({
                     inputs: inputs,
-                    outputs: wfjs.ObjectHelper.ShallowClone(wfjs.ObjectHelper.GetValue(innerContext, 'Outputs')),
+                    outputs: wfjs._ObjectHelper.ShallowClone(wfjs._ObjectHelper.GetValue(innerContext, 'Outputs')),
                     err: err
                 }));
                 done(err);
@@ -592,12 +626,13 @@ var wfjs;
     var _Specifications = (function () {
         function _Specifications() {
         }
-        _Specifications.IsPaused = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, 'State') == 3 /* Paused */ || wfjs.ObjectHelper.GetValue(o, 'StateData') != null; });
-        _Specifications.IsWildcardDictionary = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, '*') != null; });
-        _Specifications.IsWildcardArray = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, 0) == '*'; });
-        _Specifications.Has$next = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, 'Outputs', '$next') != null; });
-        _Specifications.IsWorkflowActivity = new wfjs.Specification(function (o) { return wfjs.ObjectHelper.GetValue(o, 'activity') != null; });
-        _Specifications.IsExecutableActivity = new wfjs.Specification(function (o) { return typeof wfjs.ObjectHelper.GetValue(o, 'Execute') == 'function'; });
+        _Specifications.IsPaused = new wfjs._Specification(function (o) { return wfjs._ObjectHelper.GetValue(o, 'State') == 3 /* Paused */ || wfjs._ObjectHelper.GetValue(o, 'StateData') != null; });
+        _Specifications.IsWildcardDictionary = new wfjs._Specification(function (o) { return wfjs._ObjectHelper.GetValue(o, '*') != null; });
+        _Specifications.IsWildcardArray = new wfjs._Specification(function (o) { return wfjs._ObjectHelper.GetValue(o, 0) == '*'; });
+        _Specifications.Has$next = new wfjs._Specification(function (o) { return wfjs._ObjectHelper.GetValue(o, 'Outputs', '$next') != null; });
+        _Specifications.IsWorkflowActivity = new wfjs._Specification(function (o) { return wfjs._ObjectHelper.GetValue(o, 'activity') != null; });
+        _Specifications.IsExecutableActivity = new wfjs._Specification(function (o) { return typeof wfjs._ObjectHelper.GetValue(o, 'Execute') == 'function'; });
+        _Specifications.IsExecuteAsync = new wfjs._Specification(function (o) { return o != null && wfjs._FunctionHelper.ParameterCount(o) >= 2; });
         return _Specifications;
     })();
     wfjs._Specifications = _Specifications;
@@ -616,26 +651,44 @@ var wfjs;
                 this._activity = new wfjs.FlowchartActivity(activity);
             }
         }
+        /**
+         * CreateActivity Returns a WorkflowInvoker with attached IActivity.
+         */
         WorkflowInvoker.CreateActivity = function (activity) {
             return new WorkflowInvoker(activity);
         };
+        /**
+         * Inputs Sets the inputs for the IActivity.
+         */
         WorkflowInvoker.prototype.Inputs = function (inputs) {
             this._inputs = inputs;
             return this;
         };
+        /**
+         * State Sets the IPauseState for the IActivity.
+         */
         WorkflowInvoker.prototype.State = function (state) {
             this._stateData = this._activity._stateData = state;
             return this;
         };
+        /**
+         * Extensions Sets the extensions for the IActivity.
+         */
         WorkflowInvoker.prototype.Extensions = function (extensions) {
             this._extensions = extensions;
             return this;
         };
+        /**
+         * Invoke Executes the IActivity and returns an error or context.
+         */
         WorkflowInvoker.prototype.Invoke = function (callback) {
             callback = callback || function () {
             };
             WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, callback);
         };
+        /**
+         * _InvokeActivity Creates an ActivityContext for the IActivity and calls the Execute method.
+         */
         WorkflowInvoker._InvokeActivity = function (activity, inputs, state, extensions, callback) {
             if (activity == null) {
                 return callback(null, { Inputs: {}, Outputs: {} });
@@ -644,24 +697,36 @@ var wfjs;
                 if (err != null) {
                     return callback(err, context);
                 }
-                try {
-                    activity.Execute(context, function (err) {
-                        if (err != null) {
-                            return callback(err, null);
-                        }
-                        if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
-                            return callback(null, context);
-                        }
-                        wfjs._bll.Workflow.GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
-                            context.Outputs = values;
-                            callback(err, context);
-                        });
+                WorkflowInvoker._ActivityExecuteAsync(activity, context, function (err) {
+                    if (err != null) {
+                        return callback(err, context);
+                    }
+                    if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
+                        return callback(null, context);
+                    }
+                    wfjs._bll.Workflow.GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
+                        context.Outputs = values;
+                        callback(err, context);
                     });
-                }
-                catch (err) {
-                    callback(err);
-                }
+                });
             });
+        };
+        /**
+         * _ActivityExecuteAsync Executes either Asynchronous or Synchronous Activity.
+         */
+        WorkflowInvoker._ActivityExecuteAsync = function (activity, context, done) {
+            try {
+                if (wfjs._Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute)) {
+                    activity.Execute(context, done);
+                }
+                else {
+                    activity.Execute(context);
+                    done();
+                }
+            }
+            catch (err) {
+                return done(err);
+            }
         };
         return WorkflowInvoker;
     })();

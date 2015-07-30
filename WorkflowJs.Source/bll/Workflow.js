@@ -21,9 +21,9 @@ var wfjs;
                     return null;
                 }
                 // the Activity sets $next
-                var $next = wfjs.ObjectHelper.GetValue(context, 'Outputs', '$next');
+                var $next = wfjs._ObjectHelper.GetValue(context, 'Outputs', '$next');
                 // 'next' value on the Activity.
-                var nextActivityName = $next || wfjs.ObjectHelper.GetValue(activity, 'next');
+                var nextActivityName = $next || wfjs._ObjectHelper.GetValue(activity, 'next');
                 return activities[nextActivityName] != null ? nextActivityName : null;
             };
             /**
@@ -31,12 +31,12 @@ var wfjs;
              */
             Workflow.GetInputs = function (context, inputs) {
                 var value = {};
-                var allValues = wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
+                var allValues = wfjs._ObjectHelper.CombineObjects(context.Inputs, context.Outputs);
                 if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(inputs)) {
                     return allValues;
                 }
                 for (var key in inputs) {
-                    value[key] = wfjs.EvalHelper.Eval(allValues, inputs[key]);
+                    value[key] = wfjs._EvalHelper.Eval(allValues, inputs[key]);
                 }
                 return value;
             };
@@ -47,7 +47,7 @@ var wfjs;
                 outputs = outputs || {};
                 var value = {};
                 if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(outputs)) {
-                    return wfjs.ObjectHelper.ShallowClone(context.Outputs);
+                    return wfjs._ObjectHelper.ShallowClone(context.Outputs);
                 }
                 for (var key in outputs) {
                     var v = outputs[key];
@@ -62,8 +62,8 @@ var wfjs;
                 if (state != null) {
                     return callback(null, new wfjs.ActivityContext({
                         Extensions: extensions,
-                        Inputs: wfjs.ObjectHelper.CombineObjects(state.i, inputs) || {},
-                        Outputs: wfjs.ObjectHelper.ShallowClone(state.o) || {}
+                        Inputs: wfjs._ObjectHelper.CombineObjects(state.i, inputs) || {},
+                        Outputs: wfjs._ObjectHelper.ShallowClone(state.o) || {}
                     }));
                 }
                 Workflow.GetValueDictionary(activity.$inputs, inputs, 'input', function (err, values) {
@@ -82,7 +82,7 @@ var wfjs;
                 var result = {};
                 var key;
                 if (wfjs._Specifications.IsWildcardArray.IsSatisfiedBy(keys)) {
-                    return callback(null, wfjs.ObjectHelper.ShallowClone(values));
+                    return callback(null, wfjs._ObjectHelper.ShallowClone(values));
                 }
                 for (var i = 0; i < (keys || []).length; i++) {
                     key = keys[i];
@@ -101,8 +101,8 @@ var wfjs;
              */
             Workflow.CreateChildActivityContext = function (context) {
                 return context == null ? null : {
-                    Extensions: wfjs.ObjectHelper.ShallowClone(context.Extensions),
-                    Inputs: wfjs.ObjectHelper.CombineObjects(context.Inputs, context.Outputs),
+                    Extensions: wfjs._ObjectHelper.ShallowClone(context.Extensions),
+                    Inputs: wfjs._ObjectHelper.CombineObjects(context.Inputs, context.Outputs),
                     Outputs: {}
                 };
             };
@@ -114,7 +114,7 @@ var wfjs;
                     return;
                 }
                 var outputs = _bll.Workflow.GetOutputs(innerContext, activity.$outputs);
-                wfjs.ObjectHelper.CopyProperties(outputs, outerContext.Outputs);
+                wfjs._ObjectHelper.CopyProperties(outputs, outerContext.Outputs);
                 if (innerContext.State != null) {
                     outerContext.State = innerContext.State;
                 }
@@ -124,8 +124,8 @@ var wfjs;
              */
             Workflow.GetPauseState = function (context, nextActivityName) {
                 return {
-                    i: wfjs.ObjectHelper.ShallowClone(wfjs.ObjectHelper.GetValue(context, 'Inputs')),
-                    o: wfjs.ObjectHelper.ShallowClone(wfjs.ObjectHelper.GetValue(context, 'Outputs')),
+                    i: wfjs._ObjectHelper.ShallowClone(wfjs._ObjectHelper.GetValue(context, 'Inputs')),
+                    o: wfjs._ObjectHelper.ShallowClone(wfjs._ObjectHelper.GetValue(context, 'Outputs')),
                     n: nextActivityName
                 };
             };

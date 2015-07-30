@@ -1,10 +1,19 @@
 declare module wfjs {
-    class EvalHelper {
+    class _EvalHelper {
         static Eval(thisArg: any, code: string): any;
     }
 }
 declare module wfjs {
-    class ObjectHelper {
+    class _FunctionHelper {
+        static ParameterCount(fn: Function): number;
+        /**
+         * FormalParameterList returns a string array of parameter names
+         */
+        static FormalParameterList(fn: Function): string[];
+    }
+}
+declare module wfjs {
+    class _ObjectHelper {
         static CopyProperties(source: any, destination: any): void;
         static GetKeys(obj: any): string[];
         static GetValue<T>(obj: any, ...params: any[]): T;
@@ -19,7 +28,7 @@ declare module wfjs {
     }
 }
 declare module wfjs {
-    class Specification<T> {
+    class _Specification<T> {
         private _criteria;
         constructor(criteria: (obj: T) => boolean);
         IsSatisfiedBy(value: T): boolean;
@@ -49,7 +58,7 @@ declare module wfjs {
     interface IActivity {
         $inputs?: string[];
         $outputs?: string[];
-        Execute(context: ActivityContext, done: (err?: Error) => void): void;
+        Execute(context: ActivityContext, done?: (err?: Error) => void): void;
     }
 }
 declare module wfjs {
@@ -268,12 +277,13 @@ declare module wfjs {
 }
 declare module wfjs {
     class _Specifications {
-        static IsPaused: Specification<ActivityContext>;
-        static IsWildcardDictionary: Specification<Dictionary<any>>;
-        static IsWildcardArray: Specification<string[]>;
-        static Has$next: Specification<ActivityContext>;
-        static IsWorkflowActivity: Specification<IActivityBase>;
-        static IsExecutableActivity: Specification<IActivity | IFlowchart>;
+        static IsPaused: _Specification<ActivityContext>;
+        static IsWildcardDictionary: _Specification<Dictionary<any>>;
+        static IsWildcardArray: _Specification<string[]>;
+        static Has$next: _Specification<ActivityContext>;
+        static IsWorkflowActivity: _Specification<IActivityBase>;
+        static IsExecutableActivity: _Specification<IActivity | IFlowchart>;
+        static IsExecuteAsync: _Specification<Function>;
     }
 }
 declare module wfjs {
@@ -283,11 +293,33 @@ declare module wfjs {
         private _extensions;
         private _stateData;
         constructor(activity: IActivity | IFlowchart);
+        /**
+         * CreateActivity Returns a WorkflowInvoker with attached IActivity.
+         */
         static CreateActivity(activity: IActivity | IFlowchart): WorkflowInvoker;
+        /**
+         * Inputs Sets the inputs for the IActivity.
+         */
         Inputs(inputs: Dictionary<any>): WorkflowInvoker;
+        /**
+         * State Sets the IPauseState for the IActivity.
+         */
         State(state: IPauseState): WorkflowInvoker;
+        /**
+         * Extensions Sets the extensions for the IActivity.
+         */
         Extensions(extensions: Dictionary<any>): WorkflowInvoker;
+        /**
+         * Invoke Executes the IActivity and returns an error or context.
+         */
         Invoke(callback?: (err: Error, context?: ActivityContext) => void): void;
+        /**
+         * _InvokeActivity Creates an ActivityContext for the IActivity and calls the Execute method.
+         */
         private static _InvokeActivity(activity, inputs, state, extensions, callback);
+        /**
+         * _ActivityExecuteAsync Executes either Asynchronous or Synchronous Activity.
+         */
+        private static _ActivityExecuteAsync(activity, context, done);
     }
 }

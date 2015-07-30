@@ -4,6 +4,6 @@
     {
         $inputs?: string[];
         $outputs?: string[];
-        Execute(context: ActivityContext, done: (err?: Error) => void): void;
+        Execute(context: ActivityContext, done?: (err?: Error) => void): void;
     }
 }

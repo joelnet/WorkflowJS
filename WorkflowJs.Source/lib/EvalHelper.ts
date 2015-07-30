@@ -1,6 +1,6 @@
 ﻿module wfjs
 {
-    export class EvalHelper
+    export class _EvalHelper
     {
         public static Eval(thisArg, code: string): any
         {

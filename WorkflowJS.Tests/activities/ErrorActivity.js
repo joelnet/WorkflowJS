@@ -9,7 +9,7 @@ var wfjsTests;
             {
             }
 
-            ErrorActivity.prototype.Execute = function (context, done)
+            ErrorActivity.prototype.Execute = function (context)
             {
                 throw new Error('ErrorActivity');
             };

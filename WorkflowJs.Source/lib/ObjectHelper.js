@@ -1,9 +1,9 @@
 var wfjs;
 (function (wfjs) {
-    var ObjectHelper = (function () {
-        function ObjectHelper() {
+    var _ObjectHelper = (function () {
+        function _ObjectHelper() {
         }
-        ObjectHelper.CopyProperties = function (source, destination) {
+        _ObjectHelper.CopyProperties = function (source, destination) {
             if (source == null || destination == null) {
                 return;
             }
@@ -11,14 +11,14 @@ var wfjs;
                 destination[key] = source[key];
             }
         };
-        ObjectHelper.GetKeys = function (obj) {
+        _ObjectHelper.GetKeys = function (obj) {
             var keys = [];
             for (var key in (obj || {})) {
                 keys.push(key);
             }
             return keys;
         };
-        ObjectHelper.GetValue = function (obj) {
+        _ObjectHelper.GetValue = function (obj) {
             var params = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 params[_i - 1] = arguments[_i];
@@ -39,7 +39,7 @@ var wfjs;
             }
             return value;
         };
-        ObjectHelper.ShallowClone = function (obj) {
+        _ObjectHelper.ShallowClone = function (obj) {
             if (obj == null) {
                 return null;
             }
@@ -51,41 +51,41 @@ var wfjs;
                 return this.ShallowCloneObject(obj);
             }
         };
-        ObjectHelper.CombineObjects = function (obj1, obj2) {
+        _ObjectHelper.CombineObjects = function (obj1, obj2) {
             var clone = {};
-            ObjectHelper.CopyProperties(obj1, clone);
-            ObjectHelper.CopyProperties(obj2, clone);
+            _ObjectHelper.CopyProperties(obj1, clone);
+            _ObjectHelper.CopyProperties(obj2, clone);
             return clone;
         };
         /**
          * TrimObject Returns the a shallow clone of the object (excluding any values that are null, undefined or have no keys).
          */
-        ObjectHelper.TrimObject = function (obj) {
-            var clone = ObjectHelper.ShallowClone(obj);
+        _ObjectHelper.TrimObject = function (obj) {
+            var clone = _ObjectHelper.ShallowClone(obj);
             for (var key in clone || {}) {
-                var keys = ObjectHelper.GetKeys(clone[key]);
+                var keys = _ObjectHelper.GetKeys(clone[key]);
                 if (clone[key] == null || keys.length == 0 || clone.length == 0) {
                     delete clone[key];
                 }
             }
             return clone;
         };
-        ObjectHelper.ShallowCloneArray = function (obj) {
+        _ObjectHelper.ShallowCloneArray = function (obj) {
             var clone = [];
             for (var i = 0; i < obj.length; i++) {
                 clone.push(obj[i]);
             }
             return clone;
         };
-        ObjectHelper.ShallowCloneObject = function (obj) {
+        _ObjectHelper.ShallowCloneObject = function (obj) {
             var clone = {};
             for (var key in obj) {
                 clone[key] = obj[key];
             }
             return clone;
         };
-        return ObjectHelper;
+        return _ObjectHelper;
     })();
-    wfjs.ObjectHelper = ObjectHelper;
+    wfjs._ObjectHelper = _ObjectHelper;
 })(wfjs || (wfjs = {}));
 //# sourceMappingURL=ObjectHelper.js.map

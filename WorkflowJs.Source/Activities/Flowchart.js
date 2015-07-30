@@ -8,7 +8,7 @@ var wfjs;
     var FlowchartActivity = (function () {
         function FlowchartActivity(flowchart, state) {
             this.State = 0 /* None */;
-            this.logger = console;
+            this.logger = null;
             flowchart = flowchart || {};
             flowchart.activities = flowchart.activities || {};
             this.$inputs = flowchart.$inputs || [];
@@ -80,7 +80,7 @@ var wfjs;
                         return done();
                     }
                     _this._ExecuteNextActivity(nextActivityName, innerContext, nextActivity, function (err) {
-                        wfjs.ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
+                        wfjs._ObjectHelper.CopyProperties(innerContext.Outputs, context.Outputs);
                         if (wfjs._Specifications.IsPaused.IsSatisfiedBy(innerContext)) {
                             context.StateData = innerContext.StateData;
                         }
@@ -101,9 +101,9 @@ var wfjs;
             var inputs = wfjs._bll.Workflow.GetInputs(context, activity.$inputs);
             wfjs.WorkflowInvoker.CreateActivity(activity.activity).Extensions(context.Extensions).Inputs(inputs).Invoke(function (err, innerContext) {
                 wfjs._bll.Workflow.CopyInnerContextToOuterContext(innerContext, context, activity);
-                _this._log(0 /* None */, activityName, wfjs.ObjectHelper.TrimObject({
+                _this._log(0 /* None */, activityName, wfjs._ObjectHelper.TrimObject({
                     inputs: inputs,
-                    outputs: wfjs.ObjectHelper.ShallowClone(wfjs.ObjectHelper.GetValue(innerContext, 'Outputs')),
+                    outputs: wfjs._ObjectHelper.ShallowClone(wfjs._ObjectHelper.GetValue(innerContext, 'Outputs')),
                     err: err
                 }));
                 done(err);
