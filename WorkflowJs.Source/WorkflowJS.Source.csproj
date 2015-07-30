@@ -42,7 +42,9 @@
     <Content Include="bll\Workflow.js">
       <DependentUpon>Workflow.ts</DependentUpon>
     </Content>
-    <Content Include="lib\FunctionHelper.js" />
+    <Content Include="lib\FunctionHelper.js">
+      <DependentUpon>FunctionHelper.ts</DependentUpon>
+    </Content>
     <Content Include="Models\ActivityContext.js">
       <DependentUpon>ActivityContext.ts</DependentUpon>
     </Content>
@@ -84,6 +86,9 @@
     </Content>
     <Content Include="Models\LogType.js">
       <DependentUpon>LogType.ts</DependentUpon>
+    </Content>
+    <Content Include="node.js">
+      <DependentUpon>node.ts</DependentUpon>
     </Content>
     <Content Include="Resource.js">
       <DependentUpon>Resource.ts</DependentUpon>
@@ -217,7 +222,12 @@
     <Content Include="Activities\Flowchart.js.map">
       <DependentUpon>Flowchart.ts</DependentUpon>
     </Content>
-    <Content Include="lib\FunctionHelper.js.map" />
+    <Content Include="lib\FunctionHelper.js.map">
+      <DependentUpon>FunctionHelper.ts</DependentUpon>
+    </Content>
+    <Content Include="node.js.map">
+      <DependentUpon>node.ts</DependentUpon>
+    </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -248,8 +258,7 @@
           <IISUrl>http://localhost:53201/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <CustomServerUrl></CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
