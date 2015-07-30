@@ -1,5 +1,8 @@
 var wfjs;
 (function (wfjs) {
+    /**
+     * _Specifications Specification Pattern test for commonly used conditions.
+     */
     var _Specifications = (function () {
         function _Specifications() {
         }

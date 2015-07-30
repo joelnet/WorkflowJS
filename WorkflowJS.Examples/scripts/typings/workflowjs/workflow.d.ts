@@ -268,6 +268,9 @@ declare module wfjs {
         Execute(context: ActivityContext, done: (err?: Error) => void): void;
     }
 }
+interface NodeModule {
+}
+declare var module: NodeModule;
 declare module wfjs {
     var Resources: {
         Error_Argument_Null: string;
@@ -276,6 +279,9 @@ declare module wfjs {
     };
 }
 declare module wfjs {
+    /**
+     * _Specifications Specification Pattern test for commonly used conditions.
+     */
     class _Specifications {
         static IsPaused: _Specification<ActivityContext>;
         static IsWildcardDictionary: _Specification<Dictionary<any>>;
@@ -287,14 +293,20 @@ declare module wfjs {
     }
 }
 declare module wfjs {
+    /**
+     * WorkflowInvoker Activity or Workflow runner.
+     */
     class WorkflowInvoker {
         private _activity;
         private _inputs;
         private _extensions;
         private _stateData;
+        /**
+         * CreateActivity Returns a WorkflowInvoker with attached activity.
+         */
         constructor(activity: IActivity | IFlowchart);
         /**
-         * CreateActivity Returns a WorkflowInvoker with attached IActivity.
+         * CreateActivity Returns a WorkflowInvoker with attached activity.
          */
         static CreateActivity(activity: IActivity | IFlowchart): WorkflowInvoker;
         /**

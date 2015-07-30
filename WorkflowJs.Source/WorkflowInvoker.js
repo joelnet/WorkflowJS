@@ -1,6 +1,12 @@
 var wfjs;
 (function (wfjs) {
+    /**
+     * WorkflowInvoker Activity or Workflow runner.
+     */
     var WorkflowInvoker = (function () {
+        /**
+         * CreateActivity Returns a WorkflowInvoker with attached activity.
+         */
         function WorkflowInvoker(activity) {
             this._inputs = null;
             this._extensions = null;
@@ -13,7 +19,7 @@ var wfjs;
             }
         }
         /**
-         * CreateActivity Returns a WorkflowInvoker with attached IActivity.
+         * CreateActivity Returns a WorkflowInvoker with attached activity.
          */
         WorkflowInvoker.CreateActivity = function (activity) {
             return new WorkflowInvoker(activity);

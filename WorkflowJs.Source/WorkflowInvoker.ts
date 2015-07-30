@@ -1,5 +1,8 @@
 ﻿module wfjs
 {
+    /**
+     * WorkflowInvoker Activity or Workflow runner.
+     */
     export class WorkflowInvoker
     {
         private _activity: IActivity;
@@ -7,6 +10,9 @@
         private _extensions: Dictionary<string> = null
         private _stateData: IPauseState = null;
 
+        /**
+         * CreateActivity Returns a WorkflowInvoker with attached activity.
+         */
         constructor(activity: IActivity | IFlowchart)
         {
             if (_Specifications.IsExecutableActivity.IsSatisfiedBy(activity))
@@ -20,7 +26,7 @@
         }
 
         /**
-         * CreateActivity Returns a WorkflowInvoker with attached IActivity.
+         * CreateActivity Returns a WorkflowInvoker with attached activity.
          */
         public static CreateActivity(activity: IActivity | IFlowchart): WorkflowInvoker
         {

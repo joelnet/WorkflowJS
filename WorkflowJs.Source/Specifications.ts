@@ -1,5 +1,8 @@
 ﻿module wfjs
 {
+    /**
+     * _Specifications Specification Pattern test for commonly used conditions.
+     */
     export class _Specifications
     {
         public static IsPaused = new _Specification((o: ActivityContext) => _ObjectHelper.GetValue<WorkflowState>(o, 'State') == WorkflowState.Paused || _ObjectHelper.GetValue(o, 'StateData') != null);

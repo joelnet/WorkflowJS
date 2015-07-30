@@ -613,6 +613,9 @@ var wfjs;
     })();
     wfjs.PauseActivity = PauseActivity;
 })(wfjs || (wfjs = {}));
+if (typeof module != 'undefined') {
+    module.exports = wfjs;
+}
 var wfjs;
 (function (wfjs) {
     wfjs.Resources = {
@@ -623,6 +626,9 @@ var wfjs;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
+    /**
+     * _Specifications Specification Pattern test for commonly used conditions.
+     */
     var _Specifications = (function () {
         function _Specifications() {
         }
@@ -639,7 +645,13 @@ var wfjs;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
+    /**
+     * WorkflowInvoker Activity or Workflow runner.
+     */
     var WorkflowInvoker = (function () {
+        /**
+         * CreateActivity Returns a WorkflowInvoker with attached activity.
+         */
         function WorkflowInvoker(activity) {
             this._inputs = null;
             this._extensions = null;
@@ -652,7 +664,7 @@ var wfjs;
             }
         }
         /**
-         * CreateActivity Returns a WorkflowInvoker with attached IActivity.
+         * CreateActivity Returns a WorkflowInvoker with attached activity.
          */
         WorkflowInvoker.CreateActivity = function (activity) {
             return new WorkflowInvoker(activity);
