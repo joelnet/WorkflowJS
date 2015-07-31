@@ -67,7 +67,13 @@
         {
             callback = callback || function(){};
 
-            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, callback);
+            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, (err: Error, context?: ActivityContext) =>
+            {
+                context = context || <ActivityContext>{};
+                context.State = context.State || (err != null ? WorkflowState.Fault : WorkflowState.Complete);
+
+                callback(err, context);
+            });
         }
 
         /**
@@ -77,9 +83,9 @@
         {
             if (activity == null)
             {
-                return callback(null, <ActivityContext>{ Inputs: {}, Outputs: {}});
+                return callback(null, <ActivityContext>{ Inputs: {}, Outputs: {} });
             }
-
+            
             _bll.Workflow.CreateContext(activity, inputs, state, extensions, (err, context) =>
             {
                 if (err != null)
@@ -117,16 +123,13 @@
             {
                 if (_Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute))
                 {
-                    activity.Execute(context, err =>
-                    {
-                        ThreadHelper.NewThread(() => done(err));
-                    });
+                    activity.Execute(context, done);
                 }
                 else
                 {
                     activity.Execute(context);
 
-                    ThreadHelper.NewThread(() => done());
+                    done();
                 }
             }
             catch (err)

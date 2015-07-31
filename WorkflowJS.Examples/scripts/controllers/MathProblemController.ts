@@ -36,6 +36,7 @@ module wfjsExample.Controllers
         public StartWorkflow(): void
         {
             var activity = wfjsExample.Activities.GetMathProblemWorkflow();
+            activity.logger = console;
 
             this._InvokeWorkflow(activity, null, null);
         }
@@ -69,20 +70,17 @@ module wfjsExample.Controllers
                         this.$scope.model.error = err.toString();
                     }
 
-                    if (ctx != null)
+                    if (ctx.Outputs != null && ctx.Outputs['problem'] != null)
                     {
-                        if (ctx.Outputs != null && ctx.Outputs['problem'] != null)
-                        {
-                            this.$scope.model.problem = ctx.Outputs['problem'];
-                        }
-
-                        if (ctx.Outputs != null && ctx.Outputs['correct'] != null)
-                        {
-                            this.$scope.model.correct = ctx.Outputs['correct'];
-                        }
+                        this.$scope.model.problem = ctx.Outputs['problem'];
                     }
 
-                    if (ctx != null && ctx.StateData != null)
+                    if (ctx.Outputs != null && ctx.Outputs['correct'] != null)
+                    {
+                        this.$scope.model.correct = ctx.Outputs['correct'];
+                    }
+
+                    if (ctx.State == wfjs.WorkflowState.Paused)
                     {
                         this.$scope.model.workflowState = ctx.StateData;
                     }

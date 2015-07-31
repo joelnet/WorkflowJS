@@ -125,7 +125,6 @@
     <TypeScriptCompile Include="bll\Logger.ts" />
     <TypeScriptCompile Include="bll\Workflow.ts" />
     <TypeScriptCompile Include="lib\FunctionHelper.ts" />
-    <TypeScriptCompile Include="lib\ThreadHelper.ts" />
     <TypeScriptCompile Include="Models\ActivityContext.ts" />
     <TypeScriptCompile Include="Activities\AssignActivity.ts" />
     <TypeScriptCompile Include="Models\Dictionary.ts" />

@@ -14,6 +14,7 @@ var wfjsExample;
             }
             MathProblemController.prototype.StartWorkflow = function () {
                 var activity = wfjsExample.Activities.GetMathProblemWorkflow();
+                activity.logger = console;
                 this._InvokeWorkflow(activity, null, null);
             };
             MathProblemController.prototype.SubmitAnswer = function (answer) {
@@ -32,15 +33,13 @@ var wfjsExample;
                     if (err != null) {
                         _this.$scope.model.error = err.toString();
                     }
-                    if (ctx != null) {
-                        if (ctx.Outputs != null && ctx.Outputs['problem'] != null) {
-                            _this.$scope.model.problem = ctx.Outputs['problem'];
-                        }
-                        if (ctx.Outputs != null && ctx.Outputs['correct'] != null) {
-                            _this.$scope.model.correct = ctx.Outputs['correct'];
-                        }
+                    if (ctx.Outputs != null && ctx.Outputs['problem'] != null) {
+                        _this.$scope.model.problem = ctx.Outputs['problem'];
                     }
-                    if (ctx != null && ctx.StateData != null) {
+                    if (ctx.Outputs != null && ctx.Outputs['correct'] != null) {
+                        _this.$scope.model.correct = ctx.Outputs['correct'];
+                    }
+                    if (ctx.State == 3 /* Paused */) {
                         _this.$scope.model.workflowState = ctx.StateData;
                     }
                 });

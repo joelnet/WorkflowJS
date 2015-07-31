@@ -35,17 +35,6 @@ declare module wfjs {
     }
 }
 declare module wfjs {
-    /**
-     * ThreadHelper Helper methods for dealing with Multi-Threading.
-     */
-    class ThreadHelper {
-        /**
-         * NewThread Creates a new Thread to execute the command
-         */
-        static NewThread(fn: Function): void;
-    }
-}
-declare module wfjs {
     interface ActivityContextOptions {
         Extensions?: Dictionary<any>;
         Inputs?: Dictionary<any>;
@@ -199,29 +188,9 @@ declare module wfjs {
 }
 declare module wfjs {
     function Assign(options: IAssignActivity): IWorkflowActivity;
-    /**
-     * AssignActivity Assigns values to Outputs.
-     */
-    class AssignActivity implements IActivity {
-        $inputs: string[];
-        $outputs: string[];
-        private _values;
-        constructor(values: Dictionary<any>);
-        Execute(context: ActivityContext, done: (err?: Error) => void): void;
-    }
 }
 declare module wfjs {
     function Decision(options: IDecisionActivity): IWorkflowActivity;
-    /**
-     * AssignActivity Assigns values to Outputs.
-     */
-    class DecisionActivity implements IActivity {
-        $inputs: string[];
-        $outputs: string[];
-        private _options;
-        constructor(options: IDecisionActivity);
-        Execute(context: ActivityContext, done: (err?: Error) => void): void;
-    }
 }
 declare module wfjs {
     function Execute(options: IExecuteActivity): IWorkflowActivity;
@@ -237,8 +206,8 @@ declare module wfjs {
     }
 }
 declare module wfjs {
-    function Flowchart(options: IFlowchart): IActivity;
-    function Flowchart(options: IFlowchart, state?: IPauseState): IActivity;
+    function Flowchart(options: IFlowchart): FlowchartActivity;
+    function Flowchart(options: IFlowchart, state?: IPauseState): FlowchartActivity;
     class FlowchartActivity implements IActivity {
         $inputs: string[];
         $outputs: string[];

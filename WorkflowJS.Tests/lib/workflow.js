@@ -152,24 +152,6 @@ var wfjs;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
-    /**
-     * ThreadHelper Helper methods for dealing with Multi-Threading.
-     */
-    var ThreadHelper = (function () {
-        function ThreadHelper() {
-        }
-        /**
-         * NewThread Creates a new Thread to execute the command
-         */
-        ThreadHelper.NewThread = function (fn) {
-            setTimeout(function () { return fn(); }, 0);
-        };
-        return ThreadHelper;
-    })();
-    wfjs.ThreadHelper = ThreadHelper;
-})(wfjs || (wfjs = {}));
-var wfjs;
-(function (wfjs) {
     var ActivityContext = (function () {
         function ActivityContext(options) {
             this.Extensions = options.Extensions || {};
@@ -388,64 +370,32 @@ var wfjs;
 (function (wfjs) {
     function Assign(options) {
         options = options || {};
-        return wfjs.Activity({
-            $inputs: { '*': '*' },
-            $outputs: { '*': '*' },
-            activity: new AssignActivity(options.values),
-            next: options.next
+        return wfjs.Execute({
+            execute: function (context) {
+                for (var key in (options.values || {})) {
+                    context.Outputs[key] = wfjs._EvalHelper.Eval(context.Inputs, options.values[key]);
+                }
+            },
+            next: wfjs._ObjectHelper.GetValue(options, 'next')
         });
     }
     wfjs.Assign = Assign;
     ;
-    /**
-     * AssignActivity Assigns values to Outputs.
-     */
-    var AssignActivity = (function () {
-        function AssignActivity(values) {
-            this.$inputs = ['*'];
-            this.$outputs = ['*'];
-            this._values = values || {};
-        }
-        AssignActivity.prototype.Execute = function (context, done) {
-            for (var key in this._values) {
-                context.Outputs[key] = wfjs._EvalHelper.Eval(context.Inputs, this._values[key]);
-            }
-            done();
-        };
-        return AssignActivity;
-    })();
-    wfjs.AssignActivity = AssignActivity;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
     function Decision(options) {
         options = options || {};
-        return wfjs.Activity({
-            $inputs: { '*': '*' },
-            $outputs: { '$next': '$next' },
-            activity: new DecisionActivity(options),
-            next: options.next
+        return wfjs.Execute({
+            execute: function (context) {
+                var result = wfjs._EvalHelper.Eval(context.Inputs, options.condition);
+                context.Outputs['$next'] = result ? options.true : options.false;
+            },
+            next: wfjs._ObjectHelper.GetValue(options, 'next')
         });
     }
     wfjs.Decision = Decision;
     ;
-    /**
-     * AssignActivity Assigns values to Outputs.
-     */
-    var DecisionActivity = (function () {
-        function DecisionActivity(options) {
-            this.$inputs = ['*'];
-            this.$outputs = ['$next'];
-            this._options = options || {};
-        }
-        DecisionActivity.prototype.Execute = function (context, done) {
-            var result = wfjs._EvalHelper.Eval(context.Inputs, this._options.condition);
-            context.Outputs['$next'] = result ? this._options.true : this._options.false;
-            done();
-        };
-        return DecisionActivity;
-    })();
-    wfjs.DecisionActivity = DecisionActivity;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
@@ -615,15 +565,11 @@ var wfjs;
     function Pause(options) {
         options = options || {};
         return wfjs.Execute({
-            execute: null,
+            execute: function (context) {
+                context.State = 3 /* Paused */;
+            },
             next: wfjs._ObjectHelper.GetValue(options, 'next')
         });
-        //return Activity({
-        //    $inputs: { '*': '*' },
-        //    $outputs: { '*': '*' },
-        //    activity: new PauseActivity(options),
-        //    next: options.next
-        //});
     }
     wfjs.Pause = Pause;
     ;
@@ -711,7 +657,11 @@ var wfjs;
         WorkflowInvoker.prototype.Invoke = function (callback) {
             callback = callback || function () {
             };
-            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, callback);
+            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, function (err, context) {
+                context = context || {};
+                context.State = context.State || (err != null ? 4 /* Fault */ : 2 /* Complete */);
+                callback(err, context);
+            });
         };
         /**
          * _InvokeActivity Creates an ActivityContext for the IActivity and calls the Execute method.
@@ -744,13 +694,11 @@ var wfjs;
         WorkflowInvoker._ActivityExecuteAsync = function (activity, context, done) {
             try {
                 if (wfjs._Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute)) {
-                    activity.Execute(context, function (err) {
-                        wfjs.ThreadHelper.NewThread(function () { return done(err); });
-                    });
+                    activity.Execute(context, done);
                 }
                 else {
                     activity.Execute(context);
-                    wfjs.ThreadHelper.NewThread(function () { return done(); });
+                    done();
                 }
             }
             catch (err) {

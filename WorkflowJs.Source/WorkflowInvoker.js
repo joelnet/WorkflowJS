@@ -51,7 +51,11 @@ var wfjs;
         WorkflowInvoker.prototype.Invoke = function (callback) {
             callback = callback || function () {
             };
-            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, callback);
+            WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, function (err, context) {
+                context = context || {};
+                context.State = context.State || (err != null ? 4 /* Fault */ : 2 /* Complete */);
+                callback(err, context);
+            });
         };
         /**
          * _InvokeActivity Creates an ActivityContext for the IActivity and calls the Execute method.
@@ -84,13 +88,11 @@ var wfjs;
         WorkflowInvoker._ActivityExecuteAsync = function (activity, context, done) {
             try {
                 if (wfjs._Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute)) {
-                    activity.Execute(context, function (err) {
-                        wfjs.ThreadHelper.NewThread(function () { return done(err); });
-                    });
+                    activity.Execute(context, done);
                 }
                 else {
                     activity.Execute(context);
-                    wfjs.ThreadHelper.NewThread(function () { return done(); });
+                    done();
                 }
             }
             catch (err) {

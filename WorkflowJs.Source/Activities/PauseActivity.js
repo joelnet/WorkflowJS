@@ -3,15 +3,11 @@ var wfjs;
     function Pause(options) {
         options = options || {};
         return wfjs.Execute({
-            execute: null,
+            execute: function (context) {
+                context.State = 3 /* Paused */;
+            },
             next: wfjs._ObjectHelper.GetValue(options, 'next')
         });
-        //return Activity({
-        //    $inputs: { '*': '*' },
-        //    $outputs: { '*': '*' },
-        //    activity: new PauseActivity(options),
-        //    next: options.next
-        //});
     }
     wfjs.Pause = Pause;
     ;

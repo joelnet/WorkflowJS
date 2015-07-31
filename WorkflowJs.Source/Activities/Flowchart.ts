@@ -1,8 +1,8 @@
 ﻿module wfjs
 {
-    export function Flowchart(options: IFlowchart): IActivity;
-    export function Flowchart(options: IFlowchart, state?: IPauseState): IActivity;
-    export function Flowchart(options: IFlowchart, state?: IPauseState): IActivity
+    export function Flowchart(options: IFlowchart): FlowchartActivity;
+    export function Flowchart(options: IFlowchart, state?: IPauseState): FlowchartActivity;
+    export function Flowchart(options: IFlowchart, state?: IPauseState): FlowchartActivity
     {
         return new FlowchartActivity(options);
     };

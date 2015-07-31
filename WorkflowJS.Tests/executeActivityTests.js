@@ -1,9 +1,6 @@
 ﻿/// <reference path="./lib/chai.js" />
 /// <reference path="./lib/mocha.js" />
 /// <reference path="./lib/workflow.js" />
-/// <reference path="./activities/ErrorActivity.js" />
-/// <reference path="./activities/AsyncErrorActivity.js" />
-/// <reference path="./activities/AddActivity.js" />
 
 var expect = chai.expect;
 
