@@ -117,24 +117,26 @@
         /**
          * _ActivityExecuteAsync Executes either Asynchronous or Synchronous Activity.
          */
-        private static _ActivityExecuteAsync(activity: IActivity, context: ActivityContext, done: (err?: Error) => void): void
+        private static _ActivityExecuteAsync(activity: IActivity, context: ActivityContext, callback: (err?: Error) => void): void
         {
             try
             {
                 if (_Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute))
                 {
-                    activity.Execute(context, done);
+                    activity.Execute(context, err =>
+                    {
+                        setTimeout(callback(err), 0);
+                    });
                 }
                 else
                 {
                     activity.Execute(context);
-
-                    done();
+                    setTimeout(callback(), 0);
                 }
             }
             catch (err)
             {
-                done(err);
+                callback(err);
             }
         }
     }

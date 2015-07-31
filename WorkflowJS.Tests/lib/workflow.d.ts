@@ -305,6 +305,6 @@ declare module wfjs {
         /**
          * _ActivityExecuteAsync Executes either Asynchronous or Synchronous Activity.
          */
-        private static _ActivityExecuteAsync(activity, context, done);
+        private static _ActivityExecuteAsync(activity, context, callback);
     }
 }

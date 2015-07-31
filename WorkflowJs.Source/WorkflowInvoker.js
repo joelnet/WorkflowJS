@@ -85,18 +85,20 @@ var wfjs;
         /**
          * _ActivityExecuteAsync Executes either Asynchronous or Synchronous Activity.
          */
-        WorkflowInvoker._ActivityExecuteAsync = function (activity, context, done) {
+        WorkflowInvoker._ActivityExecuteAsync = function (activity, context, callback) {
             try {
                 if (wfjs._Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute)) {
-                    activity.Execute(context, done);
+                    activity.Execute(context, function (err) {
+                        setTimeout(callback(err), 0);
+                    });
                 }
                 else {
                     activity.Execute(context);
-                    done();
+                    setTimeout(callback(), 0);
                 }
             }
             catch (err) {
-                done(err);
+                callback(err);
             }
         };
         return WorkflowInvoker;

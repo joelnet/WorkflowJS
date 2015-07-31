@@ -23,7 +23,7 @@ test('Null Activity executes correctly', function (done)
         });
 });
 
-test('Activity with Error is handled', function (done)
+test('Activity with Error returns Error', function (done)
 {
     var activity = new wfjsTests.Activities.ErrorActivity();
 
@@ -39,7 +39,7 @@ test('Activity with Error is handled', function (done)
         });
 });
 
-test('Activity with Async Error is handled', function (done)
+test('Activity with Async Error returns Error', function (done)
 {
     var activity = new wfjsTests.Activities.AsyncErrorActivity();
 
@@ -47,14 +47,14 @@ test('Activity with Async Error is handled', function (done)
         .CreateActivity(activity)
         .Invoke(function (err, context)
         {
-            expect(err, 'We expect err to not be null').to.exist;
+            expect(err, 'We expect err to exist').to.exist;
             expect(context.State, 'We expect context.State to be Fault').to.equal(wfjs.WorkflowState.Fault);
          
             done();
         });
 });
 
-test('Activity executed with no inputs handles error', function (done)
+test('Activity executed with no required inputs returns Error', function (done)
 {
     var activity = new wfjsTests.Activities.AddActivity();
 
@@ -70,7 +70,7 @@ test('Activity executed with no inputs handles error', function (done)
         });
 });
 
-test('Activity executed with partial inputs handles error', function (done)
+test('Activity executed with partial required inputs returns Error', function (done)
 {
     var activity = new wfjsTests.Activities.AddActivity();
 
@@ -105,7 +105,7 @@ test('Activity sets Output', function (done)
         });
 });
 
-test('Activity context has correct number of Inputs', function (done)
+test('Activity return context with Inputs', function (done)
 {
     var activity = new wfjsTests.Activities.AddActivity();
 
@@ -124,7 +124,7 @@ test('Activity context has correct number of Inputs', function (done)
         });
 });
 
-test('Activity context has correct number of Outputs', function (done)
+test('Activity returns context with Outputs', function (done)
 {
     var activity = new wfjsTests.Activities.AddActivity();
 
@@ -143,3 +143,19 @@ test('Activity context has correct number of Outputs', function (done)
         });
 });
 
+test('Activity without required Outputs returns Error', function (done)
+{
+    var activity = new wfjsTests.Activities.AddActivity();
+    activity.Execute = function() {};
+
+    wfjs.WorkflowInvoker
+        .CreateActivity(activity)
+        .Inputs({ number1: 123, number2: 456 })
+        .Invoke(function (err, context)
+        {
+            expect(err, 'We expect err to be null').to.exist;
+            expect(err.message, 'We expect err.essage to be set').to.equal('Activity expects output value: total.');
+
+            done();
+        });
+});

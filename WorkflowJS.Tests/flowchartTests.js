@@ -124,7 +124,7 @@ test('Compound Variable Workflow executes correctly', function (done)
         });
 });
 
-test('Flowchart with $input error sets err', function (done)
+test('Flowchart with $input error returns Error', function (done)
 {
     var flowchart = wfjs.Flowchart({
         $inputs: ['number1', 'number2'],
@@ -153,6 +153,53 @@ test('Flowchart with $input error sets err', function (done)
         {
             expect(err, 'We expect err to be null').to.exist;
             expect(err.toString()).to.equal('SyntaxError: Parse error');
+
+            done();
+        });
+});
+
+test('Flowchart without $inputs returns Error', function (done)
+{
+    wfjs.WorkflowInvoker
+        .CreateActivity(basicFlowchart)
+        .Invoke(function (err, context)
+        {
+            expect(err, 'We expect err to be null').to.exist;
+            expect(err.toString()).to.equal('Error: Activity expects input value: number1.');
+
+            done();
+        });
+});
+
+test('Flowchart with partial $inputs returns Error', function (done)
+{
+    wfjs.WorkflowInvoker
+        .CreateActivity(basicFlowchart)
+        .Inputs({ 'number1': 123 })
+        .Invoke(function (err, context)
+        {
+            expect(err, 'We expect err to be null').to.exist;
+            expect(err.toString()).to.equal('Error: Activity expects input value: number2.');
+
+            done();
+        });
+});
+
+test('Flowchart without $output returns Error', function (done)
+{
+    var flowchart = wfjs.Flowchart({
+        $outputs: ['total'],
+        activities:
+        {
+        }
+    });
+
+    wfjs.WorkflowInvoker
+        .CreateActivity(flowchart)
+        .Invoke(function (err, context)
+        {
+            expect(err, 'We expect err to be null').to.exist;
+            expect(err.message).to.equal('Activity expects output value: total.');
 
             done();
         });
