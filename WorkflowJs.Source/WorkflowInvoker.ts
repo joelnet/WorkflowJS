@@ -72,7 +72,7 @@
                 context = context || <ActivityContext>{};
                 context.State = context.State || (err != null ? WorkflowState.Fault : WorkflowState.Complete);
 
-                callback(err, context);
+                setTimeout(() => callback(err, context));
             });
         }
 
@@ -119,24 +119,29 @@
          */
         private static _ActivityExecuteAsync(activity: IActivity, context: ActivityContext, callback: (err?: Error) => void): void
         {
-            try
+            if (_Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute))
             {
-                if (_Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute))
+                try
                 {
-                    activity.Execute(context, err =>
-                    {
-                        setTimeout(callback(err), 0);
-                    });
+                    activity.Execute(context, callback);
                 }
-                else
+                catch (err)
                 {
-                    activity.Execute(context);
-                    setTimeout(callback(), 0);
+                    callback(err);
                 }
             }
-            catch (err)
+            else
             {
-                callback(err);
+                try
+                {
+                    activity.Execute(context);
+                }
+                catch (err)
+                {
+                    return callback(err);
+                }
+
+                callback();
             }
         }
     }

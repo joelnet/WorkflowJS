@@ -660,7 +660,7 @@ var wfjs;
             WorkflowInvoker._InvokeActivity(this._activity, this._inputs, this._stateData, this._extensions, function (err, context) {
                 context = context || {};
                 context.State = context.State || (err != null ? 4 /* Fault */ : 2 /* Complete */);
-                callback(err, context);
+                setTimeout(function () { return callback(err, context); });
             });
         };
         /**
@@ -692,19 +692,22 @@ var wfjs;
          * _ActivityExecuteAsync Executes either Asynchronous or Synchronous Activity.
          */
         WorkflowInvoker._ActivityExecuteAsync = function (activity, context, callback) {
-            try {
-                if (wfjs._Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute)) {
-                    activity.Execute(context, function (err) {
-                        setTimeout(callback(err), 0);
-                    });
+            if (wfjs._Specifications.IsExecuteAsync.IsSatisfiedBy(activity.Execute)) {
+                try {
+                    activity.Execute(context, callback);
                 }
-                else {
-                    activity.Execute(context);
-                    setTimeout(callback(), 0);
+                catch (err) {
+                    callback(err);
                 }
             }
-            catch (err) {
-                callback(err);
+            else {
+                try {
+                    activity.Execute(context);
+                }
+                catch (err) {
+                    return callback(err);
+                }
+                callback();
             }
         };
         return WorkflowInvoker;

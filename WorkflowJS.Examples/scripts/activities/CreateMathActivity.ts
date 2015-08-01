@@ -1,5 +1,8 @@
 ﻿module wfjsExample.Activities
 {
+    /**
+     * CreateMathActivity Creates a random math problem.
+     */
     export class CreateMathActivity implements wfjs.IActivity
     {
         public $outputs = ['problem', 'solution'];

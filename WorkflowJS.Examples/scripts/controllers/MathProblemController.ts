@@ -22,6 +22,8 @@ module wfjsExample.Controllers
     {
         public static $inject = ['$scope'];
 
+        public Name: string = 'MathProblemController';
+
         constructor(private $scope: IMathProblemScope)
         {
             angular.extend(
@@ -84,6 +86,8 @@ module wfjsExample.Controllers
                     {
                         this.$scope.model.workflowState = ctx.StateData;
                     }
+
+                    this.$scope.$apply();
                 });
         }
     }

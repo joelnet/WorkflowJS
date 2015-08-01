@@ -7,6 +7,7 @@ var wfjsExample;
         var MathProblemController = (function () {
             function MathProblemController($scope) {
                 this.$scope = $scope;
+                this.Name = 'MathProblemController';
                 angular.extend($scope, {
                     ctrl: this,
                     model: {}
@@ -42,6 +43,7 @@ var wfjsExample;
                     if (ctx.State == 3 /* Paused */) {
                         _this.$scope.model.workflowState = ctx.StateData;
                     }
+                    _this.$scope.$apply();
                 });
             };
             MathProblemController.$inject = ['$scope'];

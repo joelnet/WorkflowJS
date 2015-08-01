@@ -2,6 +2,9 @@ var wfjsExample;
 (function (wfjsExample) {
     var Activities;
     (function (Activities) {
+        /**
+         * CreateMathActivity Creates a random math problem.
+         */
         var CreateMathActivity = (function () {
             function CreateMathActivity() {
                 this.$outputs = ['problem', 'solution'];
