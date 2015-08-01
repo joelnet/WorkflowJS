@@ -218,7 +218,6 @@
     <Content Include="Models\IInternalWorkflow.js.map">
       <DependentUpon>IInternalWorkflow.ts</DependentUpon>
     </Content>
-    <Content Include="README.md" />
     <Content Include="Activities\Flowchart.js.map">
       <DependentUpon>Flowchart.ts</DependentUpon>
     </Content>
