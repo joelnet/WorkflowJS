@@ -7,7 +7,6 @@ var wfjsExample;
         var MathProblemController = (function () {
             function MathProblemController($scope) {
                 this.$scope = $scope;
-                this.Name = 'MathProblemController';
                 angular.extend($scope, {
                     ctrl: this,
                     model: {}
@@ -31,6 +30,7 @@ var wfjsExample;
             MathProblemController.prototype._InvokeWorkflow = function (activity, inputs, state) {
                 var _this = this;
                 wfjs.WorkflowInvoker.CreateActivity(activity).Inputs(inputs).State(state).Invoke(function (err, ctx) {
+                    console.log('ctx', ctx);
                     if (err != null) {
                         _this.$scope.model.error = err.toString();
                     }

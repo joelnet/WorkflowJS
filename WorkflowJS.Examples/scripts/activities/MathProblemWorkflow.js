@@ -4,7 +4,7 @@ var wfjsExample;
     (function (Activities) {
         function GetMathProblemWorkflow() {
             return wfjs.Flowchart({
-                $outputs: ['correct'],
+                $outputs: ['correct', 'problem', 'solution'],
                 activities: {
                     'CreateMathProblem': wfjs.Activity({
                         activity: new Activities.CreateMathActivity(),

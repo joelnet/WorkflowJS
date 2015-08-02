@@ -22,8 +22,6 @@ module wfjsExample.Controllers
     {
         public static $inject = ['$scope'];
 
-        public Name: string = 'MathProblemController';
-
         constructor(private $scope: IMathProblemScope)
         {
             angular.extend(
@@ -67,6 +65,8 @@ module wfjsExample.Controllers
                 .State(state)
                 .Invoke((err, ctx) =>
                 {
+                    console.log('ctx', ctx);
+
                     if (err != null)
                     {
                         this.$scope.model.error = err.toString();

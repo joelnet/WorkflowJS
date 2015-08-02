@@ -111,6 +111,7 @@
         {
             var result: Dictionary<any> = {};
             var key: string;
+            var error: Error = null;
 
             if (_Specifications.IsWildcardArray.IsSatisfiedBy(keys))
             {
@@ -125,17 +126,15 @@
                 {
                     result[key] = values[key];
                 }
-                else
+                else if (error == null)
                 {
-                    var message = Resources.Error_Activity_Argument_Null
+                    error = new Error(Resources.Error_Activity_Argument_Null
                         .replace(/\{0}/g, valueType)
-                        .replace(/\{1}/g, key);
-
-                    return callback(new Error(message));
+                        .replace(/\{1}/g, key));
                 }
             }
 
-            callback(null, result);
+            callback(error, result);
         }
 
         /**

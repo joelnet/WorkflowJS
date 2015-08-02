@@ -11,7 +11,15 @@ var basicWorkflow = new wfjs.Flowchart({
     $outputs: ['result'],
     activities:
     {
-        'start': wfjs.Pause(
+        'start': wfjs.Assign(
+        {
+            values:
+            {
+                'internalValue': true
+            },
+            next: 'pause'
+        }),
+        'pause': wfjs.Pause(
         {
             next: 'end'
         }),
@@ -38,6 +46,22 @@ test('PauseActivity sets StateData', function (done)
             expect(context.State, 'We expect context.State to be Paused').to.equal(wfjs.WorkflowState.Paused);
             expect(context.Outputs, 'We expect context.Outputs to exist').to.exist;
             expect(context.Outputs['result'], 'We expect context.Outputs["result"] to not exist').to.not.exist;
+
+            done();
+        })
+});
+
+test('PauseActivity with Pause does not return internal values', function (done)
+{
+    wfjs.WorkflowInvoker
+        .CreateActivity(basicWorkflow)
+        .Inputs({ name: 'test' })
+        .Invoke(function (err, context)
+        {
+            expect(err, 'We expect err to not exist').to.not.exist;
+            expect(context, 'We expect context to exist').to.exist;
+            expect(context.Outputs, 'We expect context.Outputs to exist').to.exist;
+            expect(context.Outputs['internalValue'], 'We expect context.Outputs["result"] to not exist').to.not.exist;
 
             done();
         })

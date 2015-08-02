@@ -306,6 +306,7 @@ var wfjs;
             Workflow.GetValueDictionary = function (keys, values, valueType, callback) {
                 var result = {};
                 var key;
+                var error = null;
                 if (wfjs._Specifications.IsWildcardArray.IsSatisfiedBy(keys)) {
                     return callback(null, wfjs._ObjectHelper.ShallowClone(values));
                 }
@@ -314,12 +315,11 @@ var wfjs;
                     if (values != null && values[key] !== undefined) {
                         result[key] = values[key];
                     }
-                    else {
-                        var message = wfjs.Resources.Error_Activity_Argument_Null.replace(/\{0}/g, valueType).replace(/\{1}/g, key);
-                        return callback(new Error(message));
+                    else if (error == null) {
+                        error = new Error(wfjs.Resources.Error_Activity_Argument_Null.replace(/\{0}/g, valueType).replace(/\{1}/g, key));
                     }
                 }
-                callback(null, result);
+                callback(error, result);
             };
             /**
              * CreateChildActivityContext Returns a new context for inner activities.
@@ -678,10 +678,11 @@ var wfjs;
                     if (err != null) {
                         return callback(err, context);
                     }
-                    if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
-                        return callback(null, context);
-                    }
                     wfjs._bll.Workflow.GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
+                        if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
+                            // ignore the errors from missing 'outputs'
+                            err = null;
+                        }
                         context.Outputs = values;
                         callback(err, context);
                     });

@@ -100,13 +100,14 @@
                         return callback(err, context);
                     }
 
-                    if (_Specifications.IsPaused.IsSatisfiedBy(context))
-                    {
-                        return callback(null, context);
-                    }
-
                     _bll.Workflow.GetValueDictionary(activity.$outputs, context.Outputs, 'output', (err, values) =>
                     {
+                        if (_Specifications.IsPaused.IsSatisfiedBy(context))
+                        {
+                            // ignore the errors from missing 'outputs'
+                            err = null;
+                        }
+
                         context.Outputs = values;
                         callback(err, context);
                     });

@@ -72,10 +72,11 @@ var wfjs;
                     if (err != null) {
                         return callback(err, context);
                     }
-                    if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
-                        return callback(null, context);
-                    }
                     wfjs._bll.Workflow.GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
+                        if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
+                            // ignore the errors from missing 'outputs'
+                            err = null;
+                        }
                         context.Outputs = values;
                         callback(err, context);
                     });

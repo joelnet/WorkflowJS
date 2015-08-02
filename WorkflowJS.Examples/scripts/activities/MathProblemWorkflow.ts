@@ -4,7 +4,7 @@
     {
         return wfjs.Flowchart
         ({
-            $outputs: ['correct'],
+            $outputs: ['correct', 'problem', 'solution'],
 
             activities:
             {
