@@ -204,3 +204,43 @@ test('Flowchart without $output returns Error', function (done)
             done();
         });
 });
+
+test('Flowchart without $output returns Error', function (done)
+{
+    var flowchart = wfjs.Flowchart({
+        $outputs: ['total'],
+        activities:
+        {
+        }
+    });
+
+    wfjs.WorkflowInvoker
+        .CreateActivity(flowchart)
+        .Invoke(function (err, context)
+        {
+            expect(err, 'We expect err to be null').to.exist;
+            expect(err.message).to.equal('Activity expects output value: total.');
+
+            done();
+        });
+});
+
+test('Flowchart without $output returns Error', function (done)
+{
+    var flowchart = wfjs.Flowchart({
+        $outputs: ['total'],
+        activities:
+        {
+        }
+    });
+
+    wfjs.WorkflowInvoker
+        .CreateActivity(flowchart)
+        .Invoke(function (err, context)
+        {
+            expect(err, 'We expect err to be null').to.exist;
+            expect(err.message).to.equal('Activity expects output value: total.');
+
+            done();
+        });
+});

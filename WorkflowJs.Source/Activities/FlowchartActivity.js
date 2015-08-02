@@ -124,4 +124,4 @@ var wfjs;
     })();
     wfjs.FlowchartActivity = FlowchartActivity;
 })(wfjs || (wfjs = {}));
-//# sourceMappingURL=Flowchart.js.map
+//# sourceMappingURL=FlowchartActivity.js.map

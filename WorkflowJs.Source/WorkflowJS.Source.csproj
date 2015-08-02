@@ -30,8 +30,8 @@
     <Content Include="Activities\ExecuteActivity.js">
       <DependentUpon>ExecuteActivity.ts</DependentUpon>
     </Content>
-    <Content Include="Activities\Flowchart.js">
-      <DependentUpon>Flowchart.ts</DependentUpon>
+    <Content Include="Activities\FlowchartActivity.js">
+      <DependentUpon>FlowchartActivity.ts</DependentUpon>
     </Content>
     <Content Include="Activities\PauseActivity.js">
       <DependentUpon>PauseActivity.ts</DependentUpon>
@@ -149,7 +149,7 @@
     <TypeScriptCompile Include="lib\Specification.ts" />
     <TypeScriptCompile Include="Scripts\typings\node\node.d.ts" />
     <TypeScriptCompile Include="Specifications.ts" />
-    <TypeScriptCompile Include="Activities\Flowchart.ts" />
+    <TypeScriptCompile Include="Activities\FlowchartActivity.ts" />
     <TypeScriptCompile Include="WorkflowInvoker.ts" />
     <TypeScriptCompile Include="Models\WorkflowState.ts" />
   </ItemGroup>
@@ -218,14 +218,14 @@
     <Content Include="Models\IInternalWorkflow.js.map">
       <DependentUpon>IInternalWorkflow.ts</DependentUpon>
     </Content>
-    <Content Include="Activities\Flowchart.js.map">
-      <DependentUpon>Flowchart.ts</DependentUpon>
-    </Content>
     <Content Include="lib\FunctionHelper.js.map">
       <DependentUpon>FunctionHelper.ts</DependentUpon>
     </Content>
     <Content Include="node.js.map">
       <DependentUpon>node.ts</DependentUpon>
+    </Content>
+    <Content Include="Activities\FlowchartActivity.js.map">
+      <DependentUpon>FlowchartActivity.ts</DependentUpon>
     </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
@@ -257,8 +257,7 @@
           <IISUrl>http://localhost:53201/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <CustomServerUrl></CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

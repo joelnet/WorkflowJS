@@ -73,8 +73,8 @@ var wfjs;
                         return callback(err, context);
                     }
                     wfjs._bll.Workflow.GetValueDictionary(activity.$outputs, context.Outputs, 'output', function (err, values) {
+                        // ignore the errors from missing 'outputs'
                         if (wfjs._Specifications.IsPaused.IsSatisfiedBy(context)) {
-                            // ignore the errors from missing 'outputs'
                             err = null;
                         }
                         context.Outputs = values;

@@ -102,9 +102,9 @@
 
                     _bll.Workflow.GetValueDictionary(activity.$outputs, context.Outputs, 'output', (err, values) =>
                     {
+                        // ignore the errors from missing 'outputs'
                         if (_Specifications.IsPaused.IsSatisfiedBy(context))
                         {
-                            // ignore the errors from missing 'outputs'
                             err = null;
                         }
 
