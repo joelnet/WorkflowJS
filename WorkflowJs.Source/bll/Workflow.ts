@@ -68,6 +68,11 @@
                 return _ObjectHelper.ShallowClone(context.Outputs);
             }
 
+            var keys = _ObjectHelper.GetKeys(outputs);
+
+            
+
+
             for (var key in outputs)
             {
                 var v = outputs[key];
@@ -118,10 +123,8 @@
                 return callback(null, _ObjectHelper.ShallowClone(values));
             }
 
-            for (var i = 0; i < (keys || []).length; i++)
+            (keys || []).forEach(key =>
             {
-                key = keys[i];
-
                 if (values != null && values[key] !== undefined)
                 {
                     result[key] = values[key];
@@ -132,7 +135,7 @@
                         .replace(/\{0}/g, valueType)
                         .replace(/\{1}/g, key));
                 }
-            }
+            });
 
             callback(error, result);
         }

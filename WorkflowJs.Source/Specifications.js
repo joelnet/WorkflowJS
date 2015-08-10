@@ -13,6 +13,7 @@ var wfjs;
         _Specifications.IsWorkflowActivity = new wfjs._Specification(function (o) { return wfjs._ObjectHelper.GetValue(o, 'activity') != null; });
         _Specifications.IsExecutableActivity = new wfjs._Specification(function (o) { return typeof wfjs._ObjectHelper.GetValue(o, 'Execute') == 'function'; });
         _Specifications.IsExecuteAsync = new wfjs._Specification(function (o) { return o != null && wfjs._FunctionHelper.ParameterCount(o) >= 2; });
+        _Specifications.IsArray = new wfjs._Specification(function (o) { return Object.prototype.toString.call(o) == '[object Array]'; });
         return _Specifications;
     })();
     wfjs._Specifications = _Specifications;

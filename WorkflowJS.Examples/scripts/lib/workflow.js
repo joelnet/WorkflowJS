@@ -52,6 +52,9 @@ var wfjs;
     var _ObjectHelper = (function () {
         function _ObjectHelper() {
         }
+        /**
+         * CopyProperties Copies properties source to the destination.
+         */
         _ObjectHelper.CopyProperties = function (source, destination) {
             if (source == null || destination == null) {
                 return;
@@ -60,46 +63,49 @@ var wfjs;
                 destination[key] = source[key];
             }
         };
+        /**
+         * ToKeyValueArray Returns an array of KeyValuePair
+         */
+        _ObjectHelper.ToKeyValueArray = function (obj) {
+            return _ObjectHelper.GetKeys(obj).map(function (key) { return new wfjs.KeyValuePair(key, obj[key]); });
+        };
+        /**
+         * GetKeys Returns an array of keys on the object.
+         */
         _ObjectHelper.GetKeys = function (obj) {
             var keys = [];
-            for (var key in (obj || {})) {
-                keys.push(key);
+            obj = obj || {};
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    keys.push(key);
+                }
             }
             return keys;
         };
+        /**
+         * GetValue recursive method to safely get the value of an object. to get the value of obj.point.x you would call
+         *     it like this: GetValue(obj, 'point', 'x');
+         *     If obj, point or x are null, null will be returned.
+         */
         _ObjectHelper.GetValue = function (obj) {
             var params = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 params[_i - 1] = arguments[_i];
             }
-            var value = null;
-            var length = (params || []).length;
-            if (obj == null || length == 0) {
-                return obj;
-            }
-            for (var i = 0; i < length; i++) {
-                obj = obj[params[i]];
-                if (obj == null) {
-                    break;
-                }
-                else if (i == length - 1) {
-                    value = obj;
-                }
-            }
-            return value;
+            return (params || []).reduce(function (prev, cur) { return prev == null ? prev : prev[cur]; }, obj);
         };
+        /**
+         * ShallowClone Returns a shallow clone of an Array or object.
+         */
         _ObjectHelper.ShallowClone = function (obj) {
             if (obj == null) {
                 return null;
             }
-            var isArray = Object.prototype.toString.call(obj) == '[object Array]';
-            if (isArray) {
-                return this.ShallowCloneArray(obj);
-            }
-            else {
-                return this.ShallowCloneObject(obj);
-            }
+            return wfjs._Specifications.IsArray.IsSatisfiedBy(obj) ? this.ShallowCloneArray(obj) : this.ShallowCloneObject(obj);
         };
+        /**
+         * CombineObjects returns a new object with obj1 and obj2 combined.
+         */
         _ObjectHelper.CombineObjects = function (obj1, obj2) {
             var clone = {};
             _ObjectHelper.CopyProperties(obj1, clone);
@@ -110,22 +116,20 @@ var wfjs;
          * TrimObject Returns the a shallow clone of the object (excluding any values that are null, undefined or have no keys).
          */
         _ObjectHelper.TrimObject = function (obj) {
-            var clone = _ObjectHelper.ShallowClone(obj);
-            for (var key in clone || {}) {
-                var keys = _ObjectHelper.GetKeys(clone[key]);
-                if (clone[key] == null || keys.length == 0 || clone.length == 0) {
-                    delete clone[key];
-                }
-            }
-            return clone;
+            return _ObjectHelper.ToKeyValueArray(obj).filter(function (kvp) { return kvp.value != null; }).reduce(function (prev, cur) {
+                prev[cur.key] = cur.value, prev;
+                return prev;
+            }, {});
         };
+        /**
+         * ShallowCloneArray returns a shallow clone of an array.
+         */
         _ObjectHelper.ShallowCloneArray = function (obj) {
-            var clone = [];
-            for (var i = 0; i < obj.length; i++) {
-                clone.push(obj[i]);
-            }
-            return clone;
+            return (obj || []).map(function (o) { return o; });
         };
+        /**
+         * ShallowCloneObject returns a shallow clone of an object.
+         */
         _ObjectHelper.ShallowCloneObject = function (obj) {
             var clone = {};
             for (var key in obj) {
@@ -161,6 +165,17 @@ var wfjs;
         return ActivityContext;
     })();
     wfjs.ActivityContext = ActivityContext;
+})(wfjs || (wfjs = {}));
+var wfjs;
+(function (wfjs) {
+    var KeyValuePair = (function () {
+        function KeyValuePair(key, value) {
+            this.key = key;
+            this.value = value;
+        }
+        return KeyValuePair;
+    })();
+    wfjs.KeyValuePair = KeyValuePair;
 })(wfjs || (wfjs = {}));
 var wfjs;
 (function (wfjs) {
@@ -274,6 +289,7 @@ var wfjs;
                 if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(outputs)) {
                     return wfjs._ObjectHelper.ShallowClone(context.Outputs);
                 }
+                var keys = wfjs._ObjectHelper.GetKeys(outputs);
                 for (var key in outputs) {
                     var v = outputs[key];
                     value[v] = context.Outputs[key];
@@ -310,15 +326,14 @@ var wfjs;
                 if (wfjs._Specifications.IsWildcardArray.IsSatisfiedBy(keys)) {
                     return callback(null, wfjs._ObjectHelper.ShallowClone(values));
                 }
-                for (var i = 0; i < (keys || []).length; i++) {
-                    key = keys[i];
+                (keys || []).forEach(function (key) {
                     if (values != null && values[key] !== undefined) {
                         result[key] = values[key];
                     }
                     else if (error == null) {
                         error = new Error(wfjs.Resources.Error_Activity_Argument_Null.replace(/\{0}/g, valueType).replace(/\{1}/g, key));
                     }
-                }
+                });
                 callback(error, result);
             };
             /**
@@ -600,6 +615,7 @@ var wfjs;
         _Specifications.IsWorkflowActivity = new wfjs._Specification(function (o) { return wfjs._ObjectHelper.GetValue(o, 'activity') != null; });
         _Specifications.IsExecutableActivity = new wfjs._Specification(function (o) { return typeof wfjs._ObjectHelper.GetValue(o, 'Execute') == 'function'; });
         _Specifications.IsExecuteAsync = new wfjs._Specification(function (o) { return o != null && wfjs._FunctionHelper.ParameterCount(o) >= 2; });
+        _Specifications.IsArray = new wfjs._Specification(function (o) { return Object.prototype.toString.call(o) == '[object Array]'; });
         return _Specifications;
     })();
     wfjs._Specifications = _Specifications;

@@ -14,16 +14,43 @@ declare module wfjs {
 }
 declare module wfjs {
     class _ObjectHelper {
+        /**
+         * CopyProperties Copies properties source to the destination.
+         */
         static CopyProperties(source: any, destination: any): void;
+        /**
+         * ToKeyValueArray Returns an array of KeyValuePair
+         */
+        static ToKeyValueArray(obj: any): KeyValuePair<any>[];
+        /**
+         * GetKeys Returns an array of keys on the object.
+         */
         static GetKeys(obj: any): string[];
+        /**
+         * GetValue recursive method to safely get the value of an object. to get the value of obj.point.x you would call
+         *     it like this: GetValue(obj, 'point', 'x');
+         *     If obj, point or x are null, null will be returned.
+         */
         static GetValue<T>(obj: any, ...params: any[]): T;
+        /**
+         * ShallowClone Returns a shallow clone of an Array or object.
+         */
         static ShallowClone(obj: any): any;
+        /**
+         * CombineObjects returns a new object with obj1 and obj2 combined.
+         */
         static CombineObjects(obj1: any, obj2: any): any;
         /**
          * TrimObject Returns the a shallow clone of the object (excluding any values that are null, undefined or have no keys).
          */
         static TrimObject<T>(obj: T): T;
+        /**
+         * ShallowCloneArray returns a shallow clone of an array.
+         */
         private static ShallowCloneArray(obj);
+        /**
+         * ShallowCloneObject returns a shallow clone of an object.
+         */
         private static ShallowCloneObject(obj);
     }
 }
@@ -111,6 +138,13 @@ declare module wfjs {
         $inputs?: Dictionary<any>;
         $outputs?: Dictionary<string>;
         next?: string;
+    }
+}
+declare module wfjs {
+    class KeyValuePair<T> {
+        key: string;
+        value: T;
+        constructor(key?: string, value?: T);
     }
 }
 declare module wfjs {
@@ -263,6 +297,7 @@ declare module wfjs {
         static IsWorkflowActivity: _Specification<IActivityBase>;
         static IsExecutableActivity: _Specification<IActivity | IFlowchart>;
         static IsExecuteAsync: _Specification<Function>;
+        static IsArray: _Specification<{}>;
     }
 }
 declare module wfjs {

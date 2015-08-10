@@ -63,6 +63,7 @@
     <Content Include="activities\AsyncErrorActivity.js" />
     <Content Include="activities\ErrorActivity.js" />
     <Content Include="assignActivityTests.js" />
+    <Content Include="objectHelperTests.js" />
     <Content Include="pauseActivityTests.js" />
     <Content Include="executeActivityTests.js" />
     <Content Include="flowchartTests.js" />

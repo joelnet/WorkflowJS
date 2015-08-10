@@ -114,7 +114,6 @@
     <Content Include="scripts\inputs.js">
       <DependentUpon>inputs.ts</DependentUpon>
     </Content>
-    <Content Include="packages.config" />
     <Content Include="scripts\lib\workflow.js" />
     <Content Include="scripts\models\Customer.js">
       <DependentUpon>Customer.ts</DependentUpon>

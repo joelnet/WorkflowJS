@@ -2,6 +2,9 @@
 {
     export class _ObjectHelper
     {
+        /**
+         * CopyProperties Copies properties source to the destination.
+         */
         public static CopyProperties(source, destination): void
         {
             if (source == null || destination == null)
@@ -15,45 +18,51 @@
             }
         }
 
+        /**
+         * ToKeyValueArray Returns an array of KeyValuePair
+         */
+        public static ToKeyValueArray(obj): KeyValuePair<any>[]
+        {
+            return _ObjectHelper.GetKeys(obj)
+                .map(key => new KeyValuePair<any>(key, obj[key]));
+        }
+
+        /**
+         * GetKeys Returns an array of keys on the object.
+         */
         public static GetKeys(obj): string[]
         {
             var keys: string[] = [];
 
-            for (var key in (obj || {}))
+            obj = obj || {};
+
+            for (var key in obj)
             {
-                keys.push(key);
+                if (obj.hasOwnProperty(key))
+                { 
+                    keys.push(key);
+                }
             }
 
             return keys;
         }
 
+        /**
+         * GetValue recursive method to safely get the value of an object. to get the value of obj.point.x you would call
+         *     it like this: GetValue(obj, 'point', 'x');
+         *     If obj, point or x are null, null will be returned.
+         */
         public static GetValue<T>(obj, ...params: any[]): T
         {
-            var value = null;
-            var length = (params||[]).length;
-
-            if (obj == null || length == 0)
-            {
-                return obj;
-            }
-
-            for (var i = 0; i < length; i++)
-            {
-                obj = obj[params[i]];
-
-                if (obj == null)
-                {
-                    break;
-                }
-                else if (i == length - 1)
-                {
-                    value = obj;
-                }
-            }
-
-            return value;
+            return (params || [])
+                .reduce(
+                    (prev, cur) => prev == null ? prev : prev[cur],
+                    obj);
         }
 
+        /**
+         * ShallowClone Returns a shallow clone of an Array or object.
+         */
         public static ShallowClone(obj): any
         {
             if (obj == null)
@@ -61,18 +70,14 @@
                 return null;
             }
 
-            var isArray = Object.prototype.toString.call(obj) == '[object Array]';
-
-            if (isArray)
-            {
-                return this.ShallowCloneArray(obj);
-            }
-            else
-            {
-                return this.ShallowCloneObject(obj);
-            }
+            return _Specifications.IsArray.IsSatisfiedBy(obj)
+                ? this.ShallowCloneArray(obj)
+                : this.ShallowCloneObject(obj);
         }
 
+        /**
+         * CombineObjects returns a new object with obj1 and obj2 combined.
+         */
         public static CombineObjects(obj1, obj2): any
         {
             var clone = {};
@@ -88,33 +93,29 @@
          */
         public static TrimObject<T>(obj: T): T
         {
-            var clone = _ObjectHelper.ShallowClone(obj);
-
-            for (var key in clone || {})
-            {
-                var keys = _ObjectHelper.GetKeys(clone[key]);
-
-                if (clone[key] == null || keys.length == 0 || clone.length == 0)
-                {
-                    delete clone[key];
-                }
-            }
-
-            return clone;
+            return _ObjectHelper.ToKeyValueArray(obj)
+                .filter(kvp => kvp.value != null)
+                .reduce(
+                    (prev, cur) =>
+                    {
+                        prev[cur.key] = cur.value, prev;
+                        return prev;
+                    },
+                    <T>{}
+                );
         }
 
+        /**
+         * ShallowCloneArray returns a shallow clone of an array.
+         */
         private static ShallowCloneArray(obj: any[]): any
         {
-            var clone = [];
-
-            for (var i = 0; i < obj.length; i++)
-            {
-                clone.push(obj[i]);
-            }
-
-            return clone;
+            return (obj || []).map(o => o);
         }
 
+        /**
+         * ShallowCloneObject returns a shallow clone of an object.
+         */
         private static ShallowCloneObject(obj): any
         {
             var clone = {};

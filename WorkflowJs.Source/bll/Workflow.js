@@ -49,6 +49,7 @@ var wfjs;
                 if (wfjs._Specifications.IsWildcardDictionary.IsSatisfiedBy(outputs)) {
                     return wfjs._ObjectHelper.ShallowClone(context.Outputs);
                 }
+                var keys = wfjs._ObjectHelper.GetKeys(outputs);
                 for (var key in outputs) {
                     var v = outputs[key];
                     value[v] = context.Outputs[key];
@@ -85,15 +86,14 @@ var wfjs;
                 if (wfjs._Specifications.IsWildcardArray.IsSatisfiedBy(keys)) {
                     return callback(null, wfjs._ObjectHelper.ShallowClone(values));
                 }
-                for (var i = 0; i < (keys || []).length; i++) {
-                    key = keys[i];
+                (keys || []).forEach(function (key) {
                     if (values != null && values[key] !== undefined) {
                         result[key] = values[key];
                     }
                     else if (error == null) {
                         error = new Error(wfjs.Resources.Error_Activity_Argument_Null.replace(/\{0}/g, valueType).replace(/\{1}/g, key));
                     }
-                }
+                });
                 callback(error, result);
             };
             /**

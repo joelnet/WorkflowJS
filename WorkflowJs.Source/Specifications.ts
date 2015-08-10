@@ -12,5 +12,6 @@
         public static IsWorkflowActivity = new _Specification((o: IActivityBase) => _ObjectHelper.GetValue(o, 'activity') != null);
         public static IsExecutableActivity = new _Specification((o: IActivity | IFlowchart) => typeof _ObjectHelper.GetValue(o, 'Execute') == 'function');
         public static IsExecuteAsync = new _Specification((o: Function) => o != null && _FunctionHelper.ParameterCount(o) >= 2);
+        public static IsArray = new _Specification(o => Object.prototype.toString.call(o) == '[object Array]');
     }
 }

@@ -84,6 +84,9 @@
     <Content Include="lib\ObjectHelper.js">
       <DependentUpon>ObjectHelper.ts</DependentUpon>
     </Content>
+    <Content Include="Models\KeyValuePair.js">
+      <DependentUpon>KeyValuePair.ts</DependentUpon>
+    </Content>
     <Content Include="Models\LogType.js">
       <DependentUpon>LogType.ts</DependentUpon>
     </Content>
@@ -141,6 +144,7 @@
     <TypeScriptCompile Include="lib\EvalHelper.ts" />
     <TypeScriptCompile Include="lib\ObjectHelper.ts" />
     <TypeScriptCompile Include="Activities\PauseActivity.ts" />
+    <TypeScriptCompile Include="Models\KeyValuePair.ts" />
     <TypeScriptCompile Include="Models\LogType.ts" />
     <TypeScriptCompile Include="node.ts" />
     <TypeScriptCompile Include="Resource.ts" />
@@ -226,6 +230,9 @@
     </Content>
     <Content Include="Activities\FlowchartActivity.js.map">
       <DependentUpon>FlowchartActivity.ts</DependentUpon>
+    </Content>
+    <Content Include="Models\KeyValuePair.js.map">
+      <DependentUpon>KeyValuePair.ts</DependentUpon>
     </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
