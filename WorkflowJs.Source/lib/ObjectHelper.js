@@ -1,5 +1,6 @@
 var wfjs;
 (function (wfjs) {
+    "use strict";
     var _ObjectHelper = (function () {
         function _ObjectHelper() {
         }
