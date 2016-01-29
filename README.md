@@ -31,12 +31,14 @@ to chain smaller Activities together into a larger Workflow.
     /*
      * AddActivity Adds inputs number1 and number2 and sets output total.
      */
-    function AddActivity() {
+    function AddActivity()
+    {
         this.$inputs = ['number1', 'number2'];
         this.$outputs = ['total'];
     }
 
-    AddActivity.prototype.Execute = function (context) {
+    AddActivity.prototype.Execute = function (context)
+    {
         var number1 = parseFloat(context.Inputs['number1']) || 0;
         var number2 = parseFloat(context.Inputs['number2']) || 0;
 
