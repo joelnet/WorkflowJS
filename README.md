@@ -5,6 +5,8 @@ WorkflowsJS, built for complex JavaScript applications.
 WorkflowJS was inspired by Windows Workflow Foundation (WF) in .NET 4. WorkflowJS allows you
 to chain smaller Activities together into a larger Workflow.
 
+This library is experimental and development on it has been abandoned. It is unit tested and should contain no bugs.
+
 ## Building your first Activity
 
 ### TypeScript example:
